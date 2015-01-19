@@ -1,0 +1,242 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-media-query/core-media-query.html">
+<link rel="import" href="../core-selector/core-selector.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../core-list/core-list.html">
+
+<script src="../moment/min/moment-with-locales.min.js"></script>
+
+<polymer-element name="paper-date-picker" extends="core-selector" attributes="locale minYear maxYear">
+  <template>
+    <core-media-query query="max-width: 560px" queryMatches="{{narrow}}"></core-media-query>
+    <style shim-shadowdom>
+      :host {
+        -webkit-font-smoothing: antialiased;
+        display: inline-block;
+        color: #757575;
+        font-size: 14px;
+      }
+
+      /** Horizontal ******************/
+      #datePicker {
+        width: 512px;
+        height: 248px;
+      }
+      #heading, 
+      .cal, :host /deep/ .cal {
+        width: 256px !important;
+      }
+      #heading,
+      .cal-wrap, :host /deep/ .cal-wrap {
+        height: 248px;
+      }
+
+      /** Narrow *********************/
+      :host[narrow] #datePicker {
+        width: 280px;
+        height: 496px;
+      }
+      :host[narrow] #heading,
+      :host[narrow] .cal, :host[narrow] /deep/ .cal {
+        width: 280px !important;
+      }
+
+      /** Heading ********************/
+      #heading {
+        color: #fff; 
+        background: #009688;
+        text-align: center;
+        font-kerning: auto;
+        letter-spacing: normal;
+      }
+      #heading .weekday {
+        background :#00796b;
+        padding: 8px;
+        font-size: 14px;
+      }
+      #heading .date {
+        padding: 24px;
+        font-weight: normal;
+      }
+      #heading .date .month {
+        font-size: 24px;
+        text-transform: uppercase;
+      }
+      #heading .date .day {
+        font-size: 78px;
+      }
+      #heading .date .year {
+        font-size: 24px;
+        color: #8acfc8;
+      }
+
+      /** Calendar *******************/
+      #calendarList .calendar-month {
+      }
+      #calendarList .month-name {
+        padding: 8px;
+        font-size: 14px;
+        text-align: center;
+        font-weight: 500;
+      }
+      #calendarList .month-weekdays {
+        padding: 0 6px;
+      }
+      #calendarList .month-days {
+        padding: 0 6px;
+        margin-bottom: 6px;
+      }
+      #calendarList .day {
+        width: 34px;
+        height: 32px;
+        margin: 0;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 34px;
+        cursor: pointer;
+      }
+      #calendarList .month-weekdays .day {
+        height: 20px;
+        line-height: 20px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      #calendarList .month-days .day.selected {
+        color:#fff; 
+        background:#009688;
+        border-radius: 18px;
+      }
+
+      /* hide the scrollbar */
+      #calendar {
+        overflow: hidden;
+      }
+      #calendarList {
+        padding-right: 50px;
+      }
+
+    </style>
+    <shadow target="{{$.calendarList}}" itemSelector=".month-days .day"></shadow>
+    <div id="datePicker" layout vertical?="{{narrow}}" horizontal?="{{!narrow}}">
+      <template if="{{showHeading}}">
+        <div id="heading" layout vertical>
+          <div class="weekday">{{value|dateFormat('dddd')}}</div>
+          <div class="date" flex layout vertical justified>
+            <div class="month">{{value|dateFormat('MMM')}}</div>
+            <div class="day">{{value|dateFormat('D')}}</div>
+            <div class="year">{{value|dateFormat('YYYY')}}</div>
+          </div>
+        </div>
+      </template>
+      <div id="calendar" class="cal cal-wrap">
+        <core-list id="calendarList" class="cal cal-wrap" data="{{months}}" selectionEnabled="false">
+          <template>
+            <div class="calendar-month cal">
+              <div class="month-name">{{monthNames[model.month]}} {{model.year}}</div>
+              <div class="month-weekdays" layout horizontal>
+                <template repeat="{{weekday in weekdays}}">
+                  <div class="day">{{weekday[0]}}</div>
+                </template>
+              </div>
+              <div class="month-days" layout horizontal wrap>
+                <template repeat="{{model.days}}">
+                  <div class="day">{{day}}</div>
+                </template>
+              </div>
+            </div>
+          </template>
+        </core-list>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    Polymer("paper-date-picker", {
+      publish: {
+        locale: '',
+        showHeading: true,
+        narrow: {type: 'boolean', value: false, reflect: true},
+      },
+      localeChanged: function() {
+        moment.locale(this.locale);
+      },
+      dateClicked: function(e) {
+        var element = e.originalTarget ? e.originalTarget : e.toElement;
+      },
+      days: [],
+      months: [],
+      ready: function() {
+        // initialize core-selector
+        this.super();
+        this.narrow = false;
+        this.localeChanged();
+        this.weekdays = moment.weekdays();
+        this.monthNames = moment.months();
+
+        if (!this.value) {
+          this.value = new Date();
+        }
+        if (!this.minYear) {
+          this.minYear = this.value.getFullYear() - 0;
+        }
+        if (!this.maxYear) {
+          this.maxYear = this.value.getFullYear() + 100;
+        }
+
+        // populate calendar
+        // TODO: is there a way for core-list to dynamically generate data on-demand?
+        var initialYear = this.value.getFullYear();
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
+        var year, month, date, days, padStart, padEnd, daysInMonth, m, d;
+        month = new Date();
+        for (year=this.minYear; year<=this.maxYear; year++) {
+          month.setYear(year); 
+          for (m=0; m<12; m++) {
+            // get last day of the month
+            month.setMonth(m+1);
+            month.setDate(0);
+            daysInMonth = month.getDate();
+            padEnd = 6 - month.getDay();
+            month.setYear(year);
+            month.setMonth(m);
+            month.setDate(1);
+            padStart = month.getDay();
+            days = [];
+            for (d=0; d<padStart; d++) {
+              days.push({});
+            }
+            for (d=1; d<=daysInMonth; d++) {
+              date = new Date(year, m, d);
+              days.push({
+                date: date,
+                day: d,
+                isToday: date == today
+              });
+            }
+            for (d=0; d<padEnd; d++) {
+              days.push({});
+            }
+            this.months.push({
+              month: m,
+              year: year,
+              days: days
+            });
+          }
+        }
+        //this.scrollToDate(this.value);
+      },
+      scrollToDate: function(date) {
+        if (!date) {
+          date = this.value;
+        }
+        var yearStart = (date.getFullYear() - this.minYear) * 12;
+        this.$.calendarList.scrollToItem(yearStart + date.getMonth());
+      }
+    });
+
+    PolymerExpressions.prototype.dateFormat = function(date, format) {
+      return moment(date).format(format);
+    };
+  </script>
+</polymer-element>

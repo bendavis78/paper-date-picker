@@ -1,0 +1,34 @@
+{
+  "name": "paper-date-picker",
+  "version": "0.1.0",
+  "authors": [
+    "Ben Davis <bendavis78@gmail.com>"
+  ],
+  "description": "Polymer element that represents a complex entity such as a calendar event or a contact.",
+  "keywords": [
+    "web-component",
+    "web-components",
+    "polymer",
+    "datepicker",
+    "paper-date-picker"
+  ],
+  "main": "paper-date-picker.html",
+  "license": "MIT",
+  "homepage": "http://bendavis78.github.io/paper-date-picker/components/paper-date-picker/index.html",
+  "ignore": [
+    "/.*",
+    "/tests/"
+  ],
+  "dependencies": {
+    "moment": "~2.8.3",
+    "polymer": "Polymer/polymer#0.5.2",
+    "webcomponents": "Polymer/webcomponentsjs#0.5.2",
+    "core-selector": "Polymer/core-selector#0.5.2",
+    "core-list": "Polymer/core-list#0.5.2",
+    "core-media-query": "Polymer/core-media-query#0.5.2",
+    "paper-button": "Polymer/paper-button#0.5.2"
+  },
+  "devDependencies": {
+    "web-component-tester": "Polymer/web-component-tester#^0.7.3"
+  }
+}

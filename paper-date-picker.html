@@ -200,7 +200,8 @@ Android.
         narrow: {type: 'boolean', value: false, reflect: true},
       },
       observe: {
-        '$.calendarList._viewportSize': '_viewportSizeChanged'
+        '$.calendarList._viewportSize': '_viewportSizeChanged',
+        '$.calendarList._scrollTop': '_scrollTopChanged'
       },
       localeChanged: function() {
         moment.locale(this.locale);
@@ -223,74 +224,86 @@ Android.
         if (!this.value) {
           this.value = new Date();
         }
-      
-        // prepopulate with +/- two months
-        var prepopulate = 2;
-        var initialMonth = new Date(this.value.getFullYear(), this.value.getMonth() - prepopulate) 
-        this.populateCalendar(initialMonth, 1 + (prepopulate * 2));
 
-        // scroll to the current date
+        // add the current month to the calendar
+        this.addMonthToCalendar(this.value);
+        this.loadMoreUpper();
+        this.loadMoreLower();
         this.scrollToDate();
       },
       loadMoreUpper: function(e) {
-        console.log('hit upper threshold');
-        // get prev month
-        var date = new Date(this._listStartMonth.getTime());
-        date.setMonth(date.getMonth()-1);
-        this.populateCalendar(date, -2);
-        e.target.clearUpper();
+        this.populateCalendar(-2);
+        e && e.target.clearUpper();
       },
       loadMoreLower: function(e) {
-        console.log('hit lower threshold');
-        // get next month
-        var date = new Date(this._listStartMonth.getTime());
-        date.setMonth(date.getMonth()+1);
-        this.populateCalendar(date, 2);
-        e.target.clearLower();
+        this.populateCalendar(2);
+        e && e.target.clearLower();
       },
-      populateCalendar: function(startMonth, count) {
-        // negative count populates at the front of the list, positive count at the end.
-        var month, date, days, padStart, padEnd, daysInMonth, push, m, d, n, s;
-        s = count < 0 ? -1 : 1;
-        push = count < 0 ? 'unshift' : 'push';
-        count = Math.abs(count)
-        for (n=0; n<count; n++) {
-          // get last day of the month
-          m = startMonth.getMonth() + (n * s);
-          month = new Date(startMonth.getFullYear(), m);
-          padStart = month.getDay();
-          year = month.getFullYear();
-          monthIdx = month.getMonth();
+      populateCalendar: function(count) {
+        // negative count adds to front of the list, positive count adds to the end.
 
-          if (!this._listStartMonth || month < this._listStartMonth) {
-            this._listStartMonth = month;
-          }
-
-          days = [];
-          // add "padding" days
-          for (d=0; d<padStart; d++) {
-            days.push({date: null});
-          }
-          // add actual days 
-          d = 1;
-          while (month.getMonth() == monthIdx) {
-            date = new Date(year, monthIdx, d);
-            days.push({
-              date: date,
-              isToday: date.getTime() == this.today.getTime()
-            });
-            month.setDate(++d);
-          }
-          // set month back one day
-          month.setDate(0);
-
-          // use push/unshift when appropriate
-          this.months[push]({
-            month: month.getMonth(),
-            year: month.getFullYear(),
-          });
-          this.days[push](days);
+        if (!this.months) {
+          this.addMonthToCalendar(this.value);
         }
+
+        // When adding content above, keep the current content in the viewport
+        if (count < 0 && this._calendarReady) {
+          var cal = this.$.calendarList;
+          var origHeight = cal.scrollHeight;
+          var origTop = cal.scrollTop;
+          var origCount = count;
+          var magic = 53;  // TODO: find source of this black magic
+          var restoreScrollPos = function() {
+            cal.scrollTop = (cal.scrollHeight - origHeight) + origTop - magic;
+            this.removeEventListener('calendar-size-changed', restoreScrollPos);
+          }.bind(this);
+          this.addEventListener('calendar-size-changed', restoreScrollPos);
+        }
+
+        // populate `count` months
+        var startMonth = count < 0 ? this.months[0] : this.months[this.months.length-1];
+        var month;
+        for (var n=1; n<=Math.abs(count); n++) {
+          month = new Date(startMonth.year, startMonth.month + (count < 0 ? -n: n));
+          this.addMonthToCalendar(month, count < 0);
+        }
+      },
+      addMonthToCalendar: function(month, prepend) {
+        month = new Date(month.getTime());  // clone value
+        var days = [];
+        var monthIdx = month.getMonth();
+        var pad = month.getDay();
+        var year = month.getFullYear();
+
+        if (!this._listStartMonth || month < this._listStartMonth) {
+          this._listStartMonth = month;
+        }
+
+        // add "padding" days
+        for (d=0; d<pad; d++) {
+          days.push({date: null});
+        }
+
+        // add actual days 
+        var date, d = 1;
+        while (month.getMonth() == monthIdx) {
+          date = new Date(year, monthIdx, d);
+          days.push({
+            date: date,
+            isToday: date.getTime() == this.today.getTime()
+          });
+          month.setDate(++d);
+        }
+        // reset month back one day
+        month.setDate(0);
+
+        // use push/unshift when appropriate
+        add = prepend ? 'unshift' : 'push';
+        this.months[add]({
+          year: month.getFullYear(),
+          month: month.getMonth()
+        });
+        this.days[add](days);
       },
       getMonthIdx: function(year, month) {
         var yearDiff = (year - this._listStartMonth.getFullYear());
@@ -309,9 +322,13 @@ Android.
       scrollToMonth: function(year, month) {
         var idx = this.getMonthIdx(year, month);
         var cal = this.$.calendarList;
-        this.addEventListener('viewport-ready', function() {
+        if (!this._calendarReady) {
+          this.addEventListener('calendar-ready', function() {
+            cal.scrollToGroup(idx);
+          });
+        } else {
           cal.scrollToGroup(idx);
-        });
+        }
       },
       scrollToDate: function(date) {
         if (!date) {
@@ -320,10 +337,11 @@ Android.
         this.scrollToMonth(date.getFullYear(), date.getMonth());
       },
       _viewportSizeChanged: function() {
-        if (!this._viewportReady) {
-          this._viewportReady = true;
-          this.fire('viewport-ready');
+        if (!this._calendarReady) {
+          this._calendarReady = true;
+          this.fire('calendar-ready');
         }
+        this.fire('calendar-size-changed');
       },
       selectedDateChanged: function() {
         this.value = this.selectedDate.date;
@@ -334,29 +352,12 @@ Android.
       valueChanged: function() {
         console.log('valueChanged: ', this.value);
       },
-      updateSize: function() {
-        this.$.calendarList.updateSize();
-      }
     });
 
     PolymerExpressions.prototype.dateFormat = function(date, format) {
       if (!date) return '';
       return moment(date).format(format);
     };
-
-    /**
-     * TODO
-     * When we call scrollToGroup() after the  core-list is initialized (or as
-     * we currently understand it to be  initialized), it hides the groups before
-     * that group. When we call the  same function after we manually wait for
-     * things to load and call it in  the console, it scrolls as expected and
-     * does not hide anything.
-     * 
-     * To figure out why, we need to compare the state of the calendarList
-     * object when we DON'T call scrollToGroup(), to its state when we DO call
-     * scrollToGroup(). Then we can figure out what the hell is causing the
-     * items to be hidden.
-     */
 
     window.serialize = function(obj) {
       var func = function(key, val) {

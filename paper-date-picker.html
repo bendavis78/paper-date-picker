@@ -150,9 +150,9 @@ Android.
         <div id="heading" class="heading-content" layout vertical>
           <div class="weekday">{{value|dateFormat('dddd')}}</div>
           <div class="date" flex layout vertical justified>
-            <div class="month" on-tap="{{changeMonth}}">{{value|dateFormat('MMM')}}</div>
-            <div class="day" on-tap="{{changeDay}}">{{value|dateFormat('D')}}</div>
-            <div class="year" on-tap="{{changeYear}}">{{value|dateFormat('YYYY')}}</div>
+            <div class="month" on-tap="{{tapHeadingMonth}}">{{value|dateFormat('MMM')}}</div>
+            <div class="day" on-tap="{{tapHeadingDay}}">{{value|dateFormat('D')}}</div>
+            <div class="year" on-tap="{{tapHeadingYear}}">{{value|dateFormat('YYYY')}}</div>
           </div>
         </div>
       </template>
@@ -252,8 +252,9 @@ Android.
           var origHeight = cal.scrollHeight;
           var origTop = cal.scrollTop;
           var origCount = count;
-          var magic = 53;  // TODO: find source of this black magic
+          var magic = 53;  // TODO: this magic seems to need to increase with total height
           var restoreScrollPos = function() {
+            cal.updateMetrics();
             cal.scrollTop = (cal.scrollHeight - origHeight) + origTop - magic;
             this.removeEventListener('calendar-size-changed', restoreScrollPos);
           }.bind(this);
@@ -310,16 +311,30 @@ Android.
         var monthDiff = (month - this._listStartMonth.getMonth());
         return (yearDiff * 12) + monthDiff;
       },
-      changeDay: function() {
-        this.$.pages.selected = 0;
+      tapHeadingDay: function() {
+        if (this.$.pages.selected != 0) {
+          this.$.pages.selected = 0;
+        } else {
+          this.scrollToDate();
+        }
       },
-      changeMonth: function() {
+      tapHeadingMonth: function() {
         this.$.pages.selected = 1;
       },
-      changeYear: function() {
+      tapHeadingYear: function() {
         this.$.pages.selected = 2;
       },
+      populateCalendarToMonth: function(year, month) {
+        var idx = this.getMonthIdx(year, month);
+        console.log(this.months.length, idx);
+        if (idx < 0) {
+          this.populateCalendar(idx);
+        } else if (idx >= this.months.length) {
+          this.populateCalendar((idx - this.months.length) + 1)
+        }
+      },
       scrollToMonth: function(year, month) {
+        this.populateCalendarToMonth(year, month);
         var idx = this.getMonthIdx(year, month);
         var cal = this.$.calendarList;
         if (!this._calendarReady) {

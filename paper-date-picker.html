@@ -182,9 +182,9 @@ Android.
           </div>
         </section>
         <section id="chooseYear" fit>
-          <core-list id="yearList" data="{{years}}" cross-fade fit>
+          <core-list id="yearList" data="{{years}}" selection="{{selectedYear}}" cross-fade fit layout vertical center>
             <template>
-              <paper-item class="year" class="{{ {selected: selected} | tokenList}}"><div>{{model.year}}</div></paper-item>
+              <paper-item class="year" class="{{ {selected: selected} | tokenList}}" layout horizontal center><div>{{model.year}}</div></paper-item>
             </template>
           </core-list>
         </section>
@@ -200,8 +200,8 @@ Android.
         narrow: {type: 'boolean', value: false, reflect: true},
       },
       observe: {
-        '$.calendarList._viewportSize': '_viewportSizeChanged',
-        '$.calendarList._scrollTop': '_scrollTopChanged'
+        '$.calendarList._viewportSize': '_calendarSizeChanged',
+        '$.yearList._viewportSize': '_yearListSizeChanged'
       },
       localeChanged: function() {
         moment.locale(this.locale);
@@ -229,6 +229,7 @@ Android.
         this.endYear = 2100;
         this.populateCalendar();
         this.scrollToDate();
+        this.yearListScrollToYear(this.value.getFullYear());
       },
       populateCalendar: function() {
         var year, month, days, day, date = new Date();
@@ -237,6 +238,7 @@ Android.
         var thisDay = this.today.getDate();
 
         for (year=this.startYear; year<=this.endYear; year++) {
+          this.years.push({year: year});
           date.setYear(year);
           for (month=0; month<12; month++) {
             days = [];
@@ -281,7 +283,8 @@ Android.
         }
       },
       tapHeadingMonth: function() {
-        this.$.pages.selected = 1;
+        // this.$.pages.selected = 1;
+        this.tapHeadingDay();
       },
       tapHeadingYear: function() {
         this.$.pages.selected = 2;
@@ -303,21 +306,38 @@ Android.
         }
         this.scrollToMonth(date.getFullYear(), date.getMonth());
       },
-      _viewportSizeChanged: function() {
+      yearListScrollToYear: function(year) {
+        if (!this._yearListReady) {
+          this.addEventListener('year-list-ready', function() {
+            var idx = year - this.startYear;
+            this.$.yearList.scrollToItem(idx);
+          }.bind(this));
+        }
+      },
+      _calendarSizeChanged: function() {
         if (!this._calendarReady) {
           this._calendarReady = true;
           this.fire('calendar-ready');
         }
         this.fire('calendar-size-changed');
       },
+      _yearListSizechanged: function() {
+        if (!this._yearListReady) {
+          this._yearListReady = true;
+          this.fire('year-list-ready');
+        }
+        this.fire('year-list-size-changed');
+      },
       selectedDateChanged: function() {
         this.value = this.selectedDate.date;
       },
       selectedYearChanged: function() {
         console.log('year changed');
+        this.scrollToMonth(this.selectedYear, 0);
       },
       valueChanged: function() {
         console.log('valueChanged: ', this.value);
+        // TODO 
       },
     });
 

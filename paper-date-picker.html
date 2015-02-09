@@ -159,7 +159,7 @@ Android.
       <core-animated-pages selectedProperty="active" transitions="cross-fade" id="pages" notap relative>
         <section id="chooseDay" fit>
           <core-scroll-threshold id="calendarListThreshold" scrollTarget="{{$.calendarList}}" 
-            lowerThreshold="200" upperThreshold="200" on-lower-trigger="{{loadMoreLower}}" on-upper-trigger="{{loadMoreUpper}}"></core-scroll-threshold>
+            lowerThreshold="512" upperThreshold="512" on-lower-trigger="{{loadMoreLower}}" on-upper-trigger="{{loadMoreUpper}}"></core-scroll-threshold>
           <core-list id="calendarList" data="{{days}}" groups="{{months}}" selection="{{selectedDate}}" grid width="34" height="32" cross-fade fit>
             <template>
               <div class="divider" divider>
@@ -232,11 +232,11 @@ Android.
         this.scrollToDate();
       },
       loadMoreUpper: function(e) {
-        this.populateCalendar(-2);
+        this.populateCalendar(-12);
         e && e.target.clearUpper();
       },
       loadMoreLower: function(e) {
-        this.populateCalendar(2);
+        this.populateCalendar(12);
         e && e.target.clearLower();
       },
       populateCalendar: function(count) {
@@ -252,10 +252,8 @@ Android.
           var origHeight = cal.scrollHeight;
           var origTop = cal.scrollTop;
           var origCount = count;
-          var magic = 53;  // TODO: this magic seems to need to increase with total height
           var restoreScrollPos = function() {
-            cal.updateMetrics();
-            cal.scrollTop = (cal.scrollHeight - origHeight) + origTop - magic;
+            cal.scrollTop = (cal.scrollHeight - origHeight) + origTop;
             this.removeEventListener('calendar-size-changed', restoreScrollPos);
           }.bind(this);
           this.addEventListener('calendar-size-changed', restoreScrollPos);

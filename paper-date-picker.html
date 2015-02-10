@@ -125,9 +125,6 @@ Android.
       #calendarList paper-item {
         border-radius: 18px;
       }
-      paper-item.selected {
-        color
-      }
       paper-item /deep/ .button-content {
         padding: 0;
       }
@@ -137,8 +134,7 @@ Android.
         height: 32px;
       }
 
-      #yearList .year div {
-        display: block;
+      #yearList .year {
         width: 64px;
         height: 64px;
         border-radius: 32px;
@@ -148,11 +144,11 @@ Android.
     <div id="datePicker" layout vertical?="{{narrow}}" horizontal?="{{!narrow}}">
       <template if="{{showHeading}}">
         <div id="heading" class="heading-content" layout vertical>
-          <div class="weekday">{{value|dateFormat('dddd')}}</div>
+          <div class="weekday">{{headingDate|dateFormat('dddd')}}</div>
           <div class="date" flex layout vertical justified>
-            <div class="month" on-tap="{{tapHeadingMonth}}">{{value|dateFormat('MMM')}}</div>
-            <div class="day" on-tap="{{tapHeadingDay}}">{{value|dateFormat('D')}}</div>
-            <div class="year" on-tap="{{tapHeadingYear}}">{{value|dateFormat('YYYY')}}</div>
+            <div class="month" on-tap="{{tapHeadingMonth}}">{{headingDate|dateFormat('MMM')}}</div>
+            <div class="day" on-tap="{{tapHeadingDay}}">{{headingDate|dateFormat('D')}}</div>
+            <div class="year" on-tap="{{tapHeadingYear}}">{{headingDate|dateFormat('YYYY')}}</div>
           </div>
         </div>
       </template>
@@ -194,14 +190,21 @@ Android.
 
   <script>
     Polymer("paper-date-picker", {
+      once: function(obj, eventName, callback) {
+        var doCallback = function() {
+          callback.apply(obj, arguments);
+          obj.removeEventListener(eventName, doCallback);
+        };
+        obj.addEventListener(eventName, doCallback);
+      },
       publish: {
         locale: '',
         showHeading: true,
         narrow: {type: 'boolean', value: false, reflect: true},
       },
       observe: {
-        '$.calendarList._viewportSize': '_calendarSizeChanged',
-        '$.yearList._viewportSize': '_yearListSizeChanged'
+        '$.calendarList._viewportSize': '_setCalendarReady',
+        '$.yearList._viewportSize': '_setYearListReady',
       },
       localeChanged: function() {
         moment.locale(this.locale);
@@ -220,16 +223,19 @@ Android.
         this.monthNames = moment.months();
         this.isTouch = 'ontouchstart' in window;
         this.localeChanged();
-
-        if (!this.value) {
-          this.value = new Date();
-        }
-
         this.startYear = 1900;
         this.endYear = 2100;
         this.populateCalendar();
-        this.scrollToDate();
-        this.yearListScrollToYear(this.value.getFullYear());
+        this.headingDate = this.value ? this.value : new Date();
+        this.scrollToDate(this.headingDate);
+
+        // track page transitions
+        this.$.pages.addEventListener('core-animated-pages-transition-prepare', function() {
+          this._pageTransitioning = true;
+        });
+        this.$.pages.addEventListener('core-animated-pages-transition-end', function() {
+          this._pageTransitioning = false;
+        });
       },
       populateCalendar: function() {
         var year, month, days, day, date = new Date();
@@ -238,7 +244,6 @@ Android.
         var thisDay = this.today.getDate();
 
         for (year=this.startYear; year<=this.endYear; year++) {
-          this.years.push({year: year});
           date.setYear(year);
           for (month=0; month<12; month++) {
             days = [];
@@ -261,13 +266,15 @@ Android.
               });
               date.setDate(++day);
             }
-
-            this.months.push({
+            monthData = {
               year: year,
-              month: month
-            });
+              month: month,
+              days: days
+            }
+            this.months.push(monthData);
             this.days.push(days);
           }
+          this.years.push({year: year});
         }
       },
       getMonthIdx: function(year, month) {
@@ -277,9 +284,11 @@ Android.
       },
       tapHeadingDay: function() {
         if (this.$.pages.selected != 0) {
-          this.$.pages.selected = 0;
+          this.selectPage(0, function() {
+            this.scrollToDate(this.headingDate);
+          }.bind(this));
         } else {
-          this.scrollToDate();
+          this.scrollToDate(this.headingDate);
         }
       },
       tapHeadingMonth: function() {
@@ -287,7 +296,25 @@ Android.
         this.tapHeadingDay();
       },
       tapHeadingYear: function() {
-        this.$.pages.selected = 2;
+        var idx = this.headingDate.getFullYear() - this.startYear;
+        this.$.yearList.$.selection.select(idx);
+        if (!this._yearListReady) {
+          this.addEventListener('year-list-ready', function() {
+            this.$.yearList.scrollToItem(idx);
+            this.$.yearList.scrollTop -= 94;
+          }.bind(this));
+        } else {
+          this.$.yearList.scrollToItem(idx);
+          this.$.yearList.scrollTop -= 94;
+        }
+        this.selectPage(2);
+      },
+      selectPage: function(page, callback) {
+        if (this._pageTransitioning) return;
+        if (callback) {
+          this.once(this.$.pages, 'core-animated-pages-transition-end', callback);
+        }
+        this.$.pages.selected = page;
       },
       scrollToMonth: function(year, month) {
         var idx = this.getMonthIdx(year, month);
@@ -306,30 +333,22 @@ Android.
         }
         this.scrollToMonth(date.getFullYear(), date.getMonth());
       },
-      yearListScrollToYear: function(year) {
-        if (!this._yearListReady) {
-          this.addEventListener('year-list-ready', function() {
-            var idx = year - this.startYear;
-            this.$.yearList.scrollToItem(idx);
-          }.bind(this));
-        }
-      },
-      _calendarSizeChanged: function() {
+      _setCalendarReady: function() {
         if (!this._calendarReady) {
           this._calendarReady = true;
           this.fire('calendar-ready');
         }
-        this.fire('calendar-size-changed');
       },
-      _yearListSizechanged: function() {
+      _setYearListReady: function() {
         if (!this._yearListReady) {
           this._yearListReady = true;
           this.fire('year-list-ready');
         }
-        this.fire('year-list-size-changed');
       },
       selectedDateChanged: function() {
-        this.value = this.selectedDate.date;
+        console.log(arguments);
+        var d = this.selectedDate;
+        this.value = new Date(d.year, d.month, d.day);
       },
       selectedYearChanged: function() {
         console.log('year changed');
@@ -337,7 +356,19 @@ Android.
       },
       valueChanged: function() {
         console.log('valueChanged: ', this.value);
-        // TODO 
+        this.headingDate = this.value;
+        var year = this.value.getFullYear();
+        var month = this.value.getMonth();
+        var idx = this.getMonthIdx(year, month);
+        var monthStart = (new Date(year, month, 1)).getDay();
+        var day = this.days[idx][monthStart + this.value.getDate() - 1];
+        if (!this._calendarReady) {
+          this.addEventListener('calendar-ready', function() {
+            this.$.calendarList.$.selection.select(day);
+          });
+        } else {
+          this.$.calendarList.$.selection.select(day);
+        }
       },
     });
 

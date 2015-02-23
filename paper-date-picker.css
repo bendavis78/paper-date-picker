@@ -1,0 +1,130 @@
+:host {
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  color: #757575;
+  font-size: 14px;
+}
+
+/** hide list scrollbars */
+core-list::-webkit-scrollbar {
+  width: 0 !important 
+}
+/** Horizontal ******************/
+#datePicker {
+  width: 512px;
+  height: 248px;
+}
+#heading, 
+#pages {
+  width: 256px !important;
+  height: 248px;
+}
+
+/** Narrow *********************/
+:host[narrow] #datePicker {
+  width: 280px;
+  height: 496px;
+}
+:host[narrow] #heading,
+:host[narrow] #pages {
+  width: 280px !important;
+}
+
+/** Heading ********************/
+#heading {
+  color: #fff; 
+  background: #009688;
+  text-align: center;
+  font-kerning: auto;
+  letter-spacing: normal;
+}
+#heading .weekday {
+  background :#00796b;
+  padding: 8px;
+  font-size: 14px;
+}
+#heading .date {
+  cursor: pointer;
+  padding: 24px;
+  font-weight: normal;
+}
+#heading .date .month {
+  cursor: pointer;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+#heading .date .day {
+  cursor: pointer;
+  font-size: 78px;
+}
+#heading .date .year {
+  font-size: 24px;
+  color: #8acfc8;
+}
+#heading.pg-chooseYear .date .month,
+#heading.pg-chooseYear .date .day {
+  color: #8acfc8;
+}
+#heading.pg-chooseYear .date .year {
+  color: inherit; 
+}
+
+/** Calendar *******************/
+#pages {
+  background: #fff;
+}
+#calendarList .month-name {
+  cursor: pointer;
+  padding: 8px;
+  font-size: 14px;
+  text-align: center;
+  font-weight: bold;
+}
+#calendarList .month-weekdays {
+  font-size: 13px;
+  font-weight: bold;
+}
+#calendarList .month-weekdays .day {
+  height: 20px;
+  line-height: 20px;
+  cursor: pointer;
+}
+#calendarList .day {
+  padding: 0 1px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  line-height: 32px;
+  text-align: center;
+  vertical-align: middle;
+}
+#calendarList core-item.day div {
+  width: 32px;
+  height: 32px;
+  border-radius: 18px;
+}
+#calendarList core-item.day.today {
+  color: #009688;
+}
+
+/** Year List *******************/
+#yearList .year {
+  height: 68px;
+}
+#yearList .year div {
+  text-align: center;
+  vertical-align: middle;
+  line-height: 64px;
+  margin: 2px;
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
+}
+
+paper-item /deep/ .button-content {
+  padding: 0;
+}
+core-item.selected div,
+paper-item.selected div {
+  background: #B6D9D6;
+}

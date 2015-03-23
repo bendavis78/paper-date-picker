@@ -1,0 +1,48 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../core-scroll-threshold/core-scroll-threshold.html">
+<link rel="import" href="../core-selector/core-selector.html">
+
+<script src="date-utils.js"></script>
+<script src="paper-calendar.js"></script>
+
+<polymer-element name="paper-calendar" attributes="locale minYear maxYear">
+  <template>
+    <link rel="stylesheet" href="paper-calendar.css">
+    <!-- TODO
+    <core-scroll-threshold id="calendarListThreshold" scrollTarget="{{$.calendarList}}" 
+      lowerThreshold="256" upperThreshold="256" on-lower-trigger="{{loadMoreLower}}" 
+      on-upper-trigger="{{loadMoreUpper}}"></core-scroll-threshold>
+    -->
+    <core-selector id="calendarSelector" target="{{$.calendarList}}" valueAttr="label"
+      itemsSelector=".month-days .day-item:not([disabled])"
+      on-core-select="{{dateSelected}}"></core-selector>
+    <div id="calendarList" cross-fade fit>
+      <template repeat="{{month in months}}">
+        <div class="month month-{{month.year}}-{{month.month}}">
+          <div class="month-header" layout vertical center>
+            <div class="month-name" on-press="{{scrollToMonth(month.year, month.month)}}">
+              {{monthNames[month.month]}} {{month.year}}
+            </div>
+            <div class="month-weekdays" layout horizontal>
+              <template repeat="{{weekday in weekdays}}">
+                <div class="day">{{weekday[0]}}</div>
+              </template>
+            </div>
+          </div>
+          <div class="month-days" layout vertical center>
+            <template repeat="{{week in month.days}}">
+              <div class="week" layout horizontal>
+                <template repeat="{{week}}">
+                  <div label="{{name}}" disabled?="{{!day}}" class="day-item {{ {today: isToday, selected: selected} | tokenList }}" 
+                    layout vertical center>
+                    <div class="day">{{day}}</div>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </div>
+      </template>
+    </div>
+  </template>
+</polymer-element>

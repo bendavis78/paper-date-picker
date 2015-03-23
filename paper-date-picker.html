@@ -1,9 +1,12 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../core-media-query/core-media-query.html">
 <link rel="import" href="../core-scroll-threshold/core-scroll-threshold.html">
-<link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../core-animated-pages/core-animated-pages.html">
 <link rel="import" href="../core-list/core-list.html">
+<link rel="import" href="paper-calendar.html">
+
+<script src="../moment/min/moment-with-locales.min.js"></script>
+<script src="date-utils.js"></script>
 
 <!--
 Material Design [Pickers](http://www.google.com/design/spec/components/pickers.html)
@@ -12,8 +15,6 @@ Provides a responsive date picker based on the material design spec. This
 component aims to be a clone of the date picker found on Google Calendar for
 Android. 
 -->
-
-<script src="../moment/min/moment-with-locales.min.js"></script>
 
 <polymer-element name="paper-date-picker" attributes="locale minYear maxYear">
   <template>
@@ -30,36 +31,16 @@ Android.
           </div>
         </div>
       </template>
-      <core-animated-pages selectedProperty="active" transitions="cross-fade" id="pages" notap relative class="noscroll">
+      <core-animated-pages selectedProperty="active" transitions="cross-fade" id="pages" notap relative class="hide-scrollbar">
         <section id="chooseDay" fit class="noscroll-inner">
-          <core-scroll-threshold id="calendarListThreshold" scrollTarget="{{$.calendarList}}" 
-            lowerThreshold="512" upperThreshold="512" on-lower-trigger="{{loadMoreLower}}" 
-            on-upper-trigger="{{loadMoreUpper}}"></core-scroll-threshold>
-          <core-list class="noscroll-scroller" id="calendarList" data="{{days}}" groups="{{months}}" selection="{{selectedDate}}" 
-            grid width="34" height="32" cross-fade fit>
-            <template>
-              <div class="divider" divider>
-                <div class="month-name" on-press="{{scrollToMonth(model.year, model.month)}}">
-                  {{monthNames[groupModel.month]}} {{groupModel.year}}
-                </div>
-                <div class="month-weekdays" layout horizontal>
-                  <template repeat="{{weekday in weekdays}}">
-                    <div class="day">{{weekday[0]}}</div>
-                  </template>
-                </div>
-              </div>
-              <core-item disabled?="{{!model.day}}" class="day {{ {today: model.isToday, selected: selected} | tokenList }}" 
-                layout vertical center>
-                <div>{{model.day}}</div>
-              </paper-item>
-            </template>
-          </core-list>
+          <paper-calendar id="calendar" locale="{{locale}}" minYear="{{minYear}}" maxYear="{{maxYear}}" on-date-select="{{dateSelected}}"></paper-calendar>
         </section>
         <section id="chooseYear" fit>
-          <core-list id="yearList" data="{{years}}" selection="{{selectedYear}}" cross-fade fit layout vertical>
-            <template>
-              <paper-item class="year {{ {selected: selected, } | tokenList}}" 
-                layout horizontal center-justified><div>{{model.year}}</div></paper-item>
+          <core-selector id="yearSelector" target="{{$.yearList}}" valueAttr="label" 
+            itemSelector="#yearList .year" on-core-select="{{yearSelected}}">
+          <div id="yearList" cross-fade fit layout vertical>
+            <template repeat="{{year in years}}">
+              <div class="year" label="{{year}}" layout horizontal center-justified><div>{{year}}</div></div>
             </template>
           </core-list>
         </section>

@@ -1,0 +1,48 @@
+#calendarList {
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.month {
+  padding: 0;
+}
+.month-name {
+  cursor: pointer;
+  padding: 8px;
+  font-size: 14px;
+  text-align: center;
+  font-weight: bold;
+}
+.month-weekdays {
+  font-size: 13px;
+  font-weight: bold;
+}
+.month-weekdays .day {
+  height: 20px;
+  line-height: 20px;
+}
+.week {
+  width: 238px;
+}
+.day {
+  padding: 0 1px;
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  line-height: 32px;
+  text-align: center;
+  vertical-align: middle;
+}
+.day-item:not([disabled]) .day {
+  border-radius: 18px;
+  cursor: pointer;
+}
+.day-item.core-selected .day {
+  background: #B6D9D6;
+}
+.day-item.today .day {
+  color: #009688;
+}
+
+:host([isTouch]) #calendarList::-webkit-scrollbar {
+  width: 0 !important 
+}

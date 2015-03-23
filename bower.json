@@ -26,7 +26,6 @@
     "core-scroll-threshold": "Polymer/core-scroll-threshold#0.5.4",
     "core-list": "Polymer/core-list#0.5.4",
     "core-media-query": "Polymer/core-media-query#0.5.4",
-    "paper-item": "Polymer/paper-item#0.5.4",
     "core-animated-pages": "Polymer/core-animated-pages#0.5.4"
   },
   "devDependencies": {

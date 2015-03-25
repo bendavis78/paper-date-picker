@@ -24,7 +24,7 @@ Android.
       <template if="{{showHeading}}">
         <div id="heading" class="heading-content pg-{{$.pages.selectedItem.id}}" layout vertical>
           <div class="weekday">{{headingDate|dateFormat('dddd')}}</div>
-          <div class="date" flex layout vertical justified>
+          <div class="date" flex layout vertical around-justified>
             <div class="month" on-tap="{{tapHeadingMonth}}">{{headingDate|dateFormat('MMM')}}</div>
             <div class="day" on-tap="{{tapHeadingDay}}">{{headingDate|dateFormat('D')}}</div>
             <div class="year" on-tap="{{tapHeadingYear}}">{{headingDate|dateFormat('YYYY')}}</div>

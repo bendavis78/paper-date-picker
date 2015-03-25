@@ -3,27 +3,27 @@
   display: inline-block;
   color: #757575;
   font-size: 14px;
+  border-radius: 5px;
 }
 
 /** Horizontal ******************/
 #datePicker {
-  width: 512px;
-  height: 248px;
+  width: 540px;
+  height: 240px;
 }
 #heading, 
 #pages {
-  width: 256px !important;
-  height: 248px;
+  width: 270px !important;
+  height: 240px;
 }
 
 /** Narrow *********************/
 :host([narrow]) #datePicker {
-  width: 280px;
-  height: 496px;
+  width: 270px;
+  height: 450px;
 }
-:host([narrow]) #heading,
-:host([narrow]) #pages {
-  width: 280px !important;
+:host([narrow]) #heading {
+  height: 210px;
 }
 
 /** Heading ********************/
@@ -41,7 +41,7 @@
 }
 #heading .date {
   cursor: pointer;
-  padding: 24px;
+  padding: 10px;
   font-weight: normal;
 }
 #heading .date .month {
@@ -65,7 +65,7 @@
   color: inherit; 
 }
 
-/** Calendar *******************/
+/** Calendar/Year picker ********/
 #pages {
   background: #fff;
 }

@@ -11,9 +11,6 @@
       narrow: {type: 'boolean', value: false, reflect: true},
       isTouch: {type: 'boolean', value: false, reflect: true}
     },
-    dateClicked: function(e) {
-      var element = e.originalTarget ? e.originalTarget : e.toElement;
-    },
     ready: function() {
       this.today = this.$.calendar.today;
       this.isTouch = 'ontouchstart' in window;

@@ -17,9 +17,6 @@
     localeChanged: function() {
       moment.locale(this.locale);
     },
-    dateClicked: function(e) {
-      var element = e.originalTarget ? e.originalTarget : e.toElement;
-    },
     ready: function() {
       this.selectedDate = null;
       this.isTouch = 'ontouchstart' in window;

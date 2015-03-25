@@ -29,6 +29,8 @@
     "core-animated-pages": "Polymer/core-animated-pages#0.5.4"
   },
   "devDependencies": {
-    "web-component-tester": "Polymer/web-component-tester#^0.7.3"
+    "web-component-tester": "Polymer/web-component-tester#^0.7.3",
+    "paper-shadow": "Polymer/paper-shadow#0.5.4",
+    "font-roboto": "Polymer/font-roboto#0.5.4"
   }
 }

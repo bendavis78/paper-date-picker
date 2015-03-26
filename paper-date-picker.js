@@ -7,7 +7,6 @@
       locale: null,
       minYear: null,
       maxYear: null,
-      showHeading: true,
       narrow: {type: 'boolean', value: false, reflect: true},
       isTouch: {type: 'boolean', value: false, reflect: true}
     },

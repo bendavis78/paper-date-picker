@@ -11,27 +11,61 @@
 
   <link rel="import" href="paper-date-picker.html">
   <link rel="import" href="../font-roboto/roboto.html">
-  <link rel="import" href="../paper-shadow/paper-shadow.html">
-  <!--
-  <link rel="import" href="../paper-button/paper-action-dialog.html">
-  -->
+  <link rel="import" href="../paper-dialog/paper-action-dialog.html">
+  <link rel="import" href="../paper-button/paper-button.html">
 
   <style shim-shadowdom>
-    body {
+    html /deep/ * {
       font-family: RobotoDraft, 'Helvetica Neue', Helvetica, Arial;
+    }
+    body {
       font-size: 14px;
-      margin: 0;
       padding: 24px;
     }
-    paper-shadow {
-      display: inline-block !important;
+    html /deep/ paper-action-dialog {
+      background: #eee;
+      border-radius: 10px;
+    }
+    html /deep/ paper-action-dialog paper-button {
+      color: #009688;
+      font-weight: 500;
+    }
+    html /deep/ paper-action-dialog::shadow #scroller {
+      padding: 0;
+    }
+    html /deep/ paper-action-dialog::shadow #scroller,
+    html /deep/ paper-action-dialog::shadow paper-shadow {
+      border-top-left-radius: 4px;
+    }
+    html /deep/ paper-action-dialog::shadow #scroller,
+    html /deep/ paper-calendar::shadow #calendarList,
+    html /deep/ paper-action-dialog::shadow paper-shadow {
+      border-top-right-radius: 4px;
+    }
+    html /deep/ paper-action-dialog::shadow #actions,
+    html /deep/ paper-action-dialog::shadow paper-shadow {
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
     }
   </style>
-
 </head>
 <body unresolved>
-  <paper-shadow>
-    <paper-date-picker></paper-date-picker>
-  </paper-shadow>
+  <template is="auto-binding">
+    <button on-tap="{{chooseDate}}">Choose Date</button>
+    <paper-action-dialog>
+      <paper-date-picker></paper-date-picker>
+      <paper-button affirmative>CANCEL</paper-button>
+      <paper-button affirmative>OK</paper-button>
+    </paper-action-dialog>
+  </template>
+  <script>
+    (function() {
+      var $ = document.querySelector.bind(document);
+      var scope = $('template');
+      scope.chooseDate = function() {
+        $('paper-action-dialog').toggle();
+      };
+    })();
+  </script>
 </body>
 </html>

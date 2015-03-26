@@ -21,24 +21,22 @@ Android.
     <link rel="stylesheet" href="paper-date-picker.css">
     <core-media-query query="max-width: 560px" queryMatches="{{narrow}}"></core-media-query>
     <div id="datePicker" layout vertical?="{{narrow}}" horizontal?="{{!narrow}}">
-      <template if="{{showHeading}}">
-        <div id="heading" class="heading-content pg-{{$.pages.selectedItem.id}}" layout vertical>
-          <div class="weekday">{{headingDate|dateFormat('dddd')}}</div>
-          <div class="date" flex layout vertical around-justified>
-            <div class="month" on-tap="{{tapHeadingMonth}}">{{headingDate|dateFormat('MMM')}}</div>
-            <div class="day" on-tap="{{tapHeadingDay}}">{{headingDate|dateFormat('D')}}</div>
-            <div class="year" on-tap="{{tapHeadingYear}}">{{headingDate|dateFormat('YYYY')}}</div>
-          </div>
+      <div id="heading" class="heading-content pg-{{$.pages.selectedItem.id}}" layout vertical>
+        <div class="weekday">{{headingDate|dateFormat('dddd')}}</div>
+        <div class="date" flex layout vertical around-justified>
+          <div class="month" on-tap="{{tapHeadingMonth}}">{{headingDate|dateFormat('MMM')}}</div>
+          <div class="day" on-tap="{{tapHeadingDay}}">{{headingDate|dateFormat('D')}}</div>
+          <div class="year" on-tap="{{tapHeadingYear}}">{{headingDate|dateFormat('YYYY')}}</div>
         </div>
-      </template>
+      </div>
       <core-animated-pages selectedProperty="active" transitions="cross-fade" id="pages" notap relative class="hide-scrollbar">
-        <section id="chooseDay" fit class="noscroll-inner">
+        <section id="chooseDay" class="noscroll-inner">
           <paper-calendar id="calendar" locale="{{locale}}" minYear="{{minYear}}" maxYear="{{maxYear}}" on-date-select="{{dateSelected}}"></paper-calendar>
         </section>
-        <section id="chooseYear" fit>
+        <section id="chooseYear">
           <core-selector id="yearSelector" target="{{$.yearList}}" valueAttr="label" 
             itemSelector="#yearList .year" on-core-select="{{yearSelected}}">
-          <div id="yearList" cross-fade fit layout vertical>
+          <div id="yearList" cross-fade layout vertical>
             <template repeat="{{year in years}}">
               <div class="year" label="{{year}}" layout horizontal center-justified><div>{{year}}</div></div>
             </template>

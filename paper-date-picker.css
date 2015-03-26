@@ -1,9 +1,9 @@
 :host {
   -webkit-font-smoothing: antialiased;
   display: inline-block;
-  color: #757575;
+  color: #6D6D6D;
   font-size: 14px;
-  border-radius: 5px;
+  overflow: hidden;
 }
 
 /** Horizontal ******************/
@@ -35,7 +35,7 @@
   letter-spacing: normal;
 }
 #heading .weekday {
-  background :#00796b;
+  background: #008D7F;
   padding: 8px;
   font-size: 14px;
 }
@@ -55,8 +55,8 @@
 }
 #heading .date .year {
   font-size: 24px;
-  color: #8acfc8;
 }
+#heading .date .year,
 #heading.pg-chooseYear .date .month,
 #heading.pg-chooseYear .date .day {
   color: #8acfc8;
@@ -67,7 +67,7 @@
 
 /** Calendar/Year picker ********/
 #pages {
-  background: #fff;
+  background: #eee;
 }
 
 /** Year List *******************/

@@ -1,6 +1,7 @@
 #calendarList {
   overflow-y: auto;
   overflow-x: hidden;
+  background: #eee;
 }
 .month {
   padding: 0;

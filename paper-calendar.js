@@ -1,5 +1,8 @@
 (function() {
   Polymer("paper-calendar", {
+    observe: {
+      '$.calendarList.offsetHeight': 'calendarListReady'
+    },
     once: function(obj, eventName, callback) {
       var doCallback = function() {
         callback.apply(obj, arguments);
@@ -102,7 +105,7 @@
       return (yearDiff * 12) + monthDiff;
     },
     scrollToMonth: function(year, month) {
-      this.async(function() {
+      this.once(this, 'calendar-list-ready', function() {
         var el = this.querySelector(':host /deep/ .month-' + year + '-' + month);
         this.$.calendarList.scrollTop = el.offsetTop;
       });
@@ -118,6 +121,9 @@
       this.selectedDate = new Date(dateStr);
       this.fire('date-select', {date: this.selectedDate}, this);
       this.scrollToDate(this.selectedDate);
+    },
+    calendarListReady: function() {
+      this.fire('calendar-list-ready');
     },
     _getDayName: function(date) {
       return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();

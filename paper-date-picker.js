@@ -4,6 +4,7 @@
 
   Polymer("paper-date-picker", {
     publish: {
+      responsiveWidth: '600px',
       locale: null,
       minYear: null,
       maxYear: null,

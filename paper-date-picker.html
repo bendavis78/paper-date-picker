@@ -16,10 +16,10 @@ component aims to be a clone of the date picker found on Google Calendar for
 Android. 
 -->
 
-<polymer-element name="paper-date-picker" attributes="locale minYear maxYear">
+<polymer-element name="paper-date-picker" attributes="value locale minYear maxYear responsiveWidth forceNarrow">
   <template>
     <link rel="stylesheet" href="paper-date-picker.css">
-    <core-media-query query="max-width: 560px" queryMatches="{{narrow}}"></core-media-query>
+    <core-media-query query="max-width: {{forceNarrow ? '' : responsiveWidth}}" queryMatches="{{narrow}}"></core-media-query>
     <div id="datePicker" layout vertical?="{{narrow}}" horizontal?="{{!narrow}}">
       <div id="heading" class="heading-content pg-{{$.pages.selectedItem.id}}" layout vertical>
         <div class="weekday">{{headingDate|dateFormat('dddd')}}</div>

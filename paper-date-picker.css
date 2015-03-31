@@ -1,3 +1,6 @@
+:host /deep/ * {
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
 :host {
   -webkit-font-smoothing: antialiased;
   display: inline-block;
@@ -40,17 +43,14 @@
   font-size: 14px;
 }
 #heading .date {
-  cursor: pointer;
   padding: 10px;
   font-weight: normal;
 }
 #heading .date .month {
-  cursor: pointer;
   font-size: 24px;
   text-transform: uppercase;
 }
 #heading .date .day {
-  cursor: pointer;
   font-size: 78px;
 }
 #heading .date .year {
@@ -63,6 +63,11 @@
 }
 #heading.pg-chooseYear .date .year {
   color: inherit; 
+}
+#heading .date .day:hover,
+#heading .date .month:hover,
+#heading .date .year:hover {
+  cursor: pointer;
 }
 
 /** Calendar/Year picker ********/
@@ -78,6 +83,8 @@
 #yearList .year {
   height: 68px;
   min-height: 68px;
+}
+#yearList .year:hover {
   cursor: pointer;
 }
 #yearList .year div {

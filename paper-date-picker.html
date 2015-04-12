@@ -26,6 +26,16 @@ Setting the initial date to April 20, 2015:
 
     <paper-date-picker date="2014-04-20"></paper-date-picker>
 
+If you include this element as part of a core-overlay dialog, make sure to set
+the `sizingTarget` attribute of that dialog to the date picker element. For
+example:
+
+  <paper-action-dialog id="dialog" backdrop sizingTarget="{{$.datePicker}}">
+    <paper-date-picker id="datePicker"></paper-date-picker>
+    <paper-button affirmative>OK</paper-button>
+  </paper-action-dialog>
+
+
 @element paper-date-picker
 @blurb Provides a responsive date picker based on the material design spec.
 @status alpha

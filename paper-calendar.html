@@ -173,6 +173,7 @@
         if (!this._sized) {
           this.once(this, 'paper-calendar-sized', this.scrollToMonth.bind(this, year, month));
         } else {
+          console.log('scrolling to month');
           var el = this.querySelector(':host /deep/ .month-' + year + '-' + month);
           this.$.calendarList.scrollTop = el.offsetTop;
         }
@@ -190,7 +191,7 @@
         this.scrollToDate(this.selectedDate);
       },
       updateSize: function() {
-        if (this.offsetHeight > 0) {
+        if (this.$.calendarList.offsetHeight > 0) {
           this._sized = true;
           this.fire('paper-calendar-sized');
         } else {

@@ -53,7 +53,7 @@
     <section>
       <h1>{{date|dateFormat('LL')}}</h1>
       <paper-button class="btn" on-tap="{{showDialog}}" raised>Change Date</paper-button>
-      <paper-action-dialog id="dialog" backdrop>
+      <paper-action-dialog id="dialog" backdrop sizingTarget="{{$.picker}}">
         <paper-date-picker hour="{{hour}}" minute="{{minute}}" id="picker"></paper-date-picker>
         <paper-button affirmative>CANCEL</paper-button>
         <paper-button affirmative on-tap="{{dateSelected}}">OK</paper-button>
@@ -63,19 +63,13 @@
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var scope = document.querySelector('#scope');
-      scope.updateDate = function(date) {
-        scope.date = date;
-      }
       scope.dateSelected = function() {
-        var picker = document.querySelector('html /deep/ #picker');
-        scope.updateDate(picker.date);
+        scope.date = scope.$.picker.date;
       },
       scope.showDialog = function() {
         this.$.dialog.toggle();
       };
-
-      var initialDate = new Date(2015, 5, 1);
-      scope.updateDate(initialDate);
+      scope.date = new Date();
     });
   </script>
 </body>

@@ -173,7 +173,6 @@
         if (!this._sized) {
           this.once(this, 'paper-calendar-sized', this.scrollToMonth.bind(this, year, month));
         } else {
-          console.log('scrolling to month');
           var el = this.querySelector(':host /deep/ .month-' + year + '-' + month);
           this.$.calendarList.scrollTop = el.offsetTop;
         }

@@ -184,8 +184,11 @@
         this.scrollToMonth(date.getFullYear(), date.getMonth());
       },
       dateSelected: function(event, detail) {
+        if (!detail.isSelected) return false;
         var dateStr = detail.item.getAttribute('label');
-        this.selectedDate = new Date(dateStr);
+        console.log(dateStr);
+        this.selectedDate = new Date(dateStr + ' 00:00:00');
+        console.log(this.selectedDate);
         this.fire('date-select', {date: this.selectedDate}, this);
         this.scrollToDate(this.selectedDate);
       },

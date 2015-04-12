@@ -54,7 +54,7 @@
       <h1>{{date|dateFormat('LL')}}</h1>
       <paper-button class="btn" on-tap="{{showDialog}}" raised>Change Date</paper-button>
       <paper-action-dialog id="dialog" backdrop sizingTarget="{{$.picker}}">
-        <paper-date-picker hour="{{hour}}" minute="{{minute}}" id="picker"></paper-date-picker>
+        <paper-date-picker id="picker"></paper-date-picker>
         <paper-button affirmative>CANCEL</paper-button>
         <paper-button affirmative on-tap="{{dateSelected}}">OK</paper-button>
       </paper-action-dialog>

@@ -4,7 +4,7 @@
   "authors": [
     "Ben Davis <bendavis78@gmail.com>"
   ],
-  "description": "Polymer element that represents a complex entity such as a calendar event or a contact.",
+  "description": "Provides a responsive date picker based on the material design spec",
   "keywords": [
     "web-component",
     "web-components",
@@ -21,16 +21,16 @@
   ],
   "dependencies": {
     "moment": "~2.8.3",
-    "polymer": "Polymer/polymer#0.5.4",
-    "webcomponents": "Polymer/webcomponentsjs#0.5.4",
-    "core-scroll-threshold": "Polymer/core-scroll-threshold#0.5.4",
-    "core-list": "Polymer/core-list#0.5.4",
-    "core-media-query": "Polymer/core-media-query#0.5.4",
-    "core-animated-pages": "Polymer/core-animated-pages#0.5.4"
+    "polymer": "Polymer/polymer#0.5.5",
+    "webcomponents": "Polymer/webcomponentsjs#0.5.5",
+    "core-scroll-threshold": "Polymer/core-scroll-threshold#0.5.5",
+    "core-list": "Polymer/core-list#0.5.5",
+    "core-media-query": "Polymer/core-media-query#0.5.5",
+    "core-animated-pages": "Polymer/core-animated-pages#0.5.5"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^0.7.3",
-    "paper-dialog": "Polymer/paper-dialog#0.5.4",
-    "font-roboto": "Polymer/font-roboto#0.5.4"
+    "paper-dialog": "Polymer/paper-dialog#0.5.5",
+    "font-roboto": "Polymer/font-roboto#0.5.5"
   }
 }

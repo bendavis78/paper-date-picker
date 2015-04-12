@@ -1,3 +1,9 @@
+:host {
+  -webkit-font-smoothing: antialiased;
+  display: block;
+  color: #6D6D6D;
+  font-size: 14px;
+}
 :host /deep/ * {
   -webkit-tap-highlight-color: rgba(0,0,0,0);
 }

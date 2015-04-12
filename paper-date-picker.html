@@ -3,6 +3,7 @@
 <link rel="import" href="../core-scroll-threshold/core-scroll-threshold.html">
 <link rel="import" href="../core-animated-pages/core-animated-pages.html">
 <link rel="import" href="../core-list/core-list.html">
+<link rel="import" href="../core-resizable/core-resizable.html">
 <link rel="import" href="paper-calendar.html">
 
 <script src="../moment/min/moment-with-locales.min.js"></script>
@@ -14,9 +15,24 @@ Material Design [Pickers](http://www.google.com/design/spec/components/pickers.h
 Provides a responsive date picker based on the material design spec. This
 component aims to be a clone of the date picker found on Google Calendar for
 Android. 
+
+## Examples:
+
+Default picker:
+
+    <paper-date-picker></paper-date-picker>
+
+Setting the initial date to April 20, 2015:
+
+    <paper-date-picker date="2014-04-20"></paper-date-picker>
+
+@element paper-date-picker
+@blurb Provides a responsive date picker based on the material design spec.
+@status alpha
+@homepages https://github.com/bendavis78/paper-date-picker
 -->
 
-<polymer-element name="paper-date-picker" attributes="value locale minYear maxYear responsiveWidth forceNarrow">
+<polymer-element name="paper-date-picker" attributes="date locale minYear maxYear responsiveWidth forceNarrow">
   <template>
     <link rel="stylesheet" href="paper-date-picker.css">
     <core-media-query query="max-width: {{forceNarrow ? '' : responsiveWidth}}" queryMatches="{{narrow}}"></core-media-query>
@@ -29,8 +45,8 @@ Android.
           <div class="year" on-tap="{{tapHeadingYear}}">{{headingDate|dateFormat('YYYY')}}</div>
         </div>
       </div>
-      <core-animated-pages selectedProperty="active" transitions="cross-fade" id="pages" notap relative class="hide-scrollbar">
-        <section id="chooseDay" class="noscroll-inner">
+      <core-animated-pages selectedProperty="active" transitions="cross-fade" id="pages" notap relative>
+        <section id="chooseDay">
           <paper-calendar id="calendar" locale="{{locale}}" minYear="{{minYear}}" maxYear="{{maxYear}}" on-date-select="{{dateSelected}}"></paper-calendar>
         </section>
         <section id="chooseYear">
@@ -45,6 +61,128 @@ Android.
       </core-animated-pages>
     </div>
   </template>
-</polymer-element>
+  <script>
+    var CALENDAR = 0
+    var YEARLIST = 1
 
-<script src="paper-date-picker.js"></script>
+    Polymer({
+      publish: {
+        /**
+         * The selected date (YYYY-MM-DD)
+         * @attribute date
+         * @type Date
+         * @default today's date
+         */
+        date: null,
+        /**
+         * Maximum screen width at which the picker uses a vertical layout
+         * @attribute responsiveWidth
+         * @type string
+         * @default '450px'
+         */
+        responsiveWidth: '600px',
+        /**
+         * The current locale
+         * @attribute locale
+         * @type string
+         * @default 'en'
+         */
+        locale: 'en',
+        /*
+         * The minumum allowable year
+         * @attribute minYear
+         * @type int
+         * @default 1900
+         */
+        minYear: null,
+        /*
+         * The maximum allowable year
+         * @attribute minYear
+         * @type int
+         * @default 1900
+         */
+        maxYear: null,
+        /**
+         * Force narrow layout
+         * @attribute forceNarrow
+         * @type boolean
+         * @default false
+         */
+        forceNarrow: false,
+        narrow: {type: 'boolean', value: false, reflect: true},
+        isTouch: {type: 'boolean', value: false, reflect: true}
+      },
+      ready: function() {
+        this.today = this.$.calendar.today;
+        this.isTouch = 'ontouchstart' in window;
+        this.narrow = false;
+        this.localeChanged();
+        this.headingDate = this.date ? this.date : new Date();
+        this.years = this.$.calendar.years;
+      },
+      tapHeadingDay: function() {
+        this.$.calendar.scrollToDate(this.headingDate);
+        if (this.$.pages.selected !== CALENDAR) {
+          this.selectPage(CALENDAR);
+          this.async(this.notifyResize);
+        }
+      },
+      tapHeadingMonth: function() {
+        this.tapHeadingDay();
+      },
+      tapHeadingYear: function() {
+        var year = this.headingDate.getFullYear();
+        this.scrollToYear(year);
+        if (this.$.pages.selected !== YEARLIST) {
+          this.$.yearSelector.selected = year.toString();
+          this.selectPage(YEARLIST);
+        }
+      },
+      selectPage: function(page, callback) {
+        this.$.pages.selected = page;
+      },
+      scrollToYear: function(year) {
+        this.async(function() {
+          var el = this.$.yearList.querySelector('.year[label="' + year + '"]')
+          this.$.yearList.scrollTop = el.offsetTop - 94;
+        });
+      },
+      yearSelected: function(e, detail) {
+        var year = parseInt(detail.item.getAttribute('label'));
+        var headingDate = new Date(this.headingDate)
+        if (year !== headingDate.getFullYear()) {
+          this.async(function() {
+            headingDate.setFullYear(year);
+            this.headingDate = headingDate;
+          });
+          this.$.calendar.populate(year);
+          this.async(function() {
+            this.$.calendar.scrollToDate(this.headingDate);
+            this.selectPage(CALENDAR)
+          });
+        }
+      },
+      dateSelected: function(e, detail) {
+        this.date = detail.date;
+      },
+      dateChanged: function(oldValue, newValue) {
+        if (newValue) {
+          this.headingDate = newValue;
+        } else {
+          this.headingDate = this.today;
+        }
+      },
+      // attributes that propagate to paper-calendar
+      localeChanged: function() {
+        moment.locale(this.locale);
+        this.$.calendar.locale = this.locale;
+      },
+      minYearChanged: function() {
+        this.$.calendar.minYear = this.minYear;
+      },
+      maxYearChanged: function() {
+        this.$.calendar.maxYear = this.maxYear;
+      },
+    });
+  </script>
+</polymer-element>

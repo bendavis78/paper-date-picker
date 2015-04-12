@@ -15,7 +15,8 @@
   height: 240px;
 }
 #heading, 
-#pages {
+#pages,
+paper-calendar {
   width: 270px !important;
   height: 240px;
 }

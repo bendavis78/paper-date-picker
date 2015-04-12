@@ -154,7 +154,8 @@ example:
       scrollToYear: function(year) {
         this.async(function() {
           var el = this.$.yearList.querySelector('.year[label="' + year + '"]')
-          this.$.yearList.scrollTop = el.offsetTop - 94;
+          console.log(el.offsetTop - 94);
+          this.$.yearSelector.scrollTop = el.offsetTop - 94;
         });
       },
       yearSelected: function(e, detail) {

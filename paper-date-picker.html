@@ -37,7 +37,8 @@ example:
 @element paper-date-picker
 @blurb Provides a responsive date picker based on the material design spec.
 @status alpha
-@homepage https://github.com/bendavis78/paper-date-picker
+@homepage http://bendavis78.github.io/paper-date-picker/paper-date-picker/
+@demo http://bendavis78.github.io/paper-date-picker/paper-date-picker/demo.html
 -->
 
 <polymer-element name="paper-date-picker" attributes="date locale minYear maxYear responsiveWidth forceNarrow">
@@ -70,8 +71,8 @@ example:
     </div>
   </template>
   <script>
-    var CALENDAR = 0
-    var YEARLIST = 1
+    var CALENDAR = 0;
+    var YEARLIST = 1;
 
     Polymer({
       publish: {
@@ -151,14 +152,14 @@ example:
       },
       scrollToYear: function(year) {
         this.async(function() {
-          var el = this.$.yearList.querySelector('.year[label="' + year + '"]')
+          var el = this.$.yearList.querySelector('.year[label="' + year + '"]');
           console.log(el.offsetTop - 94);
           this.$.yearSelector.scrollTop = el.offsetTop - 94;
         });
       },
       yearSelected: function(e, detail) {
         var year = parseInt(detail.item.getAttribute('label'));
-        var headingDate = new Date(this.headingDate)
+        var headingDate = new Date(this.headingDate);
         if (year !== headingDate.getFullYear()) {
           this.async(function() {
             headingDate.setFullYear(year);
@@ -167,7 +168,7 @@ example:
           this.$.calendar.populate(year);
           this.async(function() {
             this.$.calendar.scrollToDate(this.headingDate);
-            this.selectPage(CALENDAR)
+            this.selectPage(CALENDAR);
           });
         }
       },

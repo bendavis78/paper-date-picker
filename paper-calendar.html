@@ -1,36 +1,33 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../core-scroll-threshold/core-scroll-threshold.html">
-<link rel="import" href="../core-selector/core-selector.html">
-<link rel="import" href="../core-resizable/core-resizable.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../iron-selector/iron-selector.html">
 
 <script src="../moment/min/moment-with-locales.min.js"></script>
 
-<polymer-element name="paper-calendar" attributes="locale minYear maxYear">
+<dom-module id="paper-calendar">
+  <link rel="import" type="css" href="paper-calendar.css">
   <template>
-    <link rel="stylesheet" href="paper-calendar.css">
-    <core-selector id="calendarSelector" target="{{$.calendarList}}" valueAttr="label"
-      itemsSelector=".month-days .day-item:not([disabled])"
-      on-core-select="{{dateSelected}}"></core-selector>
-    <div id="calendarList" cross-fade fit>
-      <template repeat="{{month in months}}">
-        <div class="month month-{{month.year}}-{{month.month}}">
-          <div class="month-header" layout vertical center>
-            <div class="month-name" on-press="{{scrollToMonth(month.year, month.month)}}">
-              {{monthNames[month.month]}} {{month.year}}
+    <div id="calendarList" cross-fade>
+      <template is="dom-repeat" items="{{months}}" as="month">
+        <div class$="{{getMonthClass(month)}}">
+          <div class="month-header">
+            <div class="month-name" on-tap="_tapMonth">
+              <span>{{getMonthName(month.month)}}</span> <span>{{month.year}}</span>
             </div>
-            <div class="month-weekdays" layout horizontal>
-              <template repeat="{{weekday in weekdays}}">
-                <div class="day">{{weekday[0]}}</div>
+            <div class="month-weekdays">
+              <template is="dom-repeat" items="{{weekdays}}" as="weekday">
+                <div class="day">{{weekday.0}}</div>
               </template>
             </div>
           </div>
-          <div class="month-days" layout vertical center>
-            <template repeat="{{week in month.days}}">
-              <div class="week" layout horizontal>
-                <template repeat="{{week}}">
-                  <div label="{{name}}" disabled?="{{!day}}" class="day-item {{ {today: isToday, selected: selected} | tokenList }}" 
-                    layout vertical center>
-                    <div class="day">{{day}}</div>
+          <div class="month-days">
+            <template is="dom-repeat" items="{{month.weeks}}" as="week">
+              <div class="week">
+                <template is="dom-repeat" items="{{week}}">
+                  <div on-tap="_tapDay" date$="{{item.name}}" disabled$="{{!item.day}}" 
+                    class$="{{getDayClass('day-item', item.date, today, date)}}">
+                    <div class="day">{{item.day}}</div>
                   </div>
                 </template>
               </div>
@@ -41,168 +38,242 @@
     </div>
   </template>
   <script>
-    Polymer(Polymer.mixin({
-      publish: {
-        /**
-         * The current locale
-         * @attribute locale
-         * @type string
-         * @default 'en'
-         */
-        locale: null,
-        /*
-         * The minumum allowable year
-         * @attribute minYear
-         * @type int
-         * @default 1900
-         */
-        minYear: null,
-        /*
-         * The maximum allowable year
-         * @attribute minYear
-         * @type int
-         * @default 1900
-         */
-        maxYear: null,
-        isTouch: {type: 'boolean', value: false, reflect: true}
-      },
-      eventDelegates: {
-        'core-resize': 'updateSize'
-      },
-      once: function(obj, eventName, callback) {
-        var doCallback = function() {
-          callback.apply(obj, arguments);
-          obj.removeEventListener(eventName, doCallback);
-        };
-        obj.addEventListener(eventName, doCallback);
-      },
-      localeChanged: function() {
-        moment.locale(this.locale);
-      },
-      ready: function() {
-        this.selectedDate = null;
-        this.isTouch = 'ontouchstart' in window;
-        this.months = [];
-        this.years = [];
-        this.today = new Date();
-        this._physicalYears = [];
-        this.initialDate = this.initialDate ? this.initialDate : this.today;
-        this.today.setHours(0, 0, 0, 0);
-        this.weekdays = moment.weekdays();
-        this.monthNames = moment.months();
-        this.localeChanged();
-        this.startYear = this.startYear ? this.startYear : 1900;
-        this.endYear = this.endYear ? this.endYear : 2100;
-        for (var y=this.startYear; y<=this.endYear; y++) {
-          this.years.push(y);
-        }
-        this.async(function() {
-          this.populate(this.initialDate.getFullYear());
-        });
-        this.scrollToDate(this.initialDate);
-      },
-      attached: function() {
-        this.resizableAttachedHandler();
-      },
-      detached: function() {
-        this.resizableDetachedHandler();
-      },
-      /* TODO: figure out a user-friendly way to auto-populate years
-       * It takes more time on mobile, so there should be some indication that a
-       * year is loading. One idea is to make it so that when the user scrolls to
-       * the bottom, an indicator appears showing that the content for that year is
-       * loading. We'd need extra logic to handle scrolling and removal of years
-       * that are hidden from view.
-      loadMoreUpper: function() {
-      },
-      loadMoreLower: function() {
-      }
-      */
-      populate: function(year) {
-        // this currently replaces the 
-        this.months = [];
-        var month, days, day, date = new Date();
-        var thisYear = this.today.getFullYear();
-        var thisMonth = this.today.getMonth();
-        var thisDay = this.today.getDate();
+    Polymer({
+        is: 'paper-calendar',
+        properties: {
+          /*
+           * The selected date
+           * @attribute date
+           * @type Date
+           */
+          date: {
+            type: Date,
+            notify: true
+          },
+          /**
+           * The current locale
+           * @attribute locale
+           * @type string
+           * @default 'en'
+           */
+          locale: {
+            type: String,
+            value: 'en',
+            observer: 'localeChanged'
+          },
+          /*
+           * The minumum allowable year
+           * @attribute minYear
+           * @type int
+           * @default 1900
+           */
+          minYear: {
+            type: Number,
+            value: 1900
+          },
+          /*
+           * The maximum allowable year
+           * @attribute maxYear
+           * @type int
+           * @default 2100
+           */
+          maxYear: {
+            type: Number,
+            value: 2100
+          },
+          isTouch: {
+            type: Boolean,
+            value: false,
+            reflectAttribute: true
+          }
+        },
+        listeners: {
+          'iron-resize': 'updateSize'
+        },
+        behaviors: [
+          Polymer.IronResizableBehavior
+        ],
+        once: function(obj, eventName, callback) {
+          var doCallback = function() {
+            callback.apply(obj, arguments);
+            obj.removeEventListener(eventName, doCallback);
+          };
+          obj.addEventListener(eventName, doCallback);
+        },
+        localeChanged: function() {
+          moment.locale(this.locale);
+        },
+        ready: function() {
+          this.date = null;
+          this.isTouch = 'ontouchstart' in window;
+          this.months = [];
+          this.years = [];
+          this._physicalYears = [];
+          this._updateToday();
+          this.initialDate = this.initialDate ? this.initialDate : this.today;
+          this.weekdays = moment.weekdays();
+          this.monthNames = moment.months();
+          this.localeChanged();
+          this.startYear = this.startYear ? this.startYear : 1900;
+          this.endYear = this.endYear ? this.endYear : 2100;
 
-        date.setYear(year);
-        for (month=0; month<12; month++) {
-          // days are split into weeks
-          days = [[]];
-          day = 1;
-          date.setMonth(month);
-          date.setDate(1);
-          
-          // add "padding" days
-          for (d=0; d<date.getDay(); d++) {
-            days[0].push({day: null});
+          setInterval(this._updateToday, 60000);
+
+          for (var y=this.startYear; y<=this.endYear; y++) {
+            this.years.push(y);
           }
 
-          // add actual days 
-          while (date.getMonth() == month) {
-            if (d % 7 == 0) {
-              // start new week
-              days.push([]);
+          this.async(function() {
+            this.populate(this.initialDate.getFullYear());
+          });
+
+          this.scrollToDate(this.initialDate);
+        },
+        /*
+        // TODO (from 0.5): does this need migrating?
+        attached: function() {
+          this.resizableAttachedHandler();
+        },
+        detached: function() {
+          this.resizableDetachedHandler();
+        },
+        */
+        /* TODO: figure out a user-friendly way to auto-populate years
+         * It takes more time on mobile, so there should be some indication that a
+         * year is loading. One idea is to make it so that when the user scrolls to
+         * the bottom, an indicator appears showing that the content for that year is
+         * loading. We'd need extra logic to handle scrolling and removal of years
+         * that are hidden from view.
+        loadMoreUpper: function() {
+        },
+        loadMoreLower: function() {
+        }
+        */
+        populate: function(year) {
+          this.months = [];
+          this.days = [];
+          var month, days, day,rdayInfo, date = new Date();
+
+          date.setYear(year);
+          date.setHours(0, 0, 0, 0);
+
+          for (month=0; month<12; month++) {
+            weeks = [[]];
+            day = 1;
+            date.setMonth(month);
+            date.setDate(1);
+
+            // add "padding" days
+            for (d=0; d<date.getDay(); d++) {
+              weeks[0].push({day: null});
             }
-            days[days.length-1].push({
-              name: year + '-' + (month+1) + '-' + day,
+
+            // add actual days
+            while (date.getMonth() == month) {
+              if (d % 7 == 0) {
+                // start new week
+                weeks.push([]);
+              }
+              dayInfo = {
+                date: new Date(year, month, day),
+                name: this.isoFormat(year, month, day),
+                year: year,
+                month: month,
+                day: day,
+              };
+              this.days.push(dayInfo);
+              weeks[weeks.length-1].push(dayInfo);
+              date.setDate(++day);
+              d++;
+            }
+            monthData = {
               year: year,
               month: month,
-              day: day,
-              isToday: year == thisYear && month == thisMonth && day == thisDay
-            });
-            date.setDate(++day);
-            d++;
+              weeks: weeks,
+              domReady: false
+            };
+            this.push('months', monthData);
           }
-          monthData = {
-            year: year,
-            month: month,
-            days: days,
-            domReady: false
-          };
-          this.months.push(monthData);
-        }
-      },
-      getMonthIdx: function(year, month) {
-        var yearDiff = (year - this.months[0].year);
-        var monthDiff = (month - this.months[0].month);
-        return (yearDiff * 12) + monthDiff;
-      },
-      scrollToMonth: function(year, month) {
-        if (!this._sized) {
-          this.once(this, 'paper-calendar-sized', this.scrollToMonth.bind(this, year, month));
-        } else {
-          var el = this.querySelector(':host /deep/ .month-' + year + '-' + month);
-          this.$.calendarList.scrollTop = el.offsetTop;
-        }
-      },
-      scrollToDate: function(date) {
-        if (!date) {
-          date = this.initialDate;
-        }
-        this.scrollToMonth(date.getFullYear(), date.getMonth());
-      },
-      dateSelected: function(event, detail) {
-        if (!detail.isSelected) return false;
-        var dateStr = detail.item.getAttribute('label');
-        console.log(dateStr);
-        this.selectedDate = new Date(dateStr + ' 00:00:00');
-        console.log(this.selectedDate);
-        this.fire('date-select', {date: this.selectedDate}, this);
-        this.scrollToDate(this.selectedDate);
-      },
-      updateSize: function() {
-        if (this.$.calendarList.offsetHeight > 0) {
-          this._sized = true;
-          this.fire('paper-calendar-sized');
-        } else {
-          this._sized = false;
-        }
-      },
-      _getDayName: function(date) {
-        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-      },
-    }, Polymer.CoreResizable));
+        },
+        isoFormat: function(year, month, day) {
+          var date, year, month, day;
+          if (arguments.length == 1) {
+            date = arguments[0];
+            year = date.getFullYear();
+            month = date.getMonth() + 1;
+            day = date.getDate();
+          }
+          return (
+            year + '-' + 
+            ('0' + month).slice(-2) + '-' + 
+            ('0' + day).slice(-2)
+          );
+        },
+        getDayClass: function(cssClass, date, today, selectedDate) {
+          if (!date) return cssClass;
+          if (date.getTime() == this.today.getTime()) {
+            cssClass += ' today';
+          }
+          if (this.date && date.getTime() == this.date.getTime()) {
+            cssClass += ' selected';
+          }
+          return cssClass;
+        },
+        getMonthClass: function(month) {
+          return 'month month-' + month.year + '-' + month.month;
+        },
+        getMonthIdx: function(year, month) {
+          var yearDiff = (year - this.months[0].year);
+          var monthDiff = (month - this.months[0].month);
+          return (yearDiff * 12) + monthDiff;
+        },
+        scrollToMonth: function(year, month) {
+          if (!this._sized) {
+            this.once(this, 'paper-calendar-sized', this.scrollToMonth.bind(this, year, month));
+          } else {
+            var sel = '.month-' + year + '-' + month;
+            if (Polymer.Settings.useNativeShadow) {
+              sel = ':host /deep/ ' + sel;
+            }
+            var el = this.querySelector(sel);
+            this.$.calendarList.scrollTop = el.offsetTop;
+          }
+        },
+        scrollToDate: function(date) {
+          if (!date) {
+            date = this.initialDate;
+          }
+          this.scrollToMonth(date.getFullYear(), date.getMonth());
+        },
+        _tapMonth: function(event) {
+          var month = event.model.month;
+          this.scrollToMonth(month.year, month.month);
+        },
+        _tapDay: function(event) {
+          this.date = event.model.item.date;
+        },
+        updateSize: function() {
+          if (this.$.calendarList.offsetHeight > 0) {
+            this._sized = true;
+            this.fire('paper-calendar-sized');
+          } else {
+            this._sized = false;
+          }
+        },
+        getMonthName: function(month) {
+          return this.monthNames[month];
+        },
+        _updateToday: function() {
+          var today = new Date();
+          today.setHours(0, 0, 0, 0);
+          this._todayYear = today.getFullYear();
+          this._todayMonth = today.getMonth();
+          this._todayDay = today.getDate();
+          this.today = today;
+        },
+        _getDayName: function(date) {
+          return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+        },
+    });
   </script>
-</polymer-element>
+</dom-module>

@@ -1,6 +1,6 @@
 {
   "name": "paper-date-picker",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "authors": [
     "Ben Davis <bendavis78@gmail.com>"
   ],
@@ -21,16 +21,22 @@
   ],
   "dependencies": {
     "moment": "~2.8.3",
-    "polymer": "Polymer/polymer#0.5.5",
-    "webcomponents": "Polymer/webcomponentsjs#0.5.5",
-    "core-scroll-threshold": "Polymer/core-scroll-threshold#0.5.5",
-    "core-list": "Polymer/core-list#0.5.5",
-    "core-media-query": "Polymer/core-media-query#0.5.5",
-    "core-animated-pages": "Polymer/core-animated-pages#0.5.5"
+    "polymer": "Polymer/polymer#^1.0.0",
+    "iron-media-query": "PolymerElements/iron-media-query#^1.0.0",
+    "iron-selector": "PolymerElements/iron-selector#^1.0.0",
+    "neon-animation": "PolymerElements/neon-animation#^1.0.0",
+    "iron-resizable": "PolymerElements/iron-resizable-behavior#^1.0.0",
+    "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0"
   },
   "devDependencies": {
-    "web-component-tester": "Polymer/web-component-tester#^0.7.3",
-    "paper-dialog": "Polymer/paper-dialog#0.5.5",
-    "font-roboto": "Polymer/font-roboto#0.5.5"
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "paper-dialog": "PolymerElements/paper-dialog#^1.0.0",
+    "paper-styles": "PolymerElements/paper-styles#^1.0.0",
+    "paper-button": "PolymerElements/paper-button#^1.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "resolutions": {
+    "polymer": "^1.0.0",
+    "webcomponentsjs": "^0.7.2"
   }
 }

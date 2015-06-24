@@ -1,8 +1,8 @@
 :host {
   -webkit-font-smoothing: antialiased;
   display: block;
-  color: #6D6D6D;
-  font-size: 14px;
+  color: var(--primary-text-color);
+  @apply(--paper-font-body1);
 }
 :host /deep/ * {
   -webkit-tap-highlight-color: rgba(0,0,0,0);
@@ -10,16 +10,21 @@
 #calendarList {
   overflow-y: auto;
   overflow-x: hidden;
-  background: #eee;
+  background: var(--primary-background-color);
+  @apply(--layout-fit);
+}
+.month-header {
+  @apply(--layout-vertical);
+  @apply(--layout-center);
 }
 .month {
   padding: 0;
 }
 .month-name {
   padding: 8px;
-  font-size: 14px;
   text-align: center;
   font-weight: bold;
+  @apply(--paper-font-body2);
 }
 .month-name:hover {
   cursor: pointer;
@@ -27,6 +32,11 @@
 .month-weekdays {
   font-size: 13px;
   font-weight: bold;
+  @apply(--layout-horizontal);
+}
+.month-days {
+  @apply(--layout-vertical);
+  @apply(--layout-center);
 }
 .month-weekdays .day {
   height: 20px;
@@ -34,6 +44,10 @@
 }
 .week {
   width: 238px;
+  @apply(--layout-horizontal);
+}
+.month-days .month-day {
+  @apply(--layout-vertical-center);
 }
 .day {
   padding: 0 1px;
@@ -45,16 +59,20 @@
   vertical-align: middle;
 }
 .day-item:not([disabled]) .day {
-  border-radius: 18px;
+  border-radius: 100%;
 }
 .day-item:not([disabled]) .day:hover {
   cursor: pointer;
 }
-.day-item.core-selected .day {
-  background: #B6D9D6;
+.day-item.selected .day {
+  background: var(--default-primary-color);
+  color: var(--text-primary-color);
 }
 .day-item.today .day {
-  color: #009688;
+  color: var(--default-primary-color);
+}
+.day-item.selected.today .day {
+  color: var(--text-primary-color);
 }
 
 :host([isTouch]) #calendarList::-webkit-scrollbar {

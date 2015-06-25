@@ -86,6 +86,9 @@ paper-calendar {
 #pages {
   background: var(--default-background-color);
 }
+#pages section {
+  position: relative;
+}
 
 /** Year List *******************/
 #yearList {

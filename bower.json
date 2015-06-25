@@ -14,7 +14,7 @@
   ],
   "main": "paper-date-picker.html",
   "license": "MIT",
-  "homepage": "http://bendavis78.github.io/paper-date-picker/components/paper-date-picker/index.html",
+  "homepage": "http://bendavis78.github.io/paper-date-picker/",
   "ignore": [
     "/.*",
     "/tests/"

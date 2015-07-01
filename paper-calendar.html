@@ -111,7 +111,7 @@
           this._physicalYears = [];
           this._updateToday();
           this.initialDate = this.initialDate ? this.initialDate : this.today;
-          this.weekdays = moment.weekdays();
+          this.weekdays = moment.weekdaysMin();
           this.monthNames = moment.months();
           this.localeChanged();
           this.startYear = this.startYear ? this.startYear : 1900;

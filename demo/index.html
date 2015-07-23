@@ -44,8 +44,8 @@
     </section>
   </template>
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      var scope = document.querySelector('#scope');
+    document.addEventListener('WebComponentsReady', function() {
+      var scope = Polymer.dom(document).querySelector('#scope');
       scope.dateFormat = scope.$.picker.dateFormat;
       scope.dismissDialog = function() {
         scope.date = scope.$.picker.date;

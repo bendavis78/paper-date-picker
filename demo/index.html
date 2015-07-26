@@ -47,9 +47,11 @@
     document.addEventListener('WebComponentsReady', function() {
       var scope = Polymer.dom(document).querySelector('#scope');
       scope.dateFormat = scope.$.picker.dateFormat;
-      scope.dismissDialog = function() {
-        scope.date = scope.$.picker.date;
-      },
+      scope.dismissDialog = function(event) {
+        if (event.detail.confirmed) {
+          scope.date = scope.$.picker.date;
+        }
+      };
       scope.showDialog = function() {
         this.$.dialog.toggle();
       };

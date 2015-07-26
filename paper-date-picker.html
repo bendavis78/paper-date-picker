@@ -197,7 +197,7 @@ If you include this element as part of `paper-dialog`, use the class
           this._selectPage(YEARLIST);
         }
       },
-      _selectPage: function(page, callback) {
+      _selectPage: function(page) {
         this.$.pages.selected = page;
       },
       _scrollToYear: function(year) {
@@ -235,7 +235,9 @@ If you include this element as part of `paper-dialog`, use the class
         return pfx + ' pg-' + selectedPage;
       },
       dateFormat: function(date, format) {
-        if (!date) return '';
+        if (!date) {
+          return '';
+        }
         return moment(date).format(format);
       },
       _computeNarrow: function() {

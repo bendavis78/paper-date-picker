@@ -173,6 +173,12 @@ If you include this element as part of `paper-dialog`, use the class
           observer: '_computeNarrow'
         }
       },
+      behaviors: [
+        Polymer.IronResizableBehavior
+      ],
+      listeners: {
+        'iron-resize': '_resizeHandler'
+      },
       ready: function() {
         this.today = this.$.calendar.today;
         this.isTouch = 'ontouchstart' in window;
@@ -242,6 +248,9 @@ If you include this element as part of `paper-dialog`, use the class
       },
       _computeNarrow: function() {
         this._setNarrow(this._queryMatches || this.forceNarrow);
+      },
+      _resizeHandler: function() {
+        this.$.calendar.updateSize();
       }
     });
   </script>

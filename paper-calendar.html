@@ -90,6 +90,8 @@
         behaviors: [
           Polymer.IronResizableBehavior
         ],
+        listeners: {
+          'iron-resize': '_resizeHandler'
         },
         localeChanged: function() {
           moment.locale(this.locale);
@@ -224,7 +226,9 @@
               sel = ':host /deep/ ' + sel;
             }
             var el = this.querySelector(sel);
-            this.$.calendarList.scrollTop = el.offsetTop;
+            if (el) {
+              this.$.calendarList.scrollTop = el.offsetTop;
+            }
           }
         },
         scrollToDate: function(date) {
@@ -239,6 +243,9 @@
         },
         _tapDay: function(event) {
           this.date = event.model.item.date;
+        },
+        _resizeHandler: function() {
+          this.updateSize();
         },
         updateSize: function() {
           if (this.$.calendarList.offsetHeight > 0) {

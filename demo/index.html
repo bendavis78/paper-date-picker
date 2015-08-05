@@ -28,10 +28,6 @@
     h1 {
       @apply(--paper-font-display2);
     }
-    
-    paper-input{
-      width: 200px;
-    }
   </style>
 </head>
 <body unresolved>
@@ -39,11 +35,11 @@
     <section>
       <h1>{{dateFormat(date, 'LL')}}</h1>
       <paper-button class="btn" on-tap="showDialog" raised>Change Date</paper-button>
-      <paper-input value={{responsiveWidth}} label="responsive width"></paper-input>
-      <paper-button on-tap="setToday">Change to today</paper-button>
       <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog">
         <paper-date-picker id="picker" date="{{date}}" responsive-width="{{responsiveWidth}}"></paper-date-picker>
         <div class="buttons">
+          <paper-button on-tap="toggleState" raised>toggle vertical</paper-button>
+          <paper-button on-tap="setMayFifth" raised>Change to May 5th</paper-button>
           <paper-button dialog-dismiss>Cancel</paper-button>
           <paper-button dialog-confirm>OK</paper-button>
         </div>
@@ -65,6 +61,14 @@
       scope.date = new Date();
       
       scope.responsiveWidth = '655px';
+      
+      scope.setMayFifth = function(){
+        scope.date = new Date(2015,4,5);
+      }
+      
+      scope.toggleState = function(){
+        scope.responsiveWidth = (scope.responsiveWidth === '655px' ? '100000px' : '655px');
+      }
     });
 
   </script>

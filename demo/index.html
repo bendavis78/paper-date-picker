@@ -13,7 +13,8 @@
   <link rel="import" href="../../paper-styles/paper-styles.html">
   <link rel="import" href="../../paper-dialog/paper-dialog.html">
   <link rel="import" href="../../paper-button/paper-button.html">
-
+  <link rel="import" href="../../paper-input/paper-input.html">
+  
   <style is="custom-style">
     html /deep/ * {
     }
@@ -27,6 +28,10 @@
     h1 {
       @apply(--paper-font-display2);
     }
+    
+    paper-input{
+      width: 200px;
+    }
   </style>
 </head>
 <body unresolved>
@@ -34,8 +39,10 @@
     <section>
       <h1>{{dateFormat(date, 'LL')}}</h1>
       <paper-button class="btn" on-tap="showDialog" raised>Change Date</paper-button>
+      <paper-input value={{responsiveWidth}} label="responsive width"></paper-input>
+      <paper-button on-tap="setToday">Change to today</paper-button>
       <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog">
-        <paper-date-picker id="picker" responsive-width="655px"></paper-date-picker>
+        <paper-date-picker id="picker" date="{{date}}" responsive-width="{{responsiveWidth}}"></paper-date-picker>
         <div class="buttons">
           <paper-button dialog-dismiss>Cancel</paper-button>
           <paper-button dialog-confirm>OK</paper-button>
@@ -56,6 +63,8 @@
         this.$.dialog.toggle();
       };
       scope.date = new Date();
+      
+      scope.responsiveWidth = '655px';
     });
 
   </script>

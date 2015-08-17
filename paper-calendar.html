@@ -25,7 +25,7 @@
             <template is="dom-repeat" items="{{month.weeks}}" as="week">
               <div class="week">
                 <template is="dom-repeat" items="{{week}}">
-                  <div on-tap="_tapDay" date$="{{item.name}}" disabled$="{{!item.day}}" 
+                  <div on-tap="_tapDay" date$="{{item.name}}" disabled$="{{!item.day}}"
                     class$="{{getDayClass('day-item', item.date, today, date)}}">
                     <div class="day">{{item.day}}</div>
                   </div>
@@ -188,8 +188,8 @@
             day = date.getDate();
           }
           return (
-            year + '-' + 
-            ('0' + month).slice(-2) + '-' + 
+            year + '-' +
+            ('0' + month).slice(-2) + '-' +
             ('0' + day).slice(-2)
           );
         },
@@ -217,6 +217,8 @@
           if (!this._sized) {
             var _this = this;
             this.addEventListener('paper-calendar-sized', function() {
+              var year = _this.date.getFullYear(),
+                  month = _this.date.getMonth();
               this.scrollToMonth(year, month);
               _this.removeEventListener('paper-calendar-sized', this);
             });

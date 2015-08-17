@@ -87,18 +87,11 @@
             reflectAttribute: true
           }
         },
-        listeners: {
-          'iron-resize': 'updateSize'
-        },
         behaviors: [
           Polymer.IronResizableBehavior
         ],
-        once: function(obj, eventName, callback) {
-          var doCallback = function() {
-            callback.apply(obj, arguments);
-            obj.removeEventListener(eventName, doCallback);
-          };
-          obj.addEventListener(eventName, doCallback);
+        listeners: {
+          'iron-resize': '_resizeHandler'
         },
         localeChanged: function() {
           moment.locale(this.locale);
@@ -129,15 +122,6 @@
 
           this.scrollToDate(this.initialDate);
         },
-        /*
-        // TODO (from 0.5): does this need migrating?
-        attached: function() {
-          this.resizableAttachedHandler();
-        },
-        detached: function() {
-          this.resizableDetachedHandler();
-        },
-        */
         /* TODO: figure out a user-friendly way to auto-populate years
          * It takes more time on mobile, so there should be some indication that a
          * year is loading. One idea is to make it so that when the user scrolls to
@@ -152,7 +136,7 @@
         populate: function(year) {
           this.months = [];
           this.days = [];
-          var month, days, day,rdayInfo, date = new Date();
+          var month, weeks, day, d, dayInfo, monthData, date = new Date();
 
           date.setYear(year);
           date.setHours(0, 0, 0, 0);
@@ -169,8 +153,8 @@
             }
 
             // add actual days
-            while (date.getMonth() == month) {
-              if (d % 7 == 0) {
+            while (date.getMonth() === month) {
+              if (d % 7 === 0) {
                 // start new week
                 weeks.push([]);
               }
@@ -196,8 +180,8 @@
           }
         },
         isoFormat: function(year, month, day) {
-          var date, year, month, day;
-          if (arguments.length == 1) {
+          var date;
+          if (arguments.length === 1) {
             date = arguments[0];
             year = date.getFullYear();
             month = date.getMonth() + 1;
@@ -209,12 +193,14 @@
             ('0' + day).slice(-2)
           );
         },
-        getDayClass: function(cssClass, date, today, selectedDate) {
-          if (!date) return cssClass;
-          if (date.getTime() == this.today.getTime()) {
+        getDayClass: function(cssClass, date) {
+          if (!date) {
+            return cssClass;
+          }
+          if (date.getTime() === this.today.getTime()) {
             cssClass += ' today';
           }
-          if (this.date && date.getTime() == this.date.getTime()) {
+          if (this.date && date.getTime() === this.date.getTime()) {
             cssClass += ' selected';
           }
           return cssClass;
@@ -229,14 +215,20 @@
         },
         scrollToMonth: function(year, month) {
           if (!this._sized) {
-            this.once(this, 'paper-calendar-sized', this.scrollToMonth.bind(this, year, month));
+            var _this = this;
+            this.addEventListener('paper-calendar-sized', function() {
+              this.scrollToMonth(year, month);
+              _this.removeEventListener('paper-calendar-sized', this);
+            });
           } else {
             var sel = '.month-' + year + '-' + month;
             if (Polymer.Settings.useNativeShadow) {
               sel = ':host /deep/ ' + sel;
             }
             var el = this.querySelector(sel);
-            this.$.calendarList.scrollTop = el.offsetTop;
+            if (el) {
+              this.$.calendarList.scrollTop = el.offsetTop;
+            }
           }
         },
         scrollToDate: function(date) {
@@ -251,6 +243,9 @@
         },
         _tapDay: function(event) {
           this.date = event.model.item.date;
+        },
+        _resizeHandler: function() {
+          this.updateSize();
         },
         updateSize: function() {
           if (this.$.calendarList.offsetHeight > 0) {

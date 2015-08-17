@@ -217,8 +217,10 @@
           if (!this._sized) {
             var _this = this;
             this.addEventListener('paper-calendar-sized', function() {
-              var year = _this.date.getFullYear(),
-                  month = _this.date.getMonth();
+              if (_this.date) {
+                year = _this.date.getFullYear(),
+                month = _this.date.getMonth();
+              }
               this.scrollToMonth(year, month);
               _this.removeEventListener('paper-calendar-sized', this);
             });

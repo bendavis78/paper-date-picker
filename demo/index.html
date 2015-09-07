@@ -13,7 +13,8 @@
   <link rel="import" href="../../paper-styles/paper-styles.html">
   <link rel="import" href="../../paper-dialog/paper-dialog.html">
   <link rel="import" href="../../paper-button/paper-button.html">
-
+  <link rel="import" href="../../paper-input/paper-input.html">
+  
   <style is="custom-style">
     html /deep/ * {
     }
@@ -35,8 +36,10 @@
       <h1>{{dateFormat(date, 'LL')}}</h1>
       <paper-button class="btn" on-tap="showDialog" raised>Change Date</paper-button>
       <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog">
-        <paper-date-picker id="picker" responsive-width="655px"></paper-date-picker>
+        <paper-date-picker id="picker" date="{{date}}" responsive-width="{{responsiveWidth}}"></paper-date-picker>
         <div class="buttons">
+          <paper-button on-tap="toggleState" raised>toggle vertical</paper-button>
+          <paper-button on-tap="setMayFifth" raised>Change to May 5th</paper-button>
           <paper-button dialog-dismiss>Cancel</paper-button>
           <paper-button dialog-confirm>OK</paper-button>
         </div>
@@ -56,6 +59,16 @@
         this.$.dialog.toggle();
       };
       scope.date = new Date();
+      
+      scope.responsiveWidth = '655px';
+      
+      scope.setMayFifth = function(){
+        scope.date = new Date(2015,4,5);
+      }
+      
+      scope.toggleState = function(){
+        scope.responsiveWidth = (scope.responsiveWidth === '655px' ? '100000px' : '655px');
+      }
     });
 
   </script>

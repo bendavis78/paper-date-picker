@@ -48,7 +48,8 @@
            */
           date: {
             type: Date,
-            notify: true
+            notify: true,
+            observer:'_dateChanged'
           },
           /**
            * The current locale
@@ -214,21 +215,13 @@
           return (yearDiff * 12) + monthDiff;
         },
         scrollToMonth: function(year, month) {
-          if (!this._sized) {
-            var _this = this;
-            this.addEventListener('paper-calendar-sized', function() {
-              this.scrollToMonth(year, month);
-              _this.removeEventListener('paper-calendar-sized', this);
-            });
-          } else {
-            var sel = '.month-' + year + '-' + month;
-            if (Polymer.Settings.useNativeShadow) {
-              sel = ':host /deep/ ' + sel;
-            }
-            var el = this.querySelector(sel);
-            if (el) {
-              this.$.calendarList.scrollTop = el.offsetTop;
-            }
+          var sel = '.month-' + year + '-' + month;
+          if (Polymer.Settings.useNativeShadow) {
+            sel = ':host /deep/ ' + sel;
+          }
+          var el = this.querySelector(sel);
+          if (el) {
+            this.$.calendarList.scrollTop = el.offsetTop;
           }
         },
         scrollToDate: function(date) {
@@ -268,6 +261,24 @@
         },
         _getDayName: function(date) {
           return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+        },
+        _dateChanged:function(newDate){
+          if(newDate){
+            this.scrollToDate(newDate);        
+            this._setDaySelected(newDate);
+          }
+        },
+        _setDaySelected:function(date){
+          if(!date) return;
+          var dateAttribute = date.getFullYear() + '-';
+          var month = date.getMonth();
+          var day = date.getDate(); 
+          dateAttribute += ('0' + month).slice(-2) + '-' + ('0' + day).slice(-2);
+
+          var dayElement = this.querySelector('.day-item[date=\''+dateAttribute+'\']');
+          if(dayElement){
+            dayElement.classList.add('selected');
+          }
         },
     });
   </script>

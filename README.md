@@ -37,6 +37,16 @@ If you include this element as part of `paper-dialog`, use the class
     </paper-action-dialog>
 ```
 
+## Development
+
+### run locally 
+
+```
+npm install -g gulp
+npm install
+bower install
+gulp serve
+```
 ---
 
 If you find this component useful, please show your support by donating to

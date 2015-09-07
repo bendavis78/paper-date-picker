@@ -48,7 +48,10 @@ gulp.task('bower:reload', ['bower'], reload);
 var redirect = function(from, to) {
   return function(req, res, next) {
     if (from === req.url) {
-      res.writeHead(301, {'Location': to});
+      res.writeHead(301, {
+        'Location': to,
+        'Cache-Control': 'cache-control: private, max-age=0, no-cache'
+      });
       res.end();
     }
     next();
@@ -102,7 +105,7 @@ gulp.task('gh-pages', function() {
     bower('.tmp')
       .pipe(add(
         'index.html',
-        '<meta http-equev="refresh" content="0;' + pkgName + '/">'
+        '<meta http-equiv="refresh" content="0;' + pkgName + '/">'
       ))
     ).pipe(ghPages()).on('end', function() {
       del(['.tmp', '.publish']);

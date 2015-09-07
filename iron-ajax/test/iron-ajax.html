@@ -71,6 +71,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var request;
       var server;
 
+      // A stand-in for Promise.all, as promise-polyfill doesn't polyfill it.
+      function promiseAll(promises) {
+        promises = promises.slice(); // defensive copy
+        return new Promise(function(resolve, reject) {
+          var successes = 0;
+          var onSuccess = function() {
+            successes++;
+            if (successes >= promises.length) {
+              resolve();
+            };
+          };
+          for (var i = 0; i < promises.length; i++) {
+            promises[i].then(onSuccess, reject);
+          }
+        });
+      }
+
       function timePasses(ms) {
         return new Promise(function(resolve) {
           window.setTimeout(function() {
@@ -185,18 +202,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           expect(ajax.generateRequest()).to.be.instanceOf(IronRequest);
         });
 
-        test('reflects the loading state in the `loading` property', function(done) {
+        test('reflects the loading state in the `loading` property', function() {
           var request = ajax.generateRequest();
 
           expect(ajax.loading).to.be.equal(true);
 
           server.respond();
 
-          timePasses(1).then(function() {
+          return request.completes.then(function() {
+            return timePasses(1);
+          }).then(function() {
             expect(ajax.loading).to.be.equal(false);
-            done();
-          }).catch(function(e) {
-            done(e);
           });
         });
       });
@@ -216,13 +232,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           expect(requests).to.deep.eql(ajax.activeRequests);
         });
 
-        test('empties `activeRequests` when requests are completed', function(done) {
+        test('empties `activeRequests` when requests are completed', function() {
           server.respond();
-          timePasses(1).then(function() {
+          promiseAll(requests).then(function() {
             expect(ajax.activeRequests.length).to.be.equal(0);
-            done();
-          }).catch(function(e) {
-            done(e);
           });
         });
       });

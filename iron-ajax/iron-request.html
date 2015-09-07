@@ -63,7 +63,6 @@ iron-request can be used to perform XMLHttpRequests.
        * A reference to the status code, if the `xhr` has completely resolved.
        *
        * @attribute status
-       * @type short
        * @default 0
        */
       status: {
@@ -77,7 +76,6 @@ iron-request can be used to perform XMLHttpRequests.
        * A reference to the status text, if the `xhr` has completely resolved.
        *
        * @attribute statusText
-       * @type String
        * @default ""
        */
       statusText: {
@@ -237,7 +235,6 @@ iron-request can be used to perform XMLHttpRequests.
       }
       var body = this._encodeBodyObject(options.body, contentType);
 
-
       // In IE, `xhr.responseType` is an empty string when the response
       // returns. Hence, caching it as `xhr._responseType`.
       xhr.responseType = xhr._responseType = (options.handleAs || 'text');
@@ -245,7 +242,10 @@ iron-request can be used to perform XMLHttpRequests.
 
 
 
-      xhr.send(body);
+      xhr.send(
+        /** @type {ArrayBuffer|ArrayBufferView|Blob|Document|FormData|
+                   null|string|undefined} */
+        (body));
 
       return this.completes;
     },
@@ -275,7 +275,7 @@ iron-request can be used to perform XMLHttpRequests.
               // If accessing `xhr.responseText` throws, responseType `json`
               // is supported and the result is rightly `undefined`.
               try {
-                xhr.responseText;
+                /** @suppress {suspiciousCode} */ xhr.responseText;
               } catch (e) {
                 return xhr.response;
               }
@@ -314,20 +314,21 @@ iron-request can be used to perform XMLHttpRequests.
      * @param {*} body The given body of the request to try and encode.
      * @param {?string} contentType The given content type, to infer an encoding
      *     from.
-     * @return {?string|*} Either the encoded body as a string, if successful,
+     * @return {*} Either the encoded body as a string, if successful,
      *     or the unaltered body object if no encoding could be inferred.
      */
     _encodeBodyObject: function(body, contentType) {
       if (typeof body == 'string') {
         return body;  // Already encoded.
       }
+      var bodyObj = /** @type {Object} */ (body);
       switch(contentType) {
         case('application/json'):
-          return JSON.stringify(body);
+          return JSON.stringify(bodyObj);
         case('application/x-www-form-urlencoded'):
-          return this._wwwFormUrlEncode(body);
+          return this._wwwFormUrlEncode(bodyObj);
       }
-      return body;  // Unknown, make no change.
+      return body;
     },
 
     /**

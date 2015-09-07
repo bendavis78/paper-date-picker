@@ -1,33 +1,33 @@
 BUILD LOG
 ---------
-Build Time: 2015-07-15T17:22:18-0700
+Build Time: 2015-08-20T15:30:06-0700
 
 NODEJS INFORMATION
 ==================
-nodejs: v2.3.4
+nodejs: v0.12.7
 gulp: 3.9.0
 gulp-audit: 1.0.0
 gulp-concat: 2.6.0
-gulp-header: 1.2.2
+gulp-header: 1.5.0
 gulp-uglify: 1.2.0
-run-sequence: 1.1.1
-web-component-tester: 3.3.1
+run-sequence: 1.1.2
+web-component-tester: 3.3.10
 
 REPO REVISIONS
 ==============
-webcomponentsjs: 83cd82b847c1fbeab6ba9a40d822c7d4cc96367a
+webcomponentsjs: 7c1be4272a2b086d127a6de75ba3c3f1afb4738b
 
 BUILD HASHES
 ============
-CustomElements.js: f77fa5739800df7721b1e2bb86bdd8f260ef672d
-CustomElements.min.js: f1ba945213ce0495cb93919caa6d050ef114fbf5
-HTMLImports.js: c5473ac4fc64180ba40da4679479ed5903feb54f
-HTMLImports.min.js: 401ea71282cb28c1af168d7c08defecab18f5afb
-MutationObserver.js: 2cc42498f20f5b3842c6b5e8f7735d111967b579
-MutationObserver.min.js: 39a017771ac32f3edc8881b7ea20d0b2013d103e
-ShadowDOM.js: fd1d36923e47ed2c48719485dc7768a854e09015
-ShadowDOM.min.js: f771f33aab417207f8e198500918f74c1dce7314
-webcomponents-lite.js: 77d1bace03f086a89f9a8346fa1974205ba130b5
-webcomponents-lite.min.js: e87572819aedb8268109af569158d65911d8e398
-webcomponents.js: c4b4dd834dc76bba3b45e143adbfaae19bd0d340
-webcomponents.min.js: fd64b22600db44a3a428b538c468f18069435f4f
+CustomElements.js: 6a2286302817c5be1c1a7abae454fb6fd2356b2d
+CustomElements.min.js: 54ad572612b113ad0447fd0a511e6ed6a325fd5d
+HTMLImports.js: fd87b2bc09df49beb357abadbab0873815b1431a
+HTMLImports.min.js: 929f7aba1ffb0d9fc8eb8e46e5ab990f5afdb8cc
+MutationObserver.js: 4d20015dcf0aa06b4629ebe49f15bed6e9015b03
+MutationObserver.min.js: 532e4a1eeb5d76cc30aa17a746de39727f96cf0f
+ShadowDOM.js: 08981892c55c927a0063d2a60b92f598bff37b1b
+ShadowDOM.min.js: eb4a14b222a2f3d2ed36ec0ca4d49a1b71774b2c
+webcomponents-lite.js: 7d4f78d67aacced5391b31e1367620dd7c8a4720
+webcomponents-lite.min.js: 2022103f18119f2416bdd517a37f049d4bdf1e20
+webcomponents.js: e687f0f116af642618b561b7f3dc1b0af320e0c5
+webcomponents.min.js: 6f336e06e06e56574ba3df31798b7de346716996

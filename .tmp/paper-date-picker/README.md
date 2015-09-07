@@ -39,7 +39,7 @@ If you include this element as part of `paper-dialog`, use the class
 
 ---
 
-If you appreciate this component, please show your support by donating to 
+If you find this component useful, please show your support by donating to
 [Bold Idea](http://boldidea.org). Click the button below!
 
 [![ideaSpark campaign button][donate]](https://donorbox.org/bold-idea-make-ideaspark-possible-for-dallas-area-students)

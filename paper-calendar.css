@@ -64,6 +64,9 @@
 .day-item:not([disabled]) .day:hover {
   cursor: pointer;
 }
+.day-item[disabled] {
+  color: var(--text-disabled-color, #9d9d9d);
+}
 .day-item.selected .day {
   background: var(--default-primary-color);
   color: var(--text-primary-color);

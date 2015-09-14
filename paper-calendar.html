@@ -25,7 +25,7 @@
             <template is="dom-repeat" items="{{month.weeks}}" as="week">
               <div class="week">
                 <template is="dom-repeat" items="{{week}}">
-                  <div on-tap="_tapDay" date$="{{item.name}}" disabled$="{{!item.day}}" 
+                  <div on-tap="_tapDay" date$="{{item.name}}" disabled$="{{isDisabled(item.day, item.date, minDate, maxDate)}}"
                     class$="{{getDayClass('day-item', item.date, today, date)}}">
                     <div class="day">{{item.day}}</div>
                   </div>
@@ -60,6 +60,24 @@
             type: String,
             value: 'en',
             observer: 'localeChanged'
+          },
+          /**
+           * The minimum allowed date
+           * @attribute minDate
+           * @type Date
+           */
+          minDate: {
+            type: Date,
+            value: null
+          },
+          /**
+           * The maximum allowed date
+           * @attribute minDate
+           * @type Date
+           */
+          maxDate: {
+            type: Date,
+            value: null
           },
           /*
            * The minumum allowable year
@@ -205,6 +223,9 @@
           }
           return cssClass;
         },
+        isDisabled: function(day, date) {
+          return !day || !this._isDateInBounds(date);
+        },
         getMonthClass: function(month) {
           return 'month month-' + month.year + '-' + month.month;
         },
@@ -242,7 +263,13 @@
           this.scrollToMonth(month.year, month.month);
         },
         _tapDay: function(event) {
+          if (!this._isDateInBounds(event.model.item.date)) {
+            return false;
+          }
           this.date = event.model.item.date;
+        },
+        _isDateInBounds: function(date) {
+          return !date || ((!this.minDate || this.minDate.getTime() <= date.getTime()) && (!this.maxDate || this.maxDate.getTime() >= date.getTime()));
         },
         _resizeHandler: function() {
           this.updateSize();

@@ -72,7 +72,7 @@ If you include this element as part of `paper-dialog`, use the class
       </div>
       <neon-animated-pages id="pages" selected="{{selectedPage}}" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
         <section is="neon-animatable" id="chooseDay">
-          <paper-calendar id="calendar" locale="{{locale}}" minYear="{{minYear}}" maxYear="{{maxYear}}" date="{{date}}"></paper-calendar>
+          <paper-calendar id="calendar" locale="{{locale}}" minYear="{{minYear}}" maxYear="{{maxYear}}" date="{{date}}" min-date="{{minDate}}" max-date="{{maxDate}}"></paper-calendar>
         </section>
         <section is="neon-animatable" id="chooseYear">
           <div id="yearList" cross-fade>
@@ -123,6 +123,24 @@ If you include this element as part of `paper-dialog`, use the class
         locale: {
           type: String,
           value: 'en'
+        },
+        /**
+         * The minimum allowed date
+         * @attribute minDate
+         * @type Date
+         */
+        minDate: {
+          type: Date,
+          value: null
+        },
+        /**
+         * The maximum allowed date
+         * @attribute minDate
+         * @type Date
+         */
+        maxDate: {
+          type: Date,
+          value: null
         },
         /*
          * The minumum allowable year

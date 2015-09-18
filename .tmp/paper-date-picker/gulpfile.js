@@ -105,7 +105,7 @@ gulp.task('gh-pages', function() {
     bower('.tmp')
       .pipe(add(
         'index.html',
-        '<meta http-equev="refresh" content="0;URL=' + pkgName + '/">'
+        '<meta http-equiv="refresh" content="0;' + pkgName + '/">'
       ))
     ).pipe(ghPages()).on('end', function() {
       del(['.tmp', '.publish']);

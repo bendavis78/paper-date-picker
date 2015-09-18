@@ -1,6 +1,6 @@
 {
   "name": "marked-element",
-  "version": "1.0.2",
+  "version": "1.1.1",
   "description": "Element wrapper for the marked library",
   "private": true,
   "authors": [
@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "marked": "~0.3.3",
-    "polymer": "Polymer/polymer#^1.0.0"
+    "polymer": "Polymer/polymer#^1.1.0"
   },
   "license": "https://polymer.github.io/LICENSE.txt",
   "main": "marked-element.html",

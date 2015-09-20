@@ -49,7 +49,8 @@
           date: {
             type: Date,
             notify: true,
-            value: null
+            value: null,
+            observer: '_dateChanged'
           },
           /**
            * The current locale
@@ -295,6 +296,11 @@
             date = this.initialDate || this.today;
           }
           this.scrollToMonth(date.getFullYear(), date.getMonth());
+        },
+        _dateChanged: function(date) {
+          if (date) {
+            this.scrollToDate(date);
+          }
         },
         _tapMonth: function(event) {
           var month = event.model.month;

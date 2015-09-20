@@ -183,9 +183,8 @@ If you include this element as part of `paper-dialog`, use the class
         narrow: {
           type: Boolean,
           reflectToAttribute: true,
-          value: false,
           notify: true,
-          readOnly: true,
+          computed: '_computeNarrow(forceNarrow, _queryMatches)'
         },
         isTouch: {
           type: Boolean,
@@ -195,8 +194,7 @@ If you include this element as part of `paper-dialog`, use the class
         },
         _queryMatches: {
           type: Boolean,
-          value: false,
-          observer: '_computeNarrow'
+          value: false
         }
       },
       behaviors: [
@@ -271,8 +269,8 @@ If you include this element as part of `paper-dialog`, use the class
         }
         return moment(date).format(format);
       },
-      _computeNarrow: function() {
-        this._setNarrow(this._queryMatches || this.forceNarrow);
+      _computeNarrow: function(queryMatches, forceNarrow) {
+        return queryMatches || forceNarrow;
       },
       _resizeHandler: function() {
         this.$.calendar.updateSize();

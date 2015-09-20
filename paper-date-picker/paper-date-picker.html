@@ -27,6 +27,11 @@ Setting the initial date to April 20, 2015:
 
     <paper-date-picker date="2014-04-20"></paper-date-picker>
 
+You may also specify a minimum and/or maximum date allowed in this picker using
+the same date notation:
+
+    <paper-date-picker min-date="2014-04-20" max-date="2015-04-20"></paper-date-picker>
+
 If you include this element as part of `paper-dialog`, use the class
 `"paper-date-picker-dialog"` on the dialog in order to give it proper styling.
 
@@ -72,7 +77,10 @@ If you include this element as part of `paper-dialog`, use the class
       </div>
       <neon-animated-pages id="pages" selected="{{selectedPage}}" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
         <section is="neon-animatable" id="chooseDay">
-          <paper-calendar id="calendar" locale="{{locale}}" minYear="{{minYear}}" maxYear="{{maxYear}}" date="{{date}}"></paper-calendar>
+        <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}" 
+          min-year="{{minYear}}" max-year="{{maxYear}}" years="{{years}}"
+          min-date="{{minDate}}" max-date="{{maxDate}}">
+        </paper-calendar>
         </section>
         <section is="neon-animatable" id="chooseYear">
           <div id="yearList" cross-fade>
@@ -123,6 +131,24 @@ If you include this element as part of `paper-dialog`, use the class
         locale: {
           type: String,
           value: 'en'
+        },
+        /**
+         * The minimum allowed date
+         * @attribute minDate
+         * @type Date
+         */
+        minDate: {
+          type: Date,
+          value: null
+        },
+        /**
+         * The maximum allowed date
+         * @attribute minDate
+         * @type Date
+         */
+        maxDate: {
+          type: Date,
+          value: null
         },
         /*
          * The minumum allowable year
@@ -183,7 +209,6 @@ If you include this element as part of `paper-dialog`, use the class
         this.today = this.$.calendar.today;
         this.isTouch = 'ontouchstart' in window;
         this.headingDate = this.date ? this.date : new Date();
-        this.years = this.$.calendar.years;
         this._selectPage(CALENDAR);
       },
       _tapHeadingDay: function() {

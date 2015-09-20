@@ -9,7 +9,7 @@
   <link rel="import" type="css" href="paper-calendar.css">
   <template>
     <div id="calendarList" cross-fade>
-      <template is="dom-repeat" items="{{months}}" as="month">
+      <template is="dom-repeat" items="{{_months}}" as="month">
         <div class$="{{getMonthClass(month)}}">
           <div class="month-header">
             <div class="month-name" on-tap="_tapMonth">
@@ -25,7 +25,7 @@
             <template is="dom-repeat" items="{{month.weeks}}" as="week">
               <div class="week">
                 <template is="dom-repeat" items="{{week}}">
-                  <div on-tap="_tapDay" date$="{{item.name}}" disabled$="{{!item.day}}" 
+                  <div on-tap="_tapDay" date$="{{item.name}}" disabled$="{{isDisabled(item.day, item.date, minDate, maxDate)}}"
                     class$="{{getDayClass('day-item', item.date, today, date)}}">
                     <div class="day">{{item.day}}</div>
                   </div>
@@ -48,7 +48,8 @@
            */
           date: {
             type: Date,
-            notify: true
+            notify: true,
+            value: null
           },
           /**
            * The current locale
@@ -60,6 +61,24 @@
             type: String,
             value: 'en',
             observer: 'localeChanged'
+          },
+          /**
+           * The minimum allowed date
+           * @attribute minDate
+           * @type Date
+           */
+          minDate: {
+            type: Date,
+            value: null
+          },
+          /**
+           * The maximum allowed date
+           * @attribute minDate
+           * @type Date
+           */
+          maxDate: {
+            type: Date,
+            value: null
           },
           /*
            * The minumum allowable year
@@ -81,6 +100,21 @@
             type: Number,
             value: 2100
           },
+          initialDate: {
+            type: Date,
+            value: function() {
+              return this.today || new Date();
+            },
+          },
+          _year: {
+            type: Number,
+            computed: '_computeYear(initialDate, minDate, maxDate)'
+          },
+          years: {
+            type: Array,
+            computed: '_computeYears(minYear, maxYear, minDate, maxDate)',
+            notify: true
+          },
           isTouch: {
             type: Boolean,
             value: false,
@@ -90,6 +124,9 @@
         behaviors: [
           Polymer.IronResizableBehavior
         ],
+        observers: [
+          'populate(_year, minDate, maxDate)'
+        ],
         listeners: {
           'iron-resize': '_resizeHandler'
         },
@@ -97,30 +134,40 @@
           moment.locale(this.locale);
         },
         ready: function() {
-          this.date = null;
           this.isTouch = 'ontouchstart' in window;
-          this.months = [];
-          this.years = [];
           this._physicalYears = [];
           this._updateToday();
-          this.initialDate = this.initialDate ? this.initialDate : this.today;
           this.weekdays = moment.weekdays();
           this.monthNames = moment.months();
           this.localeChanged();
-          this.startYear = this.startYear ? this.startYear : 1900;
-          this.endYear = this.endYear ? this.endYear : 2100;
 
           setInterval(this._updateToday, 60000);
 
-          for (var y=this.startYear; y<=this.endYear; y++) {
-            this.years.push(y);
-          }
-
-          this.async(function() {
-            this.populate(this.initialDate.getFullYear());
-          });
-
           this.scrollToDate(this.initialDate);
+        },
+        _computeYear(initialDate, minDate, maxDate) {
+          var year = initialDate.getFullYear();
+          if (minDate && year < minDate.getFullYear()) {
+            year = minDate.getFullYear();
+          } else if (maxDate && year > maxDate.getFullYear()) {
+            year = maxDate.getFullYear();
+          }
+          return year;
+        },
+        _computeYears: function(minYear, maxYear, minDate, maxDate) {
+          var years = [];
+          if (minDate) {
+            var minDateYear = minDate.getFullYear();
+            minYear = minYear > minDateYear ? minYear : minDateYear;
+          }
+          if (maxDate) {
+            var maxDateYear = maxDate && maxDate.getFullYear();
+            maxYear = maxYear < maxDateYear ? maxYear : maxDateYear;
+          }
+          for (var y=minYear; y<=maxYear; y++) {
+            years.push(y);
+          }
+          return years;
         },
         /* TODO: figure out a user-friendly way to auto-populate years
          * It takes more time on mobile, so there should be some indication that a
@@ -133,15 +180,24 @@
         loadMoreLower: function() {
         }
         */
-        populate: function(year) {
-          this.months = [];
-          this.days = [];
+        populate: function(year, minDate, maxDate) {
+          console.log('populate', arguments);
+          var months = [];
           var month, weeks, day, d, dayInfo, monthData, date = new Date();
 
           date.setYear(year);
           date.setHours(0, 0, 0, 0);
 
-          for (month=0; month<12; month++) {
+          var startMonth = 0;
+          var endMonth = 12;
+          if (minDate && year === minDate.getFullYear()) {
+            startMonth = minDate.getMonth();
+          }
+          if (maxDate && year === maxDate.getFullYear()) {
+            endMonth = maxDate.getMonth() + 1;
+          }
+
+          for (month=startMonth; month<endMonth; month++) {
             weeks = [[]];
             day = 1;
             date.setMonth(month);
@@ -165,7 +221,6 @@
                 month: month,
                 day: day,
               };
-              this.days.push(dayInfo);
               weeks[weeks.length-1].push(dayInfo);
               date.setDate(++day);
               d++;
@@ -176,8 +231,9 @@
               weeks: weeks,
               domReady: false
             };
-            this.push('months', monthData);
+            months.push(monthData);
           }
+          this.set('_months', months);
         },
         isoFormat: function(year, month, day) {
           var date;
@@ -205,12 +261,15 @@
           }
           return cssClass;
         },
+        isDisabled: function(day, date) {
+          return !day || !this._isDateInBounds(date);
+        },
         getMonthClass: function(month) {
           return 'month month-' + month.year + '-' + month.month;
         },
         getMonthIdx: function(year, month) {
-          var yearDiff = (year - this.months[0].year);
-          var monthDiff = (month - this.months[0].month);
+          var yearDiff = (year - this._months[0].year);
+          var monthDiff = (month - this._months[0].month);
           return (yearDiff * 12) + monthDiff;
         },
         scrollToMonth: function(year, month) {
@@ -233,7 +292,7 @@
         },
         scrollToDate: function(date) {
           if (!date) {
-            date = this.initialDate;
+            date = this.initialDate || this.today;
           }
           this.scrollToMonth(date.getFullYear(), date.getMonth());
         },
@@ -242,7 +301,16 @@
           this.scrollToMonth(month.year, month.month);
         },
         _tapDay: function(event) {
+          if (!this._isDateInBounds(event.model.item.date)) {
+            return false;
+          }
           this.date = event.model.item.date;
+        },
+        _isDateInBounds: function(date) {
+          return !date || (
+            (!this.minDate || this.minDate.getTime() <= date.getTime()) && 
+            (!this.maxDate || this.maxDate.getTime() >= date.getTime())
+          );
         },
         _resizeHandler: function() {
           this.updateSize();

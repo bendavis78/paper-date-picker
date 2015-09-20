@@ -72,7 +72,7 @@ If you include this element as part of `paper-dialog`, use the class
       </div>
       <neon-animated-pages id="pages" selected="{{selectedPage}}" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
         <section is="neon-animatable" id="chooseDay">
-          <paper-calendar id="calendar" locale="{{locale}}" minYear="{{minYear}}" maxYear="{{maxYear}}" date="{{date}}"></paper-calendar>
+          <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}" min-year="{{minYear}}" max-year="{{maxYear}}" years="{{years}}"></paper-calendar>
         </section>
         <section is="neon-animatable" id="chooseYear">
           <div id="yearList" cross-fade>
@@ -183,7 +183,6 @@ If you include this element as part of `paper-dialog`, use the class
         this.today = this.$.calendar.today;
         this.isTouch = 'ontouchstart' in window;
         this.headingDate = this.date ? this.date : new Date();
-        this.years = this.$.calendar.years;
         this._selectPage(CALENDAR);
       },
       _tapHeadingDay: function() {

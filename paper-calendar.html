@@ -81,6 +81,11 @@
             type: Number,
             value: 2100
           },
+          years: {
+            type: Array,
+            computed: '_computeYears(minYear, maxYear)',
+            notify: true
+          },
           isTouch: {
             type: Boolean,
             value: false,
@@ -100,27 +105,28 @@
           this.date = null;
           this.isTouch = 'ontouchstart' in window;
           this.months = [];
-          this.years = [];
           this._physicalYears = [];
           this._updateToday();
           this.initialDate = this.initialDate ? this.initialDate : this.today;
           this.weekdays = moment.weekdays();
           this.monthNames = moment.months();
           this.localeChanged();
-          this.startYear = this.startYear ? this.startYear : 1900;
-          this.endYear = this.endYear ? this.endYear : 2100;
 
           setInterval(this._updateToday, 60000);
 
-          for (var y=this.startYear; y<=this.endYear; y++) {
-            this.years.push(y);
-          }
 
           this.async(function() {
             this.populate(this.initialDate.getFullYear());
           });
 
           this.scrollToDate(this.initialDate);
+        },
+        _computeYears: function(minYear, maxYear) {
+          var years = [];
+          for (var y=minYear; y<=maxYear; y++) {
+            years.push(y);
+          }
+          return years;
         },
         /* TODO: figure out a user-friendly way to auto-populate years
          * It takes more time on mobile, so there should be some indication that a

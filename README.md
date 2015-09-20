@@ -24,6 +24,11 @@ Setting the initial date to April 20, 2015:
 <paper-date-picker date="2014-04-20"></paper-date-picker>
 ```
 
+You may also specify a minimum and/or maximum date allowed in this picker using the same date notation:
+```html
+<paper-date-picker min-date="2014-04-20" max-date="2015-04-20"></paper-date-picker>
+```
+
 If you include this element as part of `paper-dialog`, use the class
 `"paper-date-picker-dialog"` on the dialog in order to give it proper styling.
 

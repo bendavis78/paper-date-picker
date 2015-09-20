@@ -138,7 +138,7 @@
           this.isTouch = 'ontouchstart' in window;
           this._physicalYears = [];
           this._updateToday();
-          this.weekdays = moment.weekdays();
+          this.weekdays = moment.weekdaysMin();
           this.monthNames = moment.months();
           this.localeChanged();
 

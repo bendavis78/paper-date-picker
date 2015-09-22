@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-media-query/iron-media-query.html">
 <link rel="import" href="../neon-animation/neon-animated-pages.html">
+<link rel="import" href="../neon-animation/neon-animatable.html">
 <link rel="import" href="../neon-animation/animations/fade-in-animation.html">
 <link rel="import" href="../neon-animation/animations/fade-out-animation.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
@@ -84,13 +85,13 @@ If you include this element as part of `paper-dialog`, use the class
         </div>
       </div>
       <neon-animated-pages id="pages" selected="{{selectedPage}}" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
-        <section is="neon-animatable" id="chooseDay">
-        <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}" 
-          min-year="{{minYear}}" max-year="{{maxYear}}" years="{{years}}"
-          min-date="{{minDate}}" max-date="{{maxDate}}">
-        </paper-calendar>
-        </section>
-        <section is="neon-animatable" id="chooseYear">
+        <neon-animatable id="chooseDay">
+          <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}"
+            min-year="{{minYear}}" max-year="{{maxYear}}" years="{{years}}"
+            min-date="{{minDate}}" max-date="{{maxDate}}">
+          </paper-calendar>
+        </neon-animatable>
+        <neon-animatable id="chooseYear">
           <div id="yearList" cross-fade>
             <iron-selector id="yearSelector" attr-for-selected="label" on-iron-select="_yearSelected">
               <template is="dom-repeat" items="{{years}}" as="year">
@@ -98,7 +99,7 @@ If you include this element as part of `paper-dialog`, use the class
               </template>
             </iron-selector>
           </div>
-        </section>
+        </neon-animatable>
       </neon-animated-pages>
     </div>
   </template>

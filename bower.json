@@ -20,7 +20,7 @@
     "/tests/"
   ],
   "dependencies": {
-    "moment": "~2.8.3",
+    "moment-js":"marcus7777/moment-js",
     "polymer": "Polymer/polymer#^1.0.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "iron-media-query": "PolymerElements/iron-media-query#^1.0.0",

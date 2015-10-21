@@ -17,7 +17,7 @@
       <span>{{dateFormat(date, 'L')}}</span>
     </paper-button>
     <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog">
-      <paper-date-picker locale="en-gb" id="picker" responsive-width="655px"></paper-date-picker>
+      <paper-date-picker min-date="{{minDate}}" max-date="{{maxDate}}" locale="en-gb" id="picker" responsive-width="655px"></paper-date-picker>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button><paper-button dialog-confirm>OK</paper-button>
       </div>
@@ -32,11 +32,14 @@
     },
     dismissDialog: function(event) {
       if (event.detail.confirmed) {
-        this.date = this.$.picker.date;
+        this.date = this.$.picker.date
       }
     },
     showDialog: function(){
-      this.$.dialog.toggle();
+      this.$.dialog.toggle()
     },
+    ready: function(){
+      this.$.picker.date = this.date
+    }
   });
 </script>

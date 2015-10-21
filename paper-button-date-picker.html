@@ -40,7 +40,11 @@
       this.$.dialog.toggle()
     },
     ready: function(){
-      this.$.picker.date = moment(this.date)
+      if (moment(this.date).isValid()) {
+        this.$.picker.date = moment(this.date)
+      } else {
+        this.$.picker.date = moment()
+      }
     }
   });
 </script>

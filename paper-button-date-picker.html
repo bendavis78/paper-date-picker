@@ -1,8 +1,9 @@
-<link rel="import" href="../paper-dialog/paper-dialog.html">
-<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-styles/paper-styles.html">
-<link rel="import" href="../paper-icon-button/paper-icon-button.html">
-
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-date-picker/paper-date-picker.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="paper-date-picker.html">
 <!--
 `<paper-button-date-picker>` 
@@ -11,7 +12,7 @@
 
 <dom-module id="paper-button-date-picker">
   <template>
-    <paper-icon-button icon="today" class="btn horizontal layout" on-tap="showDialog" raised>{{dateFormat(date, 'L')}}</paper-icon-button>
+    <paper-button icon="today" class="btn horizontal layout" on-tap="showDialog" raised>{{dateFormat(date, 'L')}}<iron-icon icon="today"></iron-icon></paper-button>
     <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog">
       <paper-date-picker locale="en-gb" id="picker" responsive-width="655px"></paper-date-picker>
       <div class="buttons">

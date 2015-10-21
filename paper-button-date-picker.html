@@ -12,7 +12,10 @@
 
 <dom-module id="paper-button-date-picker">
   <template>
-    <paper-button icon="today" class="btn horizontal layout" on-tap="showDialog" raised><iron-icon icon="today"></iron-icon>{{dateFormat(date, 'L')}}</paper-button>
+    <paper-button icon="today" class="btn horizontal layout" on-tap="showDialog" raised>
+      <iron-icon icon="today"></iron-icon>
+      <span>{{dateFormat(date, 'L')}}</span>
+    </paper-button>
     <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog">
       <paper-date-picker locale="en-gb" id="picker" responsive-width="655px"></paper-date-picker>
       <div class="buttons">

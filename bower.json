@@ -12,7 +12,10 @@
     "datepicker",
     "paper-date-picker"
   ],
-  "main": "paper-date-picker.html",
+  "main": [
+    "paper-date-picker.html",
+    "paper-button-date-picker.html"
+  ],
   "license": "MIT",
   "homepage": "http://bendavis78.github.io/paper-date-picker/",
   "ignore": [

@@ -13,12 +13,13 @@
 
 <dom-module id="paper-button-date-picker">
   <template>
+    <style>:host {display:inline-block}</style>
     <paper-button icon="today" class="btn horizontal layout" on-tap="showDialog" raised>
       <iron-icon icon="today"></iron-icon>
-      <span>{{dateFormat(date, 'L')}}</span>
+      <span>{{dateFormat(date, format)}}</span>
     </paper-button>
     <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog">
-      <paper-date-picker min-date="{{minDate}}" max-date="{{maxDate}}" locale="en-gb" id="picker" responsive-width="655px"></paper-date-picker>
+      <paper-date-picker min-date="{{minDate}}" max-date="{{maxDate}}" locale="{{locale}}" id="picker" responsive-width="655px"></paper-date-picker>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button><paper-button dialog-confirm>OK</paper-button>
       </div>
@@ -29,7 +30,7 @@
   Polymer({
     is: "paper-button-date-picker",
     properties: {
-      date: {notify: true}
+      date: {notify: true,value: new Date()}
     },
     dismissDialog: function(event) {
       if (event.detail.confirmed) {
@@ -39,15 +40,10 @@
     showDialog: function(){
       this.$.dialog.toggle()
     },
+    dateFormat: function(date,format){
+      return moment(date).format(format)
+    },
     ready: function(){
-      var date = new Date(this.date)
-      if (moment(this.date).isValid()) {
-        this.$.picker.date = moment(this.date)
-      } else if (moment(date).isValid()) {
-        this.$.picker.date = moment(date)
-      } else {
-        this.$.picker.date = new Date()
-      }
     }
   });
 </script>

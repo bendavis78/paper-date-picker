@@ -7,7 +7,7 @@
 <link rel="import" href="../moment-js/moment-js.html">
 <link rel="import" href="paper-date-picker.html">
 <!--
-`<paper-button-date-picker>` 
+`<paper-button-date-picker date="{{date}}" locale="en-gb" format="l"></paper-button-date-picker>` 
 @demo demo-btn.html
 -->
 
@@ -30,7 +30,8 @@
   Polymer({
     is: "paper-button-date-picker",
     properties: {
-      date: {notify: true}
+      date: {notify: true},
+      format: {value: "l"}
     },
     dismissDialog: function(event) {
       if (event.detail.confirmed) {

@@ -43,10 +43,10 @@
       var date = new Date(this.date)
       if (moment(this.date).isValid()) {
         this.$.picker.date = moment(this.date)
-      } else if (date) {
+      } else if (moment(date).isValid()) {
         this.$.picker.date = moment(date)
       } else {
-        this.$.picker.date = moment()
+        this.$.picker.date = new Date()
       }
     }
   });

@@ -20,7 +20,16 @@
 </dom-module>
 <script>
   Polymer({
-    is: "paper-button-date-picker"
-    
+    is: "paper-button-date-picker",
+    properties: {
+      date: {notify: true}
+    },
+    dismissDialog: function(){
+      //TODO add checks here
+      this.$.dialog.toggle();
+    },
+    showDialog: function(){
+      this.$.dialog.toggle();
+    },
   });
 </script>

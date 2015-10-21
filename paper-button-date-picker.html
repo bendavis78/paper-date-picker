@@ -39,7 +39,7 @@
       this.$.dialog.toggle()
     },
     ready: function(){
-      this.$.picker.date = this.date
+      this.$.picker.date = moment(this.date)
     }
   });
 </script>

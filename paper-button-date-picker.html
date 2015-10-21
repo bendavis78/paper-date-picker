@@ -11,7 +11,7 @@
   <template>
     <paper-icon-button icon="today" class="btn horizontal layout" on-tap="showDialog" raised>{{dateFormat(date, 'L')}}</paper-icon-button>
     <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog">
-      <paper-date-picker date="{{date}}" locale="en-gb" id="picker" responsive-width="655px"></paper-date-picker>
+      <paper-date-picker locale="en-gb" id="picker" responsive-width="655px"></paper-date-picker>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button><paper-button dialog-confirm>OK</paper-button>
       </div>
@@ -24,9 +24,10 @@
     properties: {
       date: {notify: true}
     },
-    dismissDialog: function(){
-      //TODO add checks here
-      this.$.dialog.toggle();
+    dismissDialog: function(event) {
+      if (event.detail.confirmed) {
+        checkin.date = checkin.$.picker.date;
+      }
     },
     showDialog: function(){
       this.$.dialog.toggle();

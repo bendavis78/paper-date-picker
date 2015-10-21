@@ -30,7 +30,7 @@
   Polymer({
     is: "paper-button-date-picker",
     properties: {
-      date: {notify: true,value: new Date()}
+      date: {notify: true}
     },
     dismissDialog: function(event) {
       if (event.detail.confirmed) {
@@ -44,6 +44,9 @@
       return moment(date).format(format)
     },
     ready: function(){
+      if (!this.date) {
+        this.date = new Date()
+      }
     }
   });
 </script>

@@ -118,7 +118,8 @@ If you include this element as part of `paper-dialog`, use the class
         date: {
           type: Date,
           notify: true,
-          observer: '_dateChanged' 
+          observer: '_dateChanged',
+          value: new Date()
         },
         /**
          * Maximum screen width at which the picker uses a vertical layout

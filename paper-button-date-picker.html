@@ -1,0 +1,53 @@
+<link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../iron-icons/iron-icons.html">
+<link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-date-picker/paper-date-picker.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../moment-js/moment-js.html">
+<link rel="import" href="paper-date-picker.html">
+<!--
+`<paper-button-date-picker date="{{date}}" locale="en-gb" format="l"></paper-button-date-picker>` 
+@demo demo-btn.html
+-->
+
+<dom-module id="paper-button-date-picker">
+  <template>
+    <style>:host {display:inline-block}</style>
+    <paper-button class="btn horizontal layout" on-tap="showDialog" raised>
+      <iron-icon icon="today"></iron-icon>
+      <span>{{dateFormat(date, format)}}</span>
+    </paper-button>
+    <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog">
+      <paper-date-picker min-date="{{minDate}}" max-date="{{maxDate}}" locale="{{locale}}" id="picker" responsive-width="655px"></paper-date-picker>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button><paper-button dialog-confirm>OK</paper-button>
+      </div>
+    </paper-dialog>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is: "paper-button-date-picker",
+    properties: {
+      date: {notify: true},
+      format: {value: "l"}
+    },
+    dismissDialog: function(event) {
+      if (event.detail.confirmed) {
+        this.date = this.$.picker.date
+      }
+    },
+    showDialog: function(){
+      this.$.dialog.toggle()
+    },
+    dateFormat: function(date,format){
+      return moment(date).format(format)
+    },
+    ready: function(){
+      if (!this.date) {
+        this.date = new Date()
+      }
+    }
+  });
+</script>

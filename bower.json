@@ -12,7 +12,10 @@
     "datepicker",
     "paper-date-picker"
   ],
-  "main": "paper-date-picker.html",
+  "main": [
+    "paper-date-picker.html",
+    "paper-button-date-picker.html"
+  ],
   "license": "MIT",
   "homepage": "http://bendavis78.github.io/paper-date-picker/",
   "ignore": [
@@ -20,7 +23,7 @@
     "/tests/"
   ],
   "dependencies": {
-    "moment": "~2.8.3",
+    "moment-js":"marcus7777/moment-js",
     "polymer": "Polymer/polymer#^1.0.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "iron-media-query": "PolymerElements/iron-media-query#^1.0.0",

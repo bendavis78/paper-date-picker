@@ -1,4 +1,3 @@
-<link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-media-query/iron-media-query.html">
 <link rel="import" href="../neon-animation/neon-animated-pages.html">
 <link rel="import" href="../neon-animation/neon-animatable.html">
@@ -8,9 +7,8 @@
 <link rel="import" href="../iron-selector/iron-selector.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../moment-js/moment-js.html">
 <link rel="import" href="paper-calendar.html">
-
-<script src="../moment/min/moment-with-locales.min.js"></script>
 
 <!--
 Material Design [Pickers](http://www.google.com/design/spec/components/pickers.html)
@@ -119,7 +117,7 @@ If you include this element as part of `paper-dialog`, use the class
         date: {
           type: Date,
           notify: true,
-          observer: '_dateChanged' 
+          observer: '_dateChanged'
         },
         /**
          * Maximum screen width at which the picker uses a vertical layout

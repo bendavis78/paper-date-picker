@@ -180,6 +180,15 @@ If you include this element as part of `paper-dialog`, use the class
           value: 2100
         },
         /**
+         *  If true set maxDate to today (disable future date)
+         *  @attribute only-past
+         *  @type Boolean
+         */
+        onlyPast: {
+          type: Boolean,
+          value: false
+        },
+        /**
          * Force narrow layout
          * @attribute forceNarrow
          * @type boolean
@@ -216,6 +225,9 @@ If you include this element as part of `paper-dialog`, use the class
         this.today = this.$.calendar.today;
         this.isTouch = 'ontouchstart' in window;
         this.headingDate = this.date ? this.date : new Date();
+        if(this.onlyPast) {
+          this.maxDate = this.today;
+        }
         this._selectPage(CALENDAR);
       },
       _tapHeadingDay: function() {

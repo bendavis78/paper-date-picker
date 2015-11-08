@@ -225,7 +225,7 @@
 
           this.scrollToDate(this.initialDate);
         },
-        _computeYear(initialDate, minDate, maxDate) {
+        _computeYear: function(initialDate, minDate, maxDate) {
           var year = initialDate.getFullYear();
           if (minDate && year < minDate.getFullYear()) {
             year = minDate.getFullYear();

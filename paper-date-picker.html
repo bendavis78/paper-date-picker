@@ -352,6 +352,7 @@ If you include this element as part of `paper-dialog`, use the class
           this.async(function() {
             headingDate.setFullYear(year);
             this.headingDate = headingDate;
+            this.date = headingDate;
           });
           this.$.calendar.populate(year);
           this.async(function() {

@@ -1,0 +1,43 @@
+{
+  "name": "moment-element",
+  "version": "1.1.0",
+  "description": "Element wrapper for the moment.js library",
+  "private": true,
+  "authors": [
+    "Ben Davis <bendavis78@gmail.com>"
+  ],
+  "keywords": [
+    "web-components",
+    "polymer",
+    "moment",
+    "container",
+    "wrapper"
+  ],
+  "dependencies": {
+    "moment": "^2.10.0",
+    "polymer": "Polymer/polymer#^1.1.0"
+  },
+  "license": "MIT",
+  "main": "moment-element.html",
+  "homepage": "http://bendavis78.github.io/moment-element/",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bendavis78/moment-element.git"
+  },
+  "devDependencies": {
+    "paper-styles": "PolymerElements/paper-styles#^1.0.4",
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "test-fixture": "polymerelements/test-fixture#^1.0.0",
+    "web-component-tester": "*",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "_release": "1.1.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.1.0",
+    "commit": "7acbc2e9dda36a536e9284bf0f6644b260be7a9b"
+  },
+  "_source": "git://github.com/bendavis78/moment-element.git",
+  "_target": "^1.1.0",
+  "_originalSource": "bendavis78/moment-element"
+}

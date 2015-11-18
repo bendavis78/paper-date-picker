@@ -29,24 +29,28 @@ Give it a hydrolysis `PropertyDescriptor` (via `descriptor`), and watch it go!
       <div id="details">
         <div id="meta" hidden$="{{_computeHideMeta(descriptor)}}">
           <span id="type" class="type">{{descriptor.type}}</span>
-          <span id="default" hidden$="{{_computeHideDefault(descriptor.default)}}">default: <span class="value">{{_computeDefaultDisplay(descriptor.default)}}</span></span>
-          <template is="dom-if" if="{{descriptor.readOnly}}"><span>&nbsp;readOnly</span></template>
-          <template is="dom-if" if="{{descriptor.notify}}"><span>&nbsp;notify</span></template>
+          <span class="annotation">[[_getAnnotation(descriptor)]]</span>
         </div>
         <ol id="params" hidden$="{{_computeHideParams(descriptor,return)}}">
           <template is="dom-repeat" items="{{descriptor.params}}">
             <li hidden$="{{!item.type}}">
               <span class="name">{{item.name}}</span>
               <span class="type">{{item.type}}</span>
-              <marked-element markdown="{{item.desc}}"></marked-element>
+              <marked-element markdown="{{item.desc}}">
+                <div class="markdown-html"></div>
+              </marked-element>
             </li>
           </template>
           <li class="return" hidden$="{{!descriptor.return}}">Returns
             <span class="type">{{descriptor.return.type}}</span>
-            <marked-element markdown="{{descriptor.return.desc}}"></marked-element>
+            <marked-element markdown="{{descriptor.return.desc}}">
+              <div class="markdown-html"></div>
+            </marked-element>
           </li>
         </ol>
-        <marked-element id="desc" markdown="{{descriptor.desc}}" hidden$="{{!descriptor.desc}}"></marked-element>
+        <marked-element id="desc" markdown="{{descriptor.desc}}" hidden$="{{!descriptor.desc}}">
+          <div class="markdown-html"></div>
+        </marked-element>
       </div>
     </div>
   </template>
@@ -185,6 +189,21 @@ Give it a hydrolysis `PropertyDescriptor` (via `descriptor`), and watch it go!
       if (def === '')
         return "''";
       return def;
+    },
+
+    _getAnnotation: function(descriptor) {
+      var annotations = [];
+
+      if (descriptor['default'] !== undefined) {
+        annotations.push('Default: ' + descriptor['default']);
+      }
+      if (descriptor.readOnly) {
+        annotations.push('readOnly');
+      }
+      if (descriptor.notify) {
+        annotations.push('notifies');
+      }
+      return annotations.join(' – ');
     }
 
   });

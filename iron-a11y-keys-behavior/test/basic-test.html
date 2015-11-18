@@ -30,6 +30,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
   </test-fixture>
 
+  <test-fixture id="NonPropagatingKeys">
+    <template>
+      <x-a11y-basic-keys stop-keyboard-event-propagation></x-a11y-basic-keys>
+    </template>
+  </test-fixture>
+
   <test-fixture id="ComboKeys">
     <template>
       <x-a11y-combo-keys></x-a11y-combo-keys>
@@ -64,6 +70,9 @@ suite('Polymer.IronA11yKeysBehavior', function() {
       _keyHandler: function(event) {
         this.keyCount++;
         this.lastEvent = event;
+      },
+      _preventDefaultHandler: function(event) {
+        event.preventDefault();
       }
     }];
 
@@ -118,7 +127,8 @@ suite('Polymer.IronA11yKeysBehavior', function() {
       ],
 
       keyBindings: {
-        'space': '_keyHandler'
+        'space': '_keyHandler',
+        'enter': '_preventDefaultHandler'
       }
     });
   });
@@ -159,6 +169,15 @@ suite('Polymer.IronA11yKeysBehavior', function() {
 
       MockInteractions.pressSpace(keys);
       expect(keys.keyCount).to.be.equal(1);
+    });
+
+    test('allows propagation beyond the key combo handler', function() {
+      var keySpy = sinon.spy();
+      document.addEventListener('keydown', keySpy);
+
+      MockInteractions.pressEnter(keys);
+
+      expect(keySpy.callCount).to.be.equal(1);
     });
 
     suite('edge cases', function() {
@@ -239,6 +258,37 @@ suite('Polymer.IronA11yKeysBehavior', function() {
       MockInteractions.pressSpace(keys);
 
       expect(keys.keyCount).to.be.equal(2);
+    });
+  });
+
+  suite('stopping propagation automatically', function() {
+    setup(function() {
+      keys = fixture('NonPropagatingKeys');
+    });
+
+    test('does not propagate key events beyond the combo handler', function() {
+      var keySpy = sinon.spy();
+
+      document.addEventListener('keydown', keySpy);
+
+      MockInteractions.pressEnter(keys);
+
+      expect(keySpy.callCount).to.be.equal(0);
+    });
+  });
+
+  suite('prevent default behavior of event', function() {
+    setup(function() {
+      keys = fixture('BehaviorKeys');
+    });
+    test('defaultPrevented is correctly set', function() {
+      var keySpy = sinon.spy();
+
+      document.addEventListener('keydown', keySpy);
+
+      MockInteractions.pressEnter(keys);
+
+      expect(keySpy.getCall(0).args[0].defaultPrevented).to.be.equal(true);
     });
   });
 

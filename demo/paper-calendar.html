@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
   <title>paper-date-picker Demo</title>
-  
+ 
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
   <link rel="import" href="../paper-date-picker.html">
@@ -18,40 +18,34 @@
     section {
       margin: 24px;
     }
+    h3 {
+      text-align: center;
+    }
+    #container {
+      margin: 0 auto;
+      height: 300px;
+      width: 300px;
+    }
   </style>
 </head>
 <body unresolved>
   <template is="dom-bind" id="scope">
+    <h3>{{dateFormat(date, 'LLL')}}</h3>
     <section>
-      <h1>{{dateFormat(date, 'LL')}}</h1>
-      <paper-button class="btn" on-tap="showDialog" raised>Change Date</paper-button>
-      <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog">
-        <paper-date-picker id="picker" date="[[date]]"></paper-date-picker>
-        <div class="buttons">
-          <paper-button dialog-dismiss>Cancel</paper-button>
-          <paper-button dialog-confirm>OK</paper-button>
-        </div>
-      </paper-dialog>
+      <div id="container">
+        <paper-calendar id="picker" date="{{date}}"></paper-calendar>
+      </div>
     </section>
   </template>
   <script>
     var scope = Polymer.dom(document).querySelector('#scope');
     scope.dateFormat = function(date, format) {
+      if (!date) {
+        return 'No date selected';
+      }
       return moment(date).format(format);
     };
-    scope.dismissDialog = function(event) {
-      if (event.detail.confirmed) {
-        scope.date = scope.$.picker.date;
-      }
-    };
-    scope.showDialog = function() {
-      this.$.dialog.toggle();
-    };
-    document.addEventListener('WebComponentsReady', function() {
-      scope.date = new Date(2017, 3, 13);
-      scope.showDialog();
-    });
-
+    scope.date = new Date(2017, 3, 13);
   </script>
 </body>
 </html>

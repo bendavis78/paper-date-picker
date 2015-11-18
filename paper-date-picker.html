@@ -8,15 +8,13 @@
 <link rel="import" href="../iron-selector/iron-selector.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../moment-element/moment-with-locales-import.html">
 <link rel="import" href="paper-calendar.html">
-
-<script src="../moment/min/moment-with-locales.min.js"></script>
 
 <!--
 Material Design [Pickers](http://www.google.com/design/spec/components/pickers.html)
 
-Provides a responsive date picker based on the material design spec. This
-component aims to be a clone of the date picker introduced in Android Lollipop.
+Provides a responsive date picker based on the material design spec.
 
 ## Examples:
 
@@ -26,23 +24,25 @@ Default picker:
 
 Setting the initial date to April 20, 2015:
 
-    <paper-date-picker date="2014-04-20"></paper-date-picker>
+    <paper-date-picker date="April 20, 2015"></paper-date-picker>
 
 You may also specify a minimum and/or maximum date allowed in this picker using
 the same date notation:
 
-    <paper-date-picker min-date="2014-04-20" max-date="2015-04-20"></paper-date-picker>
+    <paper-date-picker min-date="April 1, 2015" max-date="June 30, 2015"></paper-date-picker>
 
 If you include this element as part of `paper-dialog`, use the class
-`"paper-date-picker-dialog"` on the dialog in order to give it proper styling.
+`"paper-date-picker-dialog"` on the dialog element in order to give it proper
+styling:
 
-    <paper-action-dialog id="dialog" modal class="paper-date-picker-dialog">
-      <paper-date-picker id="datePicker"></paper-date-picker>
+    <paper-dialog id="dialog" class="paper-date-picker-dialog" modal 
+      on-iron-overlay-closed="dismissDialog">
+      <paper-date-picker id="picker" date="[[date]]"></paper-date-picker>
       <div class="buttons">
         <paper-button dialog-dismiss>Cancel</paper-button>
         <paper-button dialog-confirm>OK</paper-button>
       </div>
-    </paper-action-dialog>
+    </paper-dialog>
 
 @element paper-date-picker
 @blurb Provides a responsive date picker based on the material design spec.
@@ -53,10 +53,7 @@ If you include this element as part of `paper-dialog`, use the class
 <style is="custom-style">
   /* Allow easy styling of paper-date-picker-dialog */
   :root {
-    --paper-date-picker-dialog-picker: {
-      margin-top: 0;
-      margin-bottom: 0;
-      padding: 0;
+    --paper-date-picker-dialog-buttons-before: {
     };
     --paper-date-picker-dialog: {
       margin: 0;
@@ -67,7 +64,18 @@ If you include this element as part of `paper-dialog`, use the class
     @apply(--paper-date-picker-dialog);
   }
   :root .paper-date-picker-dialog > paper-date-picker {
+    margin-top: 0;
+    padding: 0;
+    --paper-calendar: {
+      padding-bottom: 0;
+      @apply(--paper-date-picker-dialog-calendar);
+    };
     @apply(--paper-date-picker-dialog-picker);
+  }
+  :root .paper-date-picker-dialog > paper-date-picker:not([narrow]) {
+    --paper-date-picker-heading: {
+      margin-bottom: -56px;
+    };
   }
 </style>
 
@@ -75,124 +83,119 @@ If you include this element as part of `paper-dialog`, use the class
   <template>
     <style>
       :host {
-        -webkit-font-smoothing: antialiased;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
         display: inline-block;
         color: var(--primary-text-color);
-        overflow: hidden;
         @apply(--paper-font-body1);
         --paper-date-picker-font-day: {
           @apply(--paper-font-display3);
           font-size: 72px;
           line-height: 78px;
         };
+        @apply(--paper-date-picker);
       }
 
-      /** Horizontal ******************/
+      /** Landscape ******************/
       #datePicker {
-        width: 540px;
-        height: 240px;
+        width: 512px;
+        height: 248px;
         @apply(--layout-horizontal);
       }
-      #heading, 
-      #pages {
-        width: 270px !important;
-        height: 240px;
+      #heading {
+        width: 168px;
+        @apply(--paper-date-picker-heading);
       }
 
       /** Narrow *********************/
       :host([narrow]) #datePicker {
-        width: 270px;
-        height: 450px;
+        width: 328px;
+        height: 428px;
         @apply(--layout-vertical);
       }
       :host([narrow]) #heading {
-        height: 210px;
+        width: auto;
+        height: 96px;
+        padding: 16px 24px;
       }
 
       /** Heading ********************/
       #heading {
+        padding: 16px;
+        box-sizing: border-box;
         color: var(--text-primary-color); 
         background: var(--default-primary-color);
-        text-align: center;
-        /* font-kerning: auto;
-        letter-spacing: normal; */
         @apply(--layout-vertical);
         @apply(--layout-around-justfied);
       }
-      #heading .weekday {
-        padding: 8px;
-        background: var(--dark-primary-color);
-        @apply(--paper-font-body1);
+      #heading .date,
+      #heading .year {
+        cursor: pointer;
       }
       #heading .date {
-        padding: 10px;
-        @apply(--layout-vertical);
-        @apply(--layout-around-justified);
-        @apply(--layout-flex);
+        @apply(--paper-font-display1);
+        font-weight: bold;
+        margin-top: 2px;
+        @apply(--paper-date-picker-heading-date);
       }
-      #heading .date .month {
-        @apply(--paper-font-headline);
-        text-transform: uppercase;
+      #heading div.date {
+        letter-spacing: 0.025em;
       }
-      #heading .date .day {
-        @apply(--paper-date-picker-font-day);
+      #heading .date span {
+        white-space: nowrap;
       }
-      #heading .date .year {
-        @apply(--paper-font-headline);
+      #heading .year {
+        @apply(--paper-font-body2);
+        font-size: 16px;
+        @apply(--paper-date-picker-heading-date);
       }
-      #heading .date .year,
-      #heading.pg-chooseYear .date .month,
-      #heading.pg-chooseYear .date .day {
+      #heading:not(.pg-chooseYear) .year,
+      #heading.pg-chooseYear .date {
         color: var(--light-primary-color);
-      }
-      #heading.pg-chooseYear .date .year {
-        color: inherit; 
-      }
-      #heading .date .day:hover,
-      #heading .date .month:hover,
-      #heading .date .year:hover {
-        cursor: pointer;
       }
 
       /** Calendar/Year picker ********/
       #pages {
+        flex: 1;
+        width: auto;
         background: var(--default-background-color);
       }
-      #pages section {
-        position: relative;
+
+      #calendar {
+        --paper-calendar: {
+          @apply(--paper-date-picker-calendar);
+        }
       }
 
       /** Year List *******************/
       #yearList {
         @apply(--layout-vertical);
+        @apply(--layout-center-center);
         display: block;
         height: 100%;
         overflow-y: auto;
         overflow-x: hidden;
       }
       #yearList .year {
-        height: 68px;
-        min-height: 68px;
-        @apply(--layout-horizontal);
-        @apply(--layout-center-justified);
-      }
-      #yearList .year:hover {
         cursor: pointer;
-      }
-      #yearList .year div {
+        height: 44px;
+        line-height: 44px;
         text-align: center;
         vertical-align: middle;
-        line-height: 64px;
-        margin: 2px;
-        width: 64px;
-        height: 64px;
-        border-radius: 32px;
       }
-      #yearList .year.iron-selected div {
-        background: var(--default-primary-color);
-        color: var(--text-primary-color);
+      #yearList .iron-selected {
+        @apply(--paper-font-headline);
       }
-
+      #yearList .year.iron-selected {
+        height: 58px;
+        line-height: 58px !important;
+        vertical-align: middle;
+        color: var(--default-primary-color);
+      }
       :host([isTouch]) #yearList::-webkit-scrollbar {
         width: 0 !important 
       }
@@ -200,25 +203,27 @@ If you include this element as part of `paper-dialog`, use the class
     <iron-media-query query="{{_getMediaQuery(forceNarrow, responsiveWidth)}}" query-matches="{{_queryMatches}}"></iron-media-query>
     <div id="datePicker">
       <div id="heading" class$="{{_getHeadingClass('heading-content', selectedPage)}}">
-        <div class="weekday">{{dateFormat(headingDate, 'dddd')}}</div>
-        <div class="date">
-          <div class="month" on-tap="_tapHeadingMonth">{{dateFormat(headingDate, 'MMM')}}</div>
-          <div class="day" on-tap="_tapHeadingDay">{{dateFormat(headingDate, 'D')}}</div>
-          <div class="year" on-tap="_tapHeadingYear">{{dateFormat(headingDate, 'YYYY')}}</div>
+        <div class="year" on-tap="_tapHeadingYear">{{dateFormat(date, 'YYYY', locale)}}</div>
+        <div class="date" on-tap="_tapHeadingDate">
+          <template is="dom-repeat" items="{{_splitHeadingDate(date, headingFormat, locale)}}">
+            <span>{{item}}</span>
+          </template>
         </div>
       </div>
-      <neon-animated-pages id="pages" selected="{{selectedPage}}" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
-        <neon-animatable id="chooseDay">
+      <neon-animated-pages id="pages" selected="{{selectedPage}}" attr-for-selected="id" 
+        entry-animation="fade-in-animation" exit-animation="fade-out-animation">
+        <neon-animatable id="chooseDate">
           <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}"
-            min-year="{{minYear}}" max-year="{{maxYear}}" years="{{years}}"
+            min-year="{{minYear}}" max-year="{{maxYear}}"
             min-date="{{minDate}}" max-date="{{maxDate}}">
           </paper-calendar>
         </neon-animatable>
         <neon-animatable id="chooseYear">
           <div id="yearList" cross-fade>
-            <iron-selector id="yearSelector" attr-for-selected="label" on-iron-select="_yearSelected">
+            <iron-selector id="yearSelector" attr-for-selected="label" 
+              on-iron-select="_yearSelected">
               <template is="dom-repeat" items="{{years}}" as="year">
-                <div class="year" label$="{{year}}"><div>{{year}}</div></div>
+                <div class="year" label$="{{year}}" on-tap="_tapYear">{{year}}</div>
               </template>
             </iron-selector>
           </div>
@@ -227,8 +232,6 @@ If you include this element as part of `paper-dialog`, use the class
     </div>
   </template>
   <script>
-    var CALENDAR = 0;
-    var YEARLIST = 1;
 
     Polymer({
       is: 'paper-date-picker',
@@ -238,8 +241,7 @@ If you include this element as part of `paper-dialog`, use the class
          */
         date: {
           type: Date,
-          notify: true,
-          observer: '_dateChanged' 
+          notify: true
         },
         /**
          * Maximum screen width at which the picker uses a vertical layout
@@ -256,6 +258,14 @@ If you include this element as part of `paper-dialog`, use the class
           value: 'en'
         },
         /**
+         * The format of the date displayed in the heading.
+         * See docuemntation for Moment.js for more info.
+         */
+        headingFormat: {
+          type: String,
+          value: 'ddd, MMM D'
+        },
+        /**
          * The minimum allowed date
          */
         minDate: {
@@ -268,20 +278,6 @@ If you include this element as part of `paper-dialog`, use the class
         maxDate: {
           type: Date,
           value: null
-        },
-        /*
-         * The minumum allowable year
-         */
-        minYear: {
-          type: Number,
-          value: 1900
-        },
-        /*
-         * The maximum allowable year
-         */
-        maxYear: {
-          type: Number,
-          value: 2100
         },
         /**
          * Force narrow layout
@@ -302,9 +298,17 @@ If you include this element as part of `paper-dialog`, use the class
           readOnly: true,
           reflectToAttribute: true
         },
+        years: {
+          type: Array,
+          computed: '_computeYears(minDate, maxDate)'
+        },
         _queryMatches: {
           type: Boolean,
           value: false
+        },
+        headingBreak: {
+          type: String,
+          value: '[,]'
         }
       },
       behaviors: [
@@ -316,56 +320,53 @@ If you include this element as part of `paper-dialog`, use the class
       ready: function() {
         this.today = this.$.calendar.today;
         this.isTouch = 'ontouchstart' in window;
-        this.headingDate = this.date ? this.date : new Date();
-        this._selectPage(CALENDAR);
+        this._selectPage('chooseDate');
       },
-      _tapHeadingDay: function() {
-        this.$.calendar.scrollToDate(this.headingDate);
-        if (this.$.pages.selected !== CALENDAR) {
-          this._selectPage(CALENDAR);
+      dateFormat: function() {
+        return this.$.calendar.dateFormat.apply(this.$.calendar, arguments);
+      },
+      _tapYear: function() {
+        this._selectPage('chooseDate');
+      },
+      _yearSelected: function(e, detail) {
+        var year = parseInt(detail.item.getAttribute('label'));
+        var date = new Date(this.date);
+        if (year !== date.getFullYear()) {
+          date.setFullYear(year);
+          this.date = date;
         }
       },
-      _tapHeadingMonth: function() {
-        this._tapHeadingDay();
+      _tapHeadingDate: function() {
+        if (this.$.pages.selected !== 'chooseDate') {
+          this._selectPage('chooseDate');
+        }
       },
       _tapHeadingYear: function() {
-        var year = this.headingDate.getFullYear();
-        this._scrollToYear(year);
-        if (this.$.pages.selected !== YEARLIST) {
+        var year = this.date.getFullYear();
+        this.async(function() {
+          this._scrollToYear(year);
+        }.bind(this));
+        if (this.$.pages.selected !== 'chooseYear') {
           this.$.yearSelector.select(year.toString());
-          this._selectPage(YEARLIST);
+          this._selectPage('chooseYear');
         }
       },
       _selectPage: function(page) {
         this.$.pages.selected = page;
       },
       _scrollToYear: function(year) {
-        this.async(function() {
-          var el = this.$.yearSelector.querySelector('.year[label="' + year + '"]');
-          this.$.yearList.scrollTop = el.offsetTop - 94;
-        });
+        var el = this.$.yearSelector.querySelector('.year[label="' + year + '"]');
+        var middle = this.$.chooseYear.offsetHeight / 2;
+        this.$.yearList.scrollTop = el.offsetTop - middle + (el.offsetHeight / 2);
       },
-      _yearSelected: function(e, detail) {
-        var year = parseInt(detail.item.getAttribute('label'));
-        var headingDate = new Date(this.headingDate);
-        if (year !== headingDate.getFullYear()) {
-          this.async(function() {
-            headingDate.setFullYear(year);
-            this.headingDate = headingDate;
-          });
-          this.$.calendar.populate(year);
-          this.async(function() {
-            this.$.calendar.scrollToDate(this.headingDate);
-            this._selectPage(CALENDAR);
-          });
+      _computeYears: function(minDate, maxDate) {
+        var minYear = minDate ? minDate.getFullYear() : 1900;
+        var maxYear = maxDate ? maxDate.getFullYear() : 2100;
+        var years = [];
+        for (var y = minYear; y <= maxYear; y++) {
+          years.push(y);
         }
-      },
-      _dateChanged: function(date) {
-        if (date) {
-          this.headingDate = date;
-        } else {
-          this.headingDate = this.today;
-        }
+        return years;
       },
       _getMediaQuery: function(forceNarrow, responsiveWidth) {
         return '(max-width: ' + (forceNarrow ? '' : responsiveWidth) + ')';
@@ -373,17 +374,32 @@ If you include this element as part of `paper-dialog`, use the class
       _getHeadingClass: function(pfx, selectedPage) {
         return pfx + ' pg-' + selectedPage;
       },
-      dateFormat: function(date, format) {
-        if (!date) {
-          return '';
+      _splitHeadingDate: function(date, format, locale) {
+        var re = new RegExp(this.headingBreak, 'g');
+        var text = this.dateFormat(date, format, locale);
+        var seps = text.match(re);
+        var value;
+        if (!seps) {
+          value = [text];
+        } else {
+          value = text.split(re).map(function(s, i) {
+            return s + (seps[i] || '');
+          });
         }
-        return moment(date).format(format);
+        return value;
       },
       _computeNarrow: function(queryMatches, forceNarrow) {
         return queryMatches || forceNarrow;
       },
       _resizeHandler: function() {
-        this.$.calendar.updateSize();
+        if (this._resizing) {
+          return;
+        }
+        this._resizing = true;
+        this.$.calendar.notifyResize();
+        this._resizing = false;
+
+        this.updateStyles();
       }
     });
   </script>

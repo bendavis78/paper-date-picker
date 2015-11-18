@@ -10,7 +10,7 @@ component aims to be a clone of the date picker introduced in Android Lollipop.
 See the [component page](http://bendavis78.github.io/paper-date-picker/) for 
 full documentation.
 
-## Example usage:
+## Examples:
 
 Default picker:
 
@@ -19,27 +19,28 @@ Default picker:
 ```
 
 Setting the initial date to April 20, 2015:
-
 ```html
-<paper-date-picker date="2014-04-20"></paper-date-picker>
+<paper-date-picker date="April 20, 2015"></paper-date-picker>
 ```
 
-You may also specify a minimum and/or maximum date allowed in this picker using the same date notation:
+You may also specify a minimum and/or maximum date allowed in this picker using
+the same date notation:
 ```html
-<paper-date-picker min-date="2014-04-20" max-date="2015-04-20"></paper-date-picker>
+<paper-date-picker min-date="April 1, 2015" max-date="June 30, 2015"></paper-date-picker>
 ```
 
 If you include this element as part of `paper-dialog`, use the class
-`"paper-date-picker-dialog"` on the dialog in order to give it proper styling.
-
+`"paper-date-picker-dialog"` on the dialog element in order to give it proper
+styling:
 ```html
-    <paper-action-dialog id="dialog" modal class="paper-date-picker-dialog">
-      <paper-date-picker id="datePicker"></paper-date-picker>
-      <div class="buttons">
-        <paper-button dialog-dismiss>Cancel</paper-button>
-        <paper-button dialog-confirm>OK</paper-button>
-      </div>
-    </paper-action-dialog>
+<paper-dialog id="dialog" class="paper-date-picker-dialog" modal
+  on-iron-overlay-closed="dismissDialog">
+  <paper-date-picker id="picker" date="[[date]]"></paper-date-picker>
+  <div class="buttons">
+    <paper-button dialog-dismiss>Cancel</paper-button>
+    <paper-button dialog-confirm>OK</paper-button>
+  </div>
+</paper-dialog>
 ```
 
 ---
@@ -49,6 +50,6 @@ If you find this component useful, please show your support by donating to
 
 [![ideaSpark campaign button][donate]](https://donorbox.org/bold-idea-make-ideaspark-possible-for-dallas-area-students)
 
-[wide]: http://i.imgur.com/pnKuwtk.png
-[narrow]: http://i.imgur.com/ExhVflG.png
+[wide]: http://i.imgur.com/I0SjSWf.png
+[narrow]: http://i.imgur.com/SsrLJDo.png
 [donate]: http://www.boldidea.org/donate-badge-md-1.png

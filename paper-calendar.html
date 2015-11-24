@@ -383,7 +383,7 @@
         if (date.getTime() === this.today.getTime()) {
           cssClass += ' today';
         }
-        if (this.date.getTime() === date.getTime()) {
+        if (this.date && this.date.getTime() === date.getTime()) {
           cssClass += ' selected';
         }
         return cssClass;

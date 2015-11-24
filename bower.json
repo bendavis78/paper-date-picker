@@ -21,7 +21,7 @@
   ],
   "dependencies": {
     "moment-element": "bendavis78/moment-element#^1.1.0",
-    "polymer": "Polymer/polymer#^1.0.0",
+    "polymer": "Polymer/polymer#^1.1.0",
     "iron-icons": "PolymerElements/iron-icons#^1.0.0",
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "iron-media-query": "PolymerElements/iron-media-query#^1.0.0",

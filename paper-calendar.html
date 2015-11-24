@@ -332,7 +332,11 @@
           }
 
           // add "padding" days
-          for (d=0; d<date.getDay() - this._firstDayOfWeek; d++) {
+          var firstDay = date.getDay() - this._firstDayOfWeek;
+          if (firstDay < 0) {
+            firstDay = 7 + firstDay;
+          }
+          for (d=0; d<firstDay; d++) {
             weeks[0].push({day: null, date: null});
           }
 

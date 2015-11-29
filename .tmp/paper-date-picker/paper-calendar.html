@@ -265,7 +265,9 @@
          */
         currentYear: {
           type: Number
-        }
+        },
+        _contentClass: String,
+        _months: Array
       },
       behaviors: [
         Polymer.IronResizableBehavior
@@ -332,7 +334,11 @@
           }
 
           // add "padding" days
-          for (d=0; d<date.getDay() - this._firstDayOfWeek; d++) {
+          var firstDay = date.getDay() - this._firstDayOfWeek;
+          if (firstDay < 0) {
+            firstDay = 7 + firstDay;
+          }
+          for (d=0; d<firstDay; d++) {
             weeks[0].push({day: null, date: null});
           }
 
@@ -379,7 +385,7 @@
         if (date.getTime() === this.today.getTime()) {
           cssClass += ' today';
         }
-        if (this.date.getTime() === date.getTime()) {
+        if (this.date && this.date.getTime() === date.getTime()) {
           cssClass += ' selected';
         }
         return cssClass;

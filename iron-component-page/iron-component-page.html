@@ -244,8 +244,6 @@ documentation page including demos (if available).
       Polymer({
         is: 'iron-component-page',
 
-        enableCustomStyleProperties: true,
-
         properties: {
           /**
            * The URL to an import that declares (or transitively imports) the
@@ -289,7 +287,8 @@ documentation page including demos (if available).
           base: {
             type: String,
             value: function() {
-              return this.ownerDocument.baseURI;
+              // Don't include URL hash.
+              return this.ownerDocument.baseURI.replace(/\#.*$/, '');
             }
           },
 
@@ -609,6 +608,26 @@ documentation page including demos (if available).
           if (!this._findDescriptor(this.active)) {
             this.active = this._getDefaultActive();
           }
+
+          // Scroll to element. Wait one frame so for page load case. Browser
+          // will attempt to jump to the element before it exists in DOM.
+          // TODO: support scrolling to hidden API properties/methods.
+          // TODO: deep link into non-default "active" view in select dropdown.
+          this.async(function() {
+            var hash = window.location.hash;
+            if (hash) {
+              var goToElement = null;
+              // Find element using native shadow dom. Otherwise, fall back to shady.
+              if (Polymer.Settings.useNativeShadow) {
+                goToElement = this.$.view.querySelector(':scope /deep/ ' + hash);
+              } else {
+                goToElement = this.querySelector(hash);
+              }
+              if (goToElement) {
+                goToElement.scrollIntoView(true);
+              }
+            }
+          });
         },
 
         _detectAnalyzer: function() {

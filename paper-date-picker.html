@@ -10,6 +10,7 @@
 <link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="../moment-element/moment-with-locales-import.html">
 <link rel="import" href="paper-calendar.html">
+<link rel="import" href="paper-date-picker-dialog-style.html">
 
 <!--
 Material Design [Pickers](http://www.google.com/design/spec/components/pickers.html)
@@ -50,33 +51,8 @@ styling:
 @demo demo/index.html
 -->
 
-<style is="custom-style">
-  /* Allow easy styling of paper-date-picker-dialog */
-  :root {
-    --paper-date-picker-dialog: {
-      margin: 0;
-      max-height: 520px !important;
-    };
-  }
-  :root .paper-date-picker-dialog {
-    @apply(--paper-date-picker-dialog);
-  }
-  :root .paper-date-picker-dialog > paper-date-picker {
-    margin-top: 0;
-    padding: 0;
-    --paper-calendar: {
-      padding-bottom: 0;
-      @apply(--paper-date-picker-dialog-calendar);
-    };
-    @apply(--paper-date-picker-dialog-picker);
-  }
-  :root .paper-date-picker-dialog > paper-date-picker:not([narrow]) {
-    --paper-date-picker-heading: {
-      margin-bottom: -56px;
-      @apply(--paper-date-picker-dialog-heading);
-    };
-  }
-</style>
+<!-- include dialog style at document-level for backward compatibility -->
+<style is="custom-style" include="paper-date-picker-dialog-style"></style>
 
 <dom-module id="paper-date-picker">
   <template>

@@ -281,8 +281,10 @@
       },
       ready: function() {
         this._updateToday();
-        this.currentMonth = this.date.getMonth() + 1;
-        this.currentYear = this.date.getFullYear();
+
+        var date = this.date || new Date();
+        this.currentMonth = date.getMonth() + 1;
+        this.currentYear = date.getFullYear();
         this._transitionEvent = this.style.WebkitTransition ? 'transitionEnd' : 'webkitTransitionEnd';
       },
       dateFormat: function(date, format, locale) {
@@ -567,6 +569,16 @@
         this._incrMonth(1);
       },
       _dateChanged: function(date, oldValue) {
+        if (!date) {
+          // Ensure binded values are set to null too.
+          this.set('date', null);
+
+          var curr = new Date();
+          this.currentYear = curr.getFullYear();
+          this.currentMonth = curr.getMonth() + 1;
+          return;
+        }
+
         if (!this._isValidDate(date)) {
           console.warn('Invalid date: ' + date);
           this.date = date = oldValue;

@@ -186,14 +186,14 @@
       </div>
       <div id="monthNav" class="month-nav layout horizontal center">
         <div class="flex col self-stretch">
-          <div class="btn" on-tap="_prevMonth">
+          <div class="btn" on-tap="_swipePrevMonth">
             <paper-ripple center class="ripple circle"></paper-ripple>
             <iron-icon class="icon flex" icon="chevron-left"></iron-icon>
           </div>
         </div>
         <div class="flex-5"></div>
         <div class="flex col self-stretch">
-          <div class="btn" on-tap="_nextMonth">
+          <div class="btn" on-tap="_swipeNextMonth">
             <paper-ripple center class="ripple circle"></paper-ripple>
             <iron-icon class="icon flex" icon="chevron-right"></iron-icon>
           </div>
@@ -458,25 +458,30 @@
                 this._transitionDuration = newDuration;
               }
 
-              var direction, newX;
               if (dx > 0) {
-                direction = 'right';
-                newX = 0;
+                this._swipePrevMonth();
               } else {
-                direction = 'left';
-                newX = -width * 2;
+                this._swipeNextMonth();
               }
-
-              this._translateX(newX, 'swipe', function() {
-                this.set('_contentClass', '');
-                this.transform('translateX(' + this._startPos + 'px)', this.$.months);
-                this.fire('swiped', {direction: direction});
-              }.bind(this));
             } else {
               this._translateX(this._startPos, 'reset');
             }
             this._gesture = null;
         }
+      },
+      _swipePrevMonth: function() {
+        this._translateX(0, 'swipe', function() {
+          this.set('_contentClass', '');
+          this.transform('translateX(' + this._startPos + 'px)', this.$.months);
+          this.fire('swiped', {direction: 'right'});
+        }.bind(this));
+      },
+      _swipeNextMonth: function() {
+        this._translateX(-this._containerWidth * 2, 'swipe', function() {
+          this.set('_contentClass', '');
+          this.transform('translateX(' + this._startPos + 'px)', this.$.months);
+          this.fire('swiped', {direction: 'left'});
+        }.bind(this));
       },
       _getMonthIdx: function(pos) {
         // returns the index for the visible month according to the given position

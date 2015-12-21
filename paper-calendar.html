@@ -397,16 +397,13 @@
         return name + ' month-' + month.year + '-' + month.month;
       },
       _onTrack: function(event) {
-        var detail = event.detail;
-        var state = detail.state;
         var dx = event.detail.dx;
         var dy = event.detail.dy;
         var adx = Math.abs(dx);
         var ady = Math.abs(dy);
         var width = this._containerWidth;
-        var x = this._startPos + dx;
 
-        switch (state) {
+        switch (event.detail.state) {
           case 'start':
             this._trackStartTime = (new Date()).getTime();
             this._startPos = this._currentPos;
@@ -432,6 +429,7 @@
 
             this._dragging = true;
             var fullWidth = width * this._months.length;
+            var x = this._startPos + dx;
 
             // If we're dragging outside the bounds, add some resistence
             if (x > 0 || x < (-fullWidth + width)) {

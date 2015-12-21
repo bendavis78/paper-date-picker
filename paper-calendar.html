@@ -464,8 +464,14 @@
                 this._transitionDuration = newDuration;
               }
 
-              var newX = width * idx * -1;
-              var direction = (dx < 0) ? 'left' : 'right';
+              var direction, newX;
+              if (dx > 0) {
+                direction = 'right';
+                newX = 0;
+              } else {
+                direction = 'left';
+                newX = -width * 2;
+              }
 
               this._translateX(newX, 'swipe', function() {
                 this.set('_contentClass', '');

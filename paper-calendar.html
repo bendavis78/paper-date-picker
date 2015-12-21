@@ -6,6 +6,7 @@
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../iron-selector/iron-selector.html">
 <link rel="import" href="../moment-element/moment-with-locales-import.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
 
 <dom-module id="paper-calendar">
   <template>
@@ -46,9 +47,6 @@
         height: 100%;
         @apply(--layout-horizontal);
       }
-      #months.animating .month-nav {
-        opacity: 1;
-      }
       #months.animating {
         transition-property: transform, opacity;
         transition-duration: 300ms;
@@ -68,7 +66,7 @@
         @apply(--layout-justified);
       }
 
-      .month-row, .month-nav {
+      .month-row {
         height: calc(100%/8);
         box-sizing: border-box;
         padding: 0 calc(100%/36);
@@ -80,31 +78,16 @@
         @apply(--layout-flex);
       }
 
-      .month-nav {
+      #monthNav {
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+        @apply(--layout-center);
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
+        left:0;
+        right: 0;
+        padding: 0 calc(100%/36);
+        height: calc(100%/8);
         opacity: 1;
-      }
-      .month-nav .col {
-        position: relative;
-        @apply(--layout-vertical);
-        @apply(--layout-center-center);
-      }
-      .month-nav .btn .icon {
-        cursor: pointer;
-      }
-      .month-nav .btn .ripple {
-        position: absolute;
-        width: 48px;
-        height: 48px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-      .month-nav .btn.right {
-        text-align: right;
       }
       .month-name {
         line-height: 24px;
@@ -184,20 +167,11 @@
           </div>
         </template>
       </div>
-      <div id="monthNav" class="month-nav layout horizontal center">
-        <div class="flex col self-stretch">
-          <div class="btn" on-tap="_swipePrevMonth">
-            <paper-ripple center class="ripple circle"></paper-ripple>
-            <iron-icon class="icon flex" icon="chevron-left"></iron-icon>
-          </div>
-        </div>
-        <div class="flex-5"></div>
-        <div class="flex col self-stretch">
-          <div class="btn" on-tap="_swipeNextMonth">
-            <paper-ripple center class="ripple circle"></paper-ripple>
-            <iron-icon class="icon flex" icon="chevron-right"></iron-icon>
-          </div>
-        </div>
+      <div id="monthNav">
+        <paper-icon-button icon="chevron-left" on-tap="_swipePrevMonth">
+        </paper-icon-button>
+        <paper-icon-button icon="chevron-right" on-tap="_swipeNextMonth">
+        </paper-icon-button>
       </div>
     </div>
   </template>

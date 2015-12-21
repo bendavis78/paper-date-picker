@@ -404,78 +404,80 @@
         var adx = Math.abs(dx);
         var ady = Math.abs(dy);
         var width = this._containerWidth;
-
-        if (state === 'start') {
-          this._trackStartTime = (new Date()).getTime();
-          this._startPos = this._currentPos;
-          this._moveQueue = [];
-        }
-
         var x = this._startPos + dx;
-        if (state === 'track') {
-          if (this._moveQueue.length >= 4) {
-            this._moveQueue.shift();
-          }
-          this._moveQueue.push(event);
 
-          // ignore movement within WIGGLE_THRESHOLD
-          var distance = (dx * dx) + (dy * dy);
-          if (!this._gesture && distance > WIGGLE_THRESHOLD_SQUARE) {
-            this._gesture = adx > ady ? 'pan-x' : 'pan-y';
-          }
+        switch (state) {
+          case 'start':
+            this._trackStartTime = (new Date()).getTime();
+            this._startPos = this._currentPos;
+            this._moveQueue = [];
+          break;
 
-          // only drag during pan-x gesture
-          if (this._gesture !== 'pan-x') {
-            return;
-          }
-
-          this._dragging = true;
-          var fullWidth = width * this._months.length;
-
-          // If we're dragging outside the bounds, add some resistence
-          if (x > 0 || x < (-fullWidth + width)) {
-            if (isNaN(parseInt(this._resistStart))) {
-              this._resistStart = adx;
+          case 'track':
+            if (this._moveQueue.length >= 4) {
+              this._moveQueue.shift();
             }
-            var rdx = adx - this._resistStart;
-            var p, d, max = RESIST_LENGTH;
-            p = rdx > width ? 1 : rdx / width;
-            d = max * (1 - Math.pow(1 - p, RESIST_FACTOR));
-            x = (dx < 0 ? -this._scrollWidth + width - d : d);
-          } else {
-            this._resistStart = null;
-          }
-          this._translateX(x);
-        }
-        if (state === 'end') {
-          this._resistStart = null;
-          var lastIdx = this._getMonthIdx(this._startPos);
-          var idx = this._getMonthIdx(this._currentPos);
-          var speed = this._getFastestMovement(event).v;
-          var move = idx !== lastIdx || speed > FLICK_SPEED;
-          if (!this._resistStart && this._gesture === 'pan-x' && move) {
-            if (speed > FLICK_SPEED) {
-              // calculate an ideal transition duration based on current speed of swipe
-              var remainingDistance = width - adx;
-              var newDuration = remainingDistance / speed;
-              if (newDuration > 300) {
-                newDuration = 300;
+            this._moveQueue.push(event);
+
+            // ignore movement within WIGGLE_THRESHOLD
+            var distance = (dx * dx) + (dy * dy);
+            if (!this._gesture && distance > WIGGLE_THRESHOLD_SQUARE) {
+              this._gesture = adx > ady ? 'pan-x' : 'pan-y';
+            }
+
+            // only drag during pan-x gesture
+            if (this._gesture !== 'pan-x') {
+              return;
+            }
+
+            this._dragging = true;
+            var fullWidth = width * this._months.length;
+
+            // If we're dragging outside the bounds, add some resistence
+            if (x > 0 || x < (-fullWidth + width)) {
+              if (isNaN(parseInt(this._resistStart))) {
+                this._resistStart = adx;
               }
-              this._transitionDuration = newDuration;
+              var rdx = adx - this._resistStart;
+              var p, d, max = RESIST_LENGTH;
+              p = rdx > width ? 1 : rdx / width;
+              d = max * (1 - Math.pow(1 - p, RESIST_FACTOR));
+              x = (dx < 0 ? -this._scrollWidth + width - d : d);
+            } else {
+              this._resistStart = null;
             }
+            this._translateX(x);
+          break;
 
-            var newX = width * idx * -1;
-            var direction = (dx < 0) ? 'left' : 'right';
+          case 'end':
+            this._resistStart = null;
+            var lastIdx = this._getMonthIdx(this._startPos);
+            var idx = this._getMonthIdx(this._currentPos);
+            var speed = this._getFastestMovement(event).v;
+            var move = idx !== lastIdx || speed > FLICK_SPEED;
+            if (!this._resistStart && this._gesture === 'pan-x' && move) {
+              if (speed > FLICK_SPEED) {
+                // calculate an ideal transition duration based on current speed of swipe
+                var remainingDistance = width - adx;
+                var newDuration = remainingDistance / speed;
+                if (newDuration > 300) {
+                  newDuration = 300;
+                }
+                this._transitionDuration = newDuration;
+              }
 
-            this._translateX(newX, 'swipe', function() {
-              this.set('_contentClass', '');
-              this.transform('translateX(' + this._startPos + 'px)', this.$.months);
-              this.fire('swiped', {direction: direction});
-            }.bind(this));
-          } else {
-            this._translateX(this._startPos, 'reset');
-          }
-          this._gesture = null;
+              var newX = width * idx * -1;
+              var direction = (dx < 0) ? 'left' : 'right';
+
+              this._translateX(newX, 'swipe', function() {
+                this.set('_contentClass', '');
+                this.transform('translateX(' + this._startPos + 'px)', this.$.months);
+                this.fire('swiped', {direction: direction});
+              }.bind(this));
+            } else {
+              this._translateX(this._startPos, 'reset');
+            }
+            this._gesture = null;
         }
       },
       _getMonthIdx: function(pos) {

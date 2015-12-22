@@ -167,9 +167,6 @@
     var RESIST_LENGTH = 40;
     var RESIST_FACTOR = 2;
 
-    // Number of months to preload on both sides of the current month
-    var PRELOAD_MONTHS = 1;
-
     Polymer({
       is: 'paper-calendar',
       properties: {
@@ -219,6 +216,13 @@
           type: Date,
           value: null
         },
+        /**
+         * Number of months to preload on both sides of the current month
+         */
+        preloadMonths: {
+          type: Number,
+          value: 1
+        },
         _contentClass: String,
         _gesture: {
           type: String,
@@ -230,7 +234,7 @@
         Polymer.IronResizableBehavior
       ],
       observers: [
-        '_populate(currentYear, currentMonth, minDate, maxDate, locale)',
+        '_populate(currentYear, currentMonth, minDate, maxDate, preloadMonths, locale)',
       ],
       listeners: {
         'iron-resize': '_resizeHandler',
@@ -444,7 +448,7 @@
             this._gesture = null;
         }
       },
-      _populate: function(currentYear, currentMonth, minDate, maxDate) {
+      _populate: function(currentYear, currentMonth, minDate, maxDate, preloadMonths) {
         var date, month, weeks, day, d, dayInfo, monthData, months = [];
 
         // Make sure currentYear/currentMonth are in min/max range
@@ -458,7 +462,7 @@
           return;
         }
 
-        for (var i=-PRELOAD_MONTHS; i<=PRELOAD_MONTHS; i++) {
+        for (var i=-this.preloadMonths; i<=this.preloadMonths; i++) {
           weeks = [[]];
           day = 1;
           date = new Date(currentYear, currentMonth - 1 + i, 1);
@@ -537,14 +541,14 @@
         this._updateToday();
       },
       _swipePrevMonth: function() {
-        this._translateX(-this._containerWidth * ( PRELOAD_MONTHS - 1 ), 'swipe', function() {
+        this._translateX(-this._containerWidth * ( this.preloadMonths - 1 ), 'swipe', function() {
           this.set('_contentClass', '');
           this.transform('translateX(' + this._startPos + 'px)', this.$.months);
           this.fire('swiped', {direction: 'right'});
         }.bind(this));
       },
       _swipeNextMonth: function() {
-        this._translateX(-this._containerWidth * ( PRELOAD_MONTHS + 1 ), 'swipe', function() {
+        this._translateX(-this._containerWidth * ( this.preloadMonths + 1 ), 'swipe', function() {
           this.set('_contentClass', '');
           this.transform('translateX(' + this._startPos + 'px)', this.$.months);
           this.fire('swiped', {direction: 'left'});

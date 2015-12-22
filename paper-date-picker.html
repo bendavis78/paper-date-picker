@@ -184,7 +184,7 @@ styling:
         entry-animation="fade-in-animation" exit-animation="fade-out-animation">
         <neon-animatable id="chooseDate">
           <paper-calendar id="calendar" locale="[[locale]]" date="{{date}}"
-            min-date="[[minDate]]" max-date="[[maxDate]]">
+            min-date="[[minDate]]" max-date="[[maxDate]]" preload-months="[[preloadMonths]]">
           </paper-calendar>
         </neon-animatable>
         <neon-animatable id="chooseYear">
@@ -263,6 +263,13 @@ styling:
           reflectToAttribute: true,
           notify: true,
           computed: '_computeNarrow(forceNarrow, _queryMatches)'
+        },
+        /**
+         * Number of months to preload on both sides of the current month
+         */
+        preloadMonths: {
+          type: Number,
+          value: 1
         },
         /**
          * Maximum screen width at which the picker uses a vertical layout

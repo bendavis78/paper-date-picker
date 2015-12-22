@@ -536,7 +536,6 @@
       _resizeHandler: function() {
         this._containerWidth = this.$.calendar.offsetWidth;
         this._positionSlider();
-        this._updateToday();
       },
       _swipePrevMonth: function() {
         this._translateX(-this._containerWidth * ( this.preloadMonths - 1 ), 'swipe', function() {

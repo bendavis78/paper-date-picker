@@ -242,8 +242,6 @@
       },
       ready: function() {
         this._updateToday();
-        this.currentMonth = this.date.getMonth() + 1;
-        this.currentYear = this.date.getFullYear();
         this._transitionEvent = this.style.WebkitTransition ? 'transitionEnd' : 'webkitTransitionEnd';
       },
       dateFormat: function(date, format, locale) {
@@ -275,7 +273,7 @@
       },
       _gestureChange: function(gesture) {
         if (gesture == 'pan-x' && (animatedRipples = this.$$('.day-item > paper-ripple[animating]'))){
-            animatedRipples.upAction();
+          animatedRipples.upAction();
         }
       },
       _getDayClass: function(date) {

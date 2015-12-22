@@ -78,7 +78,6 @@
         opacity: 1;
       }
       .month-name {
-        line-height: 24px;
         font-weight: bold;
         @apply(--paper-font-body2);
         @apply(--layout-center-center);
@@ -87,9 +86,18 @@
         @apply(--layout-vertical);
         @apply(--layout-center-center);
         @apply(--layout-flex);
+      }
+      .day-item {
+        width: var(--paper-calendar-day-circle-width, 38px);
+        height: var(--paper-calendar-day-circle-width, 38px);
+        line-height: var(--paper-calendar-day-circle-width, 38px);
+        text-align: center;
+        vertical-align: middle;
+        border-radius: 50%;
+        position: relative;
         cursor: pointer;
       }
-      .day[disabled] {
+      .day-item[disabled] {
         cursor: default;
         color: var(--text-disabled-color, #9d9d9d);
       }
@@ -104,12 +112,6 @@
         color: var(--default-primary-color);
       }
       .day-item.selected{
-        width: var(--paper-calendar-selected-day-circle-width, 38px);
-        height: var(--paper-calendar-selected-day-circle-width, 38px);
-        line-height: var(--paper-calendar-selected-day-circle-width, 38px);
-        text-align: center;
-        vertical-align: middle;
-        border-radius: 50%;
         background: var(--default-primary-color);
         color: var(--text-primary-color);
       }
@@ -129,10 +131,13 @@
             <template is="dom-repeat" items="{{month.weeks}}" as="row">
               <div class="month-row">
                 <template is="dom-repeat" items="{{row}}">
-                  <div class="day" on-tap="_tapDay" date$="{{item.name}}" 
-                    disabled$="{{_isDisabled(item.day, item.date, minDate, maxDate)}}">
-                    <div class$="day-item{{_getDayClass(item.date, today, date)}}">
-                    {{item.day}}</div>
+                  <div class="day">
+                    <div class$="day-item{{_getDayClass(item.date, today, date)}}"
+                      disabled$="{{_isDisabled(item.day, item.date, minDate, maxDate)}}"
+                      on-tap="_tapDay" date$="{{item.name}}">
+                      {{item.day}}
+                      <paper-ripple noink="[[!item.day]]" center></paper-ripple>
+                    </div>
                   </div>
                 </template>
               </div>

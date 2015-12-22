@@ -218,6 +218,10 @@
         currentYear: {
           type: Number
         },
+        _gesture: {
+          type: String,
+          observer: '_gestureChange'
+        },
         _contentClass: String,
         _months: Array
       },
@@ -591,6 +595,11 @@
         this.today = new Date();
         this.today.setHours(0, 0, 0, 0);
       },
+      _gestureChange: function(gesture) {
+        if (gesture == 'pan-x' && (animatedRipples = this.$$('.day-item > paper-ripple[animating]'))){
+            animatedRipples.upAction();
+        }
+      }
     });
    })();
   </script>

@@ -64,18 +64,10 @@
         @apply(--layout-flex);
         @apply(--layout-vertical);
       }
-
       .month-row {
         @apply(--layout-horizontal);
         @apply(--layout-flex);
       }
-
-      .month-col {
-        position: relative;
-        @apply(--layout-vertical);
-        @apply(--layout-flex);
-      }
-
       #monthNav {
         @apply(--layout-horizontal);
         @apply(--layout-justified);
@@ -91,42 +83,34 @@
         @apply(--paper-font-body2);
         @apply(--layout-center-center);
       }
-      .month-weekdays {
-        color: var(--secondary-text-color);
-      }
-      .month-col .day {
-        cursor: default;
-        pointer-events: none;
-        @apply(--layout-fit);
+      .day {
         @apply(--layout-vertical);
         @apply(--layout-center-center);
-      }
-      .day-item {
-        object-fit: contain;
         @apply(--layout-flex);
-      }
-      .day-item::selection {
-        background: none;
-      }
-      .day-item .selection {
-        fill: rgba(0,0,0,0);
-      }
-      .day-item.selected .selection {
-        fill: var(--default-primary-color);
-      }
-      .day-item.selected + .day {
-        color: var(--text-primary-color);
-      }
-      .day-item:not([disabled]) {
         cursor: pointer;
       }
-      .day-item[disabled] + .day {
+      .day[disabled] {
+        cursor: default;
         color: var(--text-disabled-color, #9d9d9d);
       }
-      .day-item.today + .day {
+      .weekday {
+        cursor: default;
+        color: var(--secondary-text-color);
+        @apply(--layout-flex);
+        @apply(--layout-horizontal);
+        @apply(--layout-center-center);
+      }
+      .day-item.today{
         color: var(--default-primary-color);
       }
-      .day-item.selected.today + .day {
+      .day-item.selected{
+        width: var(--paper-calendar-selected-day-circle-width, 38px);
+        height: var(--paper-calendar-selected-day-circle-width, 38px);
+        line-height: var(--paper-calendar-selected-day-circle-width, 38px);
+        text-align: center;
+        vertical-align: middle;
+        border-radius: 50%;
+        background: var(--default-primary-color);
         color: var(--text-primary-color);
       }
     </style>
@@ -137,24 +121,18 @@
             <div class="month-row month-name">
               <span>{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
             </div>
-            <div class="month-row month-weekdays week">
+            <div class="month-row">
               <template is="dom-repeat" items="{{_weekdays}}">
-                <div class="month-col">
-                  <div class="day">{{item.0}}</div>
-                </div>
+                <div class="weekday">{{item.0}}</div>
               </template>
             </div>
             <template is="dom-repeat" items="{{month.weeks}}" as="row">
               <div class="month-row">
                 <template is="dom-repeat" items="{{row}}">
-                  <div class="month-col">
-                    <svg version="1.1" viewBox="0 0 100 100"
-                      class$="{{_getDayClass('day-item', item.date, today, date)}}"
-                      disabled$="{{_isDisabled(item.day, item.date, minDate, maxDate)}}"
-                      on-tap="_tapDay" date$="{{item.name}}">
-                      <circle cx="50" cy="50" r="49" class="selection"></circle>
-                    </svg>
-                    <div class="day">{{item.day}}</div>
+                  <div class="day" on-tap="_tapDay" date$="{{item.name}}" 
+                    disabled$="{{_isDisabled(item.day, item.date, minDate, maxDate)}}">
+                    <div class$="{{_getDayClass('day-item', item.date, today, date)}}">
+                    {{item.day}}</div>
                   </div>
                 </template>
               </div>

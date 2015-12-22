@@ -117,7 +117,7 @@
     <div id="calendar">
       <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
         <template is="dom-repeat" items="{{_months}}" as="month">
-          <div class$="{{_getMonthClass('month', month)}}">
+          <div class$="month{{_getMonthClass(month)}}">
             <div class="month-row month-name">
               <span>{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
             </div>
@@ -131,7 +131,7 @@
                 <template is="dom-repeat" items="{{row}}">
                   <div class="day" on-tap="_tapDay" date$="{{item.name}}" 
                     disabled$="{{_isDisabled(item.day, item.date, minDate, maxDate)}}">
-                    <div class$="{{_getDayClass('day-item', item.date, today, date)}}">
+                    <div class$="day-item{{_getDayClass(item.date, today, date)}}">
                     {{item.day}}</div>
                   </div>
                 </template>
@@ -325,23 +325,24 @@
         this.set('_months', months);
         this._positionSlider();
       },
-      _getDayClass: function(cssClass, date) {
-        if (!date) {
-          return cssClass;
-        }
-        if (date.getTime() === this.today.getTime()) {
-          cssClass += ' today';
-        }
-        if (this.date && this.date.getTime() === date.getTime()) {
-          cssClass += ' selected';
+      _getDayClass: function(date) {
+        var cssClass = '';
+        if (date) {
+          var dateTime = date.getTime();
+          if (dateTime === this.today.getTime()) {
+            cssClass += ' today';
+          }
+          if (this.date && this.date.getTime() === dateTime) {
+            cssClass += ' selected';
+          }
         }
         return cssClass;
       },
       _isDisabled: function(day, date) {
         return !day || !this._withinValidRange(date);
       },
-      _getMonthClass: function(name, month) {
-        return name + ' month-' + month.year + '-' + month.month;
+      _getMonthClass: function(month) {
+        return ' month-' + month.year + '-' + month.month;
       },
       _onTrack: function(event) {
         var dx = event.detail.dx;

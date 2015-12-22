@@ -1,12 +1,12 @@
-<link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
-<link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../iron-selector/iron-selector.html">
 <link rel="import" href="../moment-element/moment-with-locales-import.html">
+<link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../polymer/polymer.html">
 
 <dom-module id="paper-calendar">
   <template>
@@ -172,6 +172,18 @@
     Polymer({
       is: 'paper-calendar',
       properties: {
+        /**
+         * The currently selected month (1-12) 
+         */
+        currentMonth: {
+          type: Number
+        },
+        /**
+         * The currently selected year
+         */
+        currentYear: {
+          type: Number
+        },
         /*
          * The selected date
          */
@@ -206,23 +218,11 @@
           type: Date,
           value: null
         },
-        /**
-         * The currently selected month (1-12) 
-         */
-        currentMonth: {
-          type: Number
-        },
-        /**
-         * The currently selected year
-         */
-        currentYear: {
-          type: Number
-        },
+        _contentClass: String,
         _gesture: {
           type: String,
           observer: '_gestureChange'
         },
-        _contentClass: String,
         _months: Array
       },
       behaviors: [
@@ -249,90 +249,29 @@
         value.locale(locale || this.locale);
         return value.format(format);
       },
-      _localeChanged: function(locale) {
-        // FIXME: use public API for getting locale-aware weekdays once moment/moment#2433 is fixed
-        var localeData = moment.localeData(locale);
-        var fdow = localeData._week.dow;
-        this.set('_firstDayOfWeek', fdow);
-        var weekdays = [];
-        for (var i=fdow; i<7+fdow; i++) {
-          weekdays.push(localeData._weekdaysMin[i % 7]);
+      _dateChanged: function(date, oldValue) {
+        if (!this._isValidDate(date)) {
+          console.warn('Invalid date: ' + date);
+          this.date = date = oldValue;
         }
-        this.set('_weekdays', weekdays);
+        if (!this._withinValidRange(date)) {
+          console.warn('Date outside of valid range: ' + date);
+          this.date = date = oldValue;
+        }
+        if (oldValue && date.getTime && oldValue.getTime && date.getTime() === oldValue.getTime()) {
+          return;
+        }
+        // clone the date object so as not to have unintended effects on bindings
+        date = new Date(date.getTime());
+        date.setHours(0, 0, 0, 0);
+        this.set('date', date);
+        this.currentYear = date.getFullYear();
+        this.currentMonth = date.getMonth() + 1;
       },
-      _populate: function(currentYear, currentMonth, minDate, maxDate) {
-        var date, month, weeks, day, d, dayInfo, monthData, months = [];
-
-        // Make sure currentYear/currentMonth are in min/max range
-        if (minDate && new Date(currentYear, currentMonth, 0) < minDate) {
-          this.currentYear = minDate.getFullYear();
-          this.currentMonth = minDate.getMonth() + 1;
-          return;
-        } else if (maxDate && new Date(currentYear, currentMonth - 1, 1) > maxDate) {
-          this.currentYear = maxDate.getFullYear();
-          this.currentMonth = maxDate.getMonth() + 1;
-          return;
+      _gestureChange: function(gesture) {
+        if (gesture == 'pan-x' && (animatedRipples = this.$$('.day-item > paper-ripple[animating]'))){
+            animatedRipples.upAction();
         }
-
-        for (var i=-PRELOAD_MONTHS; i<=PRELOAD_MONTHS; i++) {
-          weeks = [[]];
-          day = 1;
-          date = new Date(currentYear, currentMonth - 1 + i, 1);
-          month = date.getMonth();
-          monthData = {
-            year: date.getFullYear(),
-            month: date.getMonth() + 1,
-            date: new Date(date)
-          };
-
-          if (!this._monthWithinValidRange(monthData.year, monthData.month)) {
-            continue;
-          }
-
-          // add "padding" days
-          var firstDay = date.getDay() - this._firstDayOfWeek;
-          if (firstDay < 0) {
-            firstDay = 7 + firstDay;
-          }
-          for (d=0; d<firstDay; d++) {
-            weeks[0].push({day: null, date: null});
-          }
-
-          // add actual days
-          while (date.getMonth() === month) {
-            if (weeks[0].length && d % 7 === 0) {
-              // start new week
-              weeks.push([]);
-            }
-            dayInfo = {
-              date: new Date(date.getFullYear(), month, day),
-              name: this.dateFormat(date,'YYYY-MM-DD'),
-              year: currentYear,
-              month: month,
-              day: day,
-            };
-            weeks[weeks.length-1].push(dayInfo);
-            date.setDate(++day);
-            d++;
-          }
-
-          // add remaining "padding" days
-          while (d < 42) {
-            if (d % 7 === 0) {
-              weeks.push([]);
-            }
-            weeks[weeks.length-1].push({day: null, date: null});
-            d += 1;
-          }
-
-          monthData.weeks = weeks;
-          months.push(monthData);
-        }
-        if (!months.length) {
-          return;
-        }
-        this.set('_months', months);
-        this._positionSlider();
       },
       _getDayClass: function(date) {
         var cssClass = '';
@@ -347,12 +286,84 @@
         }
         return cssClass;
       },
-      _isDisabled: function(day, date) {
-        return !day || !this._withinValidRange(date);
+      _getDayName: function(date) {
+        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+      },
+      _getFastestMovement: function(event) {
+        // detect flick based on fastest segment of movement
+        var l = this._moveQueue.length;
+        var dt, tx, ty, tv2, x = 0, y = 0, v2 = 0;
+        for (var i = 0, m; i < l && (m = this._moveQueue[i]); i++) {
+          dt = event.timeStamp - m.timeStamp;
+          tx = (event.detail.x - m.detail.x) / dt;
+          ty = (event.detail.y - m.detail.y) / dt;
+          tv2 = tx * tx + ty * ty;
+          if (tv2 > v2) {
+            x = tx;
+            y = ty;
+            v2 = tv2;
+          }
+        }
+        return {x: x, y: y, v: Math.sqrt(v2)};
       },
       _getMonthClass: function(month) {
         return ' month-' + month.year + '-' + month.month;
       },
+      _getMonthIdx: function(pos) {
+        // returns the index for the visible month according to the given position
+        var width = this._containerWidth;
+        var i = Math.floor((-pos + (width/2)) / width);
+        return i < 0 ? 0 : i;
+      },
+      _incrMonth: function(i) {
+        var date = new Date(this.currentYear, this.currentMonth - 1 + i);
+        var year = date.getFullYear();
+        var month = date.getMonth() + 1;
+        if (this._monthWithinValidRange(year, month)) {
+          this.currentYear = year;
+          this.currentMonth = month;
+        }
+      },
+      _isDisabled: function(day, date) {
+        return !day || !this._withinValidRange(date);
+      },
+      _isValidDate: function(date) {
+        return date && date.getTime && !isNaN(date.getTime());
+      },
+      _localeChanged: function(locale) {
+        // FIXME: use public API for getting locale-aware weekdays once moment/moment#2433 is fixed
+        var localeData = moment.localeData(locale);
+        var fdow = localeData._week.dow;
+        this.set('_firstDayOfWeek', fdow);
+        var weekdays = [];
+        for (var i=fdow; i<7+fdow; i++) {
+          weekdays.push(localeData._weekdaysMin[i % 7]);
+        }
+        this.set('_weekdays', weekdays);
+      },
+      _monthWithinValidRange: function(year, month) {
+        var monthStart = new Date(year, month-1, 1);
+        var monthEnd = new Date(year, month, 0);
+        return this._withinValidRange(monthStart) || this._withinValidRange(monthEnd);
+      },
+      _nextMonth: function() {
+        this._incrMonth(1);
+      },
+      _once: function(eventName, callback, node) {
+        node = node || this;
+        function onceCallback() {
+          node.removeEventListener(eventName, onceCallback);
+          callback.apply(null, arguments);
+        }
+        node.addEventListener(eventName, onceCallback);
+      },
+      _onSwipe: function(event) {
+        if (event.detail.direction === 'right') {
+          this._prevMonth();
+        } else {
+          this._nextMonth();
+        }
+      }, 
       _onTrack: function(event) {
         var dx = event.detail.dx;
         var dy = event.detail.dy;
@@ -432,6 +443,98 @@
             this._gesture = null;
         }
       },
+      _populate: function(currentYear, currentMonth, minDate, maxDate) {
+        var date, month, weeks, day, d, dayInfo, monthData, months = [];
+
+        // Make sure currentYear/currentMonth are in min/max range
+        if (minDate && new Date(currentYear, currentMonth, 0) < minDate) {
+          this.currentYear = minDate.getFullYear();
+          this.currentMonth = minDate.getMonth() + 1;
+          return;
+        } else if (maxDate && new Date(currentYear, currentMonth - 1, 1) > maxDate) {
+          this.currentYear = maxDate.getFullYear();
+          this.currentMonth = maxDate.getMonth() + 1;
+          return;
+        }
+
+        for (var i=-PRELOAD_MONTHS; i<=PRELOAD_MONTHS; i++) {
+          weeks = [[]];
+          day = 1;
+          date = new Date(currentYear, currentMonth - 1 + i, 1);
+          month = date.getMonth();
+          monthData = {
+            year: date.getFullYear(),
+            month: date.getMonth() + 1,
+            date: new Date(date)
+          };
+
+          if (!this._monthWithinValidRange(monthData.year, monthData.month)) {
+            continue;
+          }
+
+          // add "padding" days
+          var firstDay = date.getDay() - this._firstDayOfWeek;
+          if (firstDay < 0) {
+            firstDay = 7 + firstDay;
+          }
+          for (d=0; d<firstDay; d++) {
+            weeks[0].push({day: null, date: null});
+          }
+
+          // add actual days
+          while (date.getMonth() === month) {
+            if (weeks[0].length && d % 7 === 0) {
+              // start new week
+              weeks.push([]);
+            }
+            dayInfo = {
+              date: new Date(date.getFullYear(), month, day),
+              name: this.dateFormat(date,'YYYY-MM-DD'),
+              year: currentYear,
+              month: month,
+              day: day,
+            };
+            weeks[weeks.length-1].push(dayInfo);
+            date.setDate(++day);
+            d++;
+          }
+
+          // add remaining "padding" days
+          while (d < 42) {
+            if (d % 7 === 0) {
+              weeks.push([]);
+            }
+            weeks[weeks.length-1].push({day: null, date: null});
+            d += 1;
+          }
+
+          monthData.weeks = weeks;
+          months.push(monthData);
+        }
+        if (!months.length) {
+          return;
+        }
+        this.set('_months', months);
+        this._positionSlider();
+      },
+      _positionSlider: function() {
+        if (!this._months || !this._containerWidth) {
+          return;
+        }
+        this._scrollWidth = (this.$.calendar.offsetWidth * this._months.length);
+        this.$.months.style.minWidth = this._scrollWidth + 'px';
+        var i = ((this.currentYear * 12) + this.currentMonth) - 
+                 ((this._months[0].year * 12) + this._months[0].month);
+        this._translateX(-i * this._containerWidth);
+      },
+      _prevMonth: function() {
+        this._incrMonth(-1);
+      },
+      _resizeHandler: function() {
+        this._containerWidth = this.$.calendar.offsetWidth;
+        this._positionSlider();
+        this._updateToday();
+      },
       _swipePrevMonth: function() {
         this._translateX(0, 'swipe', function() {
           this.set('_contentClass', '');
@@ -446,11 +549,11 @@
           this.fire('swiped', {direction: 'left'});
         }.bind(this));
       },
-      _getMonthIdx: function(pos) {
-        // returns the index for the visible month according to the given position
-        var width = this._containerWidth;
-        var i = Math.floor((-pos + (width/2)) / width);
-        return i < 0 ? 0 : i;
+      _tapDay: function(event) {
+        if (!this._withinValidRange(event.model.item.date)) {
+          return false;
+        }
+        this.date = event.model.item.date;
       },
       _translateX: function(x, transition, cb) {
         if (isNaN(parseInt(x))) {
@@ -487,119 +590,16 @@
           this.transform('translateX(' + x + 'px)', this.$.months);
         }.bind(this));
       },
-      _getFastestMovement: function(event) {
-        // detect flick based on fastest segment of movement
-        var l = this._moveQueue.length;
-        var dt, tx, ty, tv2, x = 0, y = 0, v2 = 0;
-        for (var i = 0, m; i < l && (m = this._moveQueue[i]); i++) {
-          dt = event.timeStamp - m.timeStamp;
-          tx = (event.detail.x - m.detail.x) / dt;
-          ty = (event.detail.y - m.detail.y) / dt;
-          tv2 = tx * tx + ty * ty;
-          if (tv2 > v2) {
-            x = tx;
-            y = ty;
-            v2 = tv2;
-          }
-        }
-        return {x: x, y: y, v: Math.sqrt(v2)};
-      },
-      _onSwipe: function(event) {
-        if (event.detail.direction === 'right') {
-          this._prevMonth();
-        } else {
-          this._nextMonth();
-        }
-      },
-      _once: function(eventName, callback, node) {
-        node = node || this;
-        function onceCallback() {
-          node.removeEventListener(eventName, onceCallback);
-          callback.apply(null, arguments);
-        }
-        node.addEventListener(eventName, onceCallback);
-      },
-      _incrMonth: function(i) {
-        var date = new Date(this.currentYear, this.currentMonth - 1 + i);
-        var year = date.getFullYear();
-        var month = date.getMonth() + 1;
-        if (this._monthWithinValidRange(year, month)) {
-          this.currentYear = year;
-          this.currentMonth = month;
-        }
-      },
-      _prevMonth: function() {
-        this._incrMonth(-1);
-      },
-      _nextMonth: function() {
-        this._incrMonth(1);
-      },
-      _dateChanged: function(date, oldValue) {
-        if (!this._isValidDate(date)) {
-          console.warn('Invalid date: ' + date);
-          this.date = date = oldValue;
-        }
-        if (!this._withinValidRange(date)) {
-          console.warn('Date outside of valid range: ' + date);
-          this.date = date = oldValue;
-        }
-        if (oldValue && date.getTime && oldValue.getTime && date.getTime() === oldValue.getTime()) {
-          return;
-        }
-        // clone the date object so as not to have unintended effects on bindings
-        date = new Date(date.getTime());
-        date.setHours(0, 0, 0, 0);
-        this.set('date', date);
-        this.currentYear = date.getFullYear();
-        this.currentMonth = date.getMonth() + 1;
-      },
-      _tapDay: function(event) {
-        if (!this._withinValidRange(event.model.item.date)) {
-          return false;
-        }
-        this.date = event.model.item.date;
-      },
-      _isValidDate: function(date) {
-        return date && date.getTime && !isNaN(date.getTime());
-      },
+      _updateToday: function() {
+        this.today = new Date();
+        this.today.setHours(0, 0, 0, 0);
+      },  
       _withinValidRange: function(date) {
         if (this._isValidDate(date)) {
           return (!this.minDate || date >= this.minDate) && (!this.maxDate || date <= this.maxDate);
         }
         return false;
-      },
-      _monthWithinValidRange: function(year, month) {
-        var monthStart = new Date(year, month-1, 1);
-        var monthEnd = new Date(year, month, 0);
-        return this._withinValidRange(monthStart) || this._withinValidRange(monthEnd);
-      },
-      _positionSlider: function() {
-        if (!this._months || !this._containerWidth) {
-          return;
-        }
-        this._scrollWidth = (this.$.calendar.offsetWidth * this._months.length);
-        this.$.months.style.minWidth = this._scrollWidth + 'px';
-        var i = ((this.currentYear * 12) + this.currentMonth) - 
-                 ((this._months[0].year * 12) + this._months[0].month);
-        this._translateX(-i * this._containerWidth);
-      },
-      _resizeHandler: function() {
-        this._containerWidth = this.$.calendar.offsetWidth;
-        this._positionSlider();
-        this._updateToday();
-      },
-      _getDayName: function(date) {
-        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-      },
-      _updateToday: function() {
-        this.today = new Date();
-        this.today.setHours(0, 0, 0, 0);
-      },
-      _gestureChange: function(gesture) {
-        if (gesture == 'pan-x' && (animatedRipples = this.$$('.day-item > paper-ripple[animating]'))){
-            animatedRipples.upAction();
-        }
-      }
+      } 
     });
    })();
   </script>

@@ -117,24 +117,24 @@
       }
     </style>
     <div id="calendar">
-      <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
-        <template is="dom-repeat" items="{{_months}}" as="month">
+      <div id="months" on-track="_onTrack" class$="[[_contentClass]]">
+        <template is="dom-repeat" items="[[_months]]" as="month">
           <div class$="month{{_getMonthClass(month)}}">
             <div class="month-row month-name">
               <span>{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
             </div>
             <div class="month-row">
-              <template is="dom-repeat" items="{{_weekdays}}">
+              <template is="dom-repeat" items="[[_weekdays]]">
                 <div class="weekday">{{item.0}}</div>
               </template>
             </div>
-            <template is="dom-repeat" items="{{month.weeks}}" as="row">
+            <template is="dom-repeat" items="[[month.weeks]]" as="row">
               <div class="month-row">
-                <template is="dom-repeat" items="{{row}}">
+                <template is="dom-repeat" items="[[row]]">
                   <div class="day">
                     <div class$="day-item{{_getDayClass(item.date, today, date)}}"
                       disabled$="{{_isDisabled(item.day, item.date, minDate, maxDate)}}"
-                      on-tap="_tapDay" date$="{{item.name}}">
+                      on-tap="_tapDay" date$="[[item.name]]">
                       {{item.day}}
                       <paper-ripple noink="[[!item.day]]" center></paper-ripple>
                     </div>

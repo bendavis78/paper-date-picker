@@ -176,23 +176,23 @@ styling:
         <div class="year" on-tap="_tapHeadingYear">{{dateFormat(date, 'YYYY', locale)}}</div>
         <div class="date" on-tap="_tapHeadingDate">
           <template is="dom-repeat" items="{{_splitHeadingDate(date, headingFormat, locale)}}">
-            <span>{{item}}</span>
+            <span>[[item]]</span>
           </template>
         </div>
       </div>
       <neon-animated-pages id="pages" selected="{{_selectedPage}}" attr-for-selected="id" 
         entry-animation="fade-in-animation" exit-animation="fade-out-animation">
         <neon-animatable id="chooseDate">
-          <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}"
-            min-date="{{minDate}}" max-date="{{maxDate}}">
+          <paper-calendar id="calendar" locale="[[locale]]" date="{{date}}"
+            min-date="[[minDate]]" max-date="[[maxDate]]">
           </paper-calendar>
         </neon-animatable>
         <neon-animatable id="chooseYear">
           <div id="yearList" cross-fade>
             <iron-selector id="yearSelector" attr-for-selected="label" 
               on-iron-select="_yearSelected">
-              <template is="dom-repeat" items="{{years}}" as="year">
-                <div class="year" label$="{{year}}" on-tap="_tapYear">{{year}}</div>
+              <template is="dom-repeat" items="[[years]]" as="year">
+                <div class="year" label$="[[year]]" on-tap="_tapYear">[[year]]</div>
               </template>
             </iron-selector>
           </div>

@@ -133,7 +133,7 @@
               <div class="month-row">
                 <template is="dom-repeat" items="[[row]]">
                   <div class="day">
-                    <div class$="day-item{{_getDayClass(item.date, today, date)}}"
+                    <div class$="day-item{{_getDayClass(item.date, date)}}"
                       disabled$="{{_isDisabled(item.day, item.date, minDate, maxDate)}}"
                       on-tap="_tapDay" date$="[[item.name]]">
                       {{item.day}}
@@ -223,6 +223,13 @@
           type: Number,
           value: 1
         },
+        today: {
+          type: Date,
+          value: function() {
+            return new Date();
+          },
+          readOnly: true
+        },
         _contentClass: String,
         _gesture: {
           type: String,
@@ -241,7 +248,6 @@
         'swiped': '_onSwipe'
       },
       ready: function() {
-        this._updateToday();
         this._transitionEvent = this.style.WebkitTransition ? 'transitionEnd' : 'webkitTransitionEnd';
       },
       dateFormat: function(date, format, locale) {
@@ -579,10 +585,6 @@
           this.transform('translateX(' + x + 'px)', this.$.months);
         }.bind(this));
       },
-      _updateToday: function() {
-        this.today = new Date();
-        this.today.setHours(0, 0, 0, 0);
-      },  
       _withinValidRange: function(date) {
         return moment.isDate(date)
             && (!this.minDate || date >= this.minDate)

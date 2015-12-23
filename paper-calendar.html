@@ -289,9 +289,6 @@
         }
         return cssClass;
       },
-      _getDayName: function(date) {
-        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-      },
       _getFastestMovement: function(event) {
         // detect flick based on fastest segment of movement
         var l = this._moveQueue.length;

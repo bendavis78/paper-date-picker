@@ -1,14 +1,14 @@
-<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../iron-media-query/iron-media-query.html">
-<link rel="import" href="../neon-animation/neon-animated-pages.html">
-<link rel="import" href="../neon-animation/neon-animatable.html">
-<link rel="import" href="../neon-animation/animations/fade-in-animation.html">
-<link rel="import" href="../neon-animation/animations/fade-out-animation.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../iron-selector/iron-selector.html">
-<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="../moment-element/moment-with-locales-import.html">
+<link rel="import" href="../neon-animation/animations/fade-in-animation.html">
+<link rel="import" href="../neon-animation/animations/fade-out-animation.html">
+<link rel="import" href="../neon-animation/neon-animatable.html">
+<link rel="import" href="../neon-animation/neon-animated-pages.html">
+<link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="paper-calendar.html">
 <link rel="import" href="paper-date-picker-dialog-style.html">
 
@@ -73,7 +73,7 @@ styling:
       /** Landscape ******************/
       #datePicker {
         width: 512px;
-        height: 248px;
+        height: 332px;
         @apply(--layout-horizontal);
       }
       #heading {
@@ -176,23 +176,23 @@ styling:
         <div class="year" on-tap="_tapHeadingYear">{{dateFormat(date, 'YYYY', locale)}}</div>
         <div class="date" on-tap="_tapHeadingDate">
           <template is="dom-repeat" items="{{_splitHeadingDate(date, headingFormat, locale)}}">
-            <span>{{item}}</span>
+            <span>[[item]]</span>
           </template>
         </div>
       </div>
       <neon-animated-pages id="pages" selected="{{_selectedPage}}" attr-for-selected="id" 
         entry-animation="fade-in-animation" exit-animation="fade-out-animation">
         <neon-animatable id="chooseDate">
-          <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}"
-            min-date="{{minDate}}" max-date="{{maxDate}}">
+          <paper-calendar id="calendar" locale="[[locale]]" date="{{date}}"
+            min-date="[[minDate]]" max-date="[[maxDate]]" preload-months="[[preloadMonths]]">
           </paper-calendar>
         </neon-animatable>
         <neon-animatable id="chooseYear">
           <div id="yearList" cross-fade>
             <iron-selector id="yearSelector" attr-for-selected="label" 
               on-iron-select="_yearSelected">
-              <template is="dom-repeat" items="{{years}}" as="year">
-                <div class="year" label$="{{year}}" on-tap="_tapYear">{{year}}</div>
+              <template is="dom-repeat" items="[[years]]" as="year">
+                <div class="year" label$="[[year]]" on-tap="_tapYear">[[year]]</div>
               </template>
             </iron-selector>
           </div>
@@ -213,18 +213,15 @@ styling:
           notify: true
         },
         /**
-         * Maximum screen width at which the picker uses a vertical layout
+         * Force narrow layout
          */
-        responsiveWidth: {
-          type: String,
-          value: '560px'
+        forceNarrow: {
+          type: Boolean,
+          value: false
         },
-        /**
-         * The current locale
-         */
-        locale: {
+        headingBreak: {
           type: String,
-          value: 'en'
+          value: '[,]'
         },
         /**
          * The format of the date displayed in the heading.
@@ -234,12 +231,18 @@ styling:
           type: String,
           value: 'ddd, MMM D'
         },
+        isTouch: {
+          type: Boolean,
+          value: false,
+          readOnly: true,
+          reflectToAttribute: true
+        },
         /**
-         * The minimum allowed date
+         * The current locale
          */
-        minDate: {
-          type: Date,
-          value: null
+        locale: {
+          type: String,
+          value: 'en'
         },
         /**
          * The maximum allowed date
@@ -249,11 +252,11 @@ styling:
           value: null
         },
         /**
-         * Force narrow layout
+         * The minimum allowed date
          */
-        forceNarrow: {
-          type: Boolean,
-          value: false
+        minDate: {
+          type: Date,
+          value: null
         },
         narrow: {
           type: Boolean,
@@ -261,11 +264,19 @@ styling:
           notify: true,
           computed: '_computeNarrow(forceNarrow, _queryMatches)'
         },
-        isTouch: {
-          type: Boolean,
-          value: false,
-          readOnly: true,
-          reflectToAttribute: true
+        /**
+         * Number of months to preload on both sides of the current month
+         */
+        preloadMonths: {
+          type: Number,
+          value: 1
+        },
+        /**
+         * Maximum screen width at which the picker uses a vertical layout
+         */
+        responsiveWidth: {
+          type: String,
+          value: '560px'
         },
         years: {
           type: Array,
@@ -274,10 +285,6 @@ styling:
         _queryMatches: {
           type: Boolean,
           value: false
-        },
-        headingBreak: {
-          type: String,
-          value: '[,]'
         },
         _selectedPage: String
       },
@@ -295,16 +302,55 @@ styling:
       dateFormat: function() {
         return this.$.calendar.dateFormat.apply(this.$.calendar, arguments);
       },
-      _tapYear: function() {
-        this._selectPage('chooseDate');
+      _computeNarrow: function(queryMatches, forceNarrow) {
+        return queryMatches || forceNarrow;
       },
-      _yearSelected: function(e, detail) {
-        var year = parseInt(detail.item.getAttribute('label'));
-        var date = new Date(this.date);
-        if (year !== date.getFullYear()) {
-          date.setFullYear(year);
-          this.date = date;
+      _computeYears: function(minDate, maxDate) {
+        var minYear = minDate ? minDate.getFullYear() : 1900;
+        var maxYear = maxDate ? maxDate.getFullYear() : 2100;
+        var years = [];
+        for (var y = minYear; y <= maxYear; y++) {
+          years.push(y);
         }
+        return years;
+      },
+      _getHeadingClass: function(pfx, selectedPage) {
+        return pfx + ' pg-' + selectedPage;
+      },
+      _getMediaQuery: function(forceNarrow, responsiveWidth) {
+        return '(max-width: ' + (forceNarrow ? '' : responsiveWidth) + ')';
+      },
+      _resizeHandler: function() {
+        if (this._resizing) {
+          return;
+        }
+        this._resizing = true;
+        this.$.calendar.notifyResize();
+        this._resizing = false;
+
+        this.updateStyles();
+      },
+      _scrollToYear: function(year) {
+        var el = this.$.yearSelector.querySelector('.year[label="' + year + '"]');
+        var middle = this.$.chooseYear.offsetHeight / 2;
+        this.$.yearList.scrollTop = el.offsetTop - middle + (el.offsetHeight / 2);
+      },
+      _selectPage: function(page) {
+        this.$.pages.selected = page;
+      },
+      _splitHeadingDate: function(date, format, locale) {
+        var re = new RegExp(this.headingBreak, 'g');
+        var text = this.dateFormat(date, format, locale);
+        var seps = text.match(re);
+        var value;
+        if (!seps) {
+          value = [text];
+        } else {
+          value = text.split(re).map(function(s, i) {
+            return s + (seps[i] || '');
+          });
+        }
+        return value;
       },
       _tapHeadingDate: function() {
         if (this.$.pages.selected !== 'chooseDate') {
@@ -321,55 +367,16 @@ styling:
           this._selectPage('chooseYear');
         }
       },
-      _selectPage: function(page) {
-        this.$.pages.selected = page;
+      _tapYear: function() {
+        this._selectPage('chooseDate');
       },
-      _scrollToYear: function(year) {
-        var el = this.$.yearSelector.querySelector('.year[label="' + year + '"]');
-        var middle = this.$.chooseYear.offsetHeight / 2;
-        this.$.yearList.scrollTop = el.offsetTop - middle + (el.offsetHeight / 2);
-      },
-      _computeYears: function(minDate, maxDate) {
-        var minYear = minDate ? minDate.getFullYear() : 1900;
-        var maxYear = maxDate ? maxDate.getFullYear() : 2100;
-        var years = [];
-        for (var y = minYear; y <= maxYear; y++) {
-          years.push(y);
+      _yearSelected: function(e, detail) {
+        var year = parseInt(detail.item.getAttribute('label'));
+        var date = new Date(this.date);
+        if (year !== date.getFullYear()) {
+          date.setFullYear(year);
+          this.date = date;
         }
-        return years;
-      },
-      _getMediaQuery: function(forceNarrow, responsiveWidth) {
-        return '(max-width: ' + (forceNarrow ? '' : responsiveWidth) + ')';
-      },
-      _getHeadingClass: function(pfx, selectedPage) {
-        return pfx + ' pg-' + selectedPage;
-      },
-      _splitHeadingDate: function(date, format, locale) {
-        var re = new RegExp(this.headingBreak, 'g');
-        var text = this.dateFormat(date, format, locale);
-        var seps = text.match(re);
-        var value;
-        if (!seps) {
-          value = [text];
-        } else {
-          value = text.split(re).map(function(s, i) {
-            return s + (seps[i] || '');
-          });
-        }
-        return value;
-      },
-      _computeNarrow: function(queryMatches, forceNarrow) {
-        return queryMatches || forceNarrow;
-      },
-      _resizeHandler: function() {
-        if (this._resizing) {
-          return;
-        }
-        this._resizing = true;
-        this.$.calendar.notifyResize();
-        this._resizing = false;
-
-        this.updateStyles();
       }
     });
   </script>

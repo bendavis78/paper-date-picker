@@ -253,21 +253,16 @@
         return value.format(format);
       },
       _dateChanged: function(date, oldValue) {
-        if (!this._isValidDate(date)) {
+        if (!moment.isDate(date)) {
           console.warn('Invalid date: ' + date);
-          this.date = date = oldValue;
+          this.date = oldValue;
+          return;
         }
         if (!this._withinValidRange(date)) {
           console.warn('Date outside of valid range: ' + date);
-          this.date = date = oldValue;
-        }
-        if (oldValue && date.getTime && oldValue.getTime && date.getTime() === oldValue.getTime()) {
+          this.date = oldValue;
           return;
         }
-        // clone the date object so as not to have unintended effects on bindings
-        date = new Date(date.getTime());
-        date.setHours(0, 0, 0, 0);
-        this.set('date', date);
         this.currentYear = date.getFullYear();
         this.currentMonth = date.getMonth() + 1;
       },
@@ -279,11 +274,10 @@
       _getDayClass: function(date) {
         var cssClass = '';
         if (date) {
-          var dateTime = date.getTime();
-          if (dateTime === this.today.getTime()) {
+          if (moment(date).isSame(this.today, 'day')) {
             cssClass += ' today';
           }
-          if (this.date && this.date.getTime() === dateTime) {
+          if (this.date && moment(date).isSame(this.date, 'day')) {
             cssClass += ' selected';
           }
         }
@@ -327,19 +321,15 @@
       _isDisabled: function(day, date) {
         return !day || !this._withinValidRange(date);
       },
-      _isValidDate: function(date) {
-        return date && date.getTime && !isNaN(date.getTime());
-      },
       _localeChanged: function(locale) {
-        // FIXME: use public API for getting locale-aware weekdays once moment/moment#2433 is fixed
-        var localeData = moment.localeData(locale);
-        var fdow = localeData._week.dow;
-        this.set('_firstDayOfWeek', fdow);
+        localeMoment = moment();
+        localeMoment.locale(locale);
         var weekdays = [];
-        for (var i=fdow; i<7+fdow; i++) {
-          weekdays.push(localeData._weekdaysMin[i % 7]);
+        for (var i=0; i<7; i++) {
+          weekdays.push(localeMoment.weekday(i).format('dd'));
         }
-        this.set('_weekdays', weekdays);
+        this._weekdays = weekdays;
+        this._firstDayOfWeek = localeMoment.weekday(0).format('d');
       },
       _monthWithinValidRange: function(year, month) {
         var monthStart = new Date(year, month-1, 1);
@@ -373,7 +363,7 @@
 
         switch (event.detail.state) {
           case 'start':
-            this._trackStartTime = (new Date()).getTime();
+            this._trackStartTime = Date.now();
             this._startPos = this._currentPos;
             this._moveQueue = [];
           break;
@@ -464,7 +454,7 @@
           month = date.getMonth();
           monthData = {
             year: date.getFullYear(),
-            month: date.getMonth() + 1,
+            month: month + 1,
             date: new Date(date)
           };
 
@@ -594,10 +584,9 @@
         this.today.setHours(0, 0, 0, 0);
       },  
       _withinValidRange: function(date) {
-        if (this._isValidDate(date)) {
-          return (!this.minDate || date >= this.minDate) && (!this.maxDate || date <= this.maxDate);
-        }
-        return false;
+        return moment.isDate(date)
+            && (!this.minDate || date >= this.minDate)
+            && (!this.maxDate || date <= this.maxDate);
       } 
     });
    })();

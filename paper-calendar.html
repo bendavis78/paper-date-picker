@@ -379,14 +379,8 @@
         this._positionSlider();
       },
       _getDayClass: function(cssClass, date) {
-        if (!date) {
-          return cssClass;
-        }
-        if (date.getTime() === this.today.getTime()) {
+        if (date && date.getTime() === this.today.getTime()) {
           cssClass += ' today';
-        }
-        if (this.date && this.date.getTime() === date.getTime()) {
-          cssClass += ' selected';
         }
         return cssClass;
       },
@@ -590,6 +584,7 @@
           return false;
         }
         this.date = event.model.item.date;
+        this.toggleClass('selected', true, Polymer.dom(event.target).parentNode);
       },
       _isValidDate: function(date) {
         return date && date.getTime && !isNaN(date.getTime());

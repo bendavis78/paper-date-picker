@@ -575,6 +575,8 @@
           console.warn('Date outside of valid range: ' + date);
           this.date = date = oldValue;
         }
+        this.currentYear = date.getFullYear();
+        this.currentMonth = date.getMonth() + 1;
         if (oldValue && date.getTime && oldValue.getTime && date.getTime() === oldValue.getTime()) {
           return;
         }
@@ -582,8 +584,6 @@
         date = new Date(date.getTime());
         date.setHours(0, 0, 0, 0);
         this.set('date', date);
-        this.currentYear = date.getFullYear();
-        this.currentMonth = date.getMonth() + 1;
       },
       _tapDay: function(event) {
         if (!this._withinValidRange(event.model.item.date)) {

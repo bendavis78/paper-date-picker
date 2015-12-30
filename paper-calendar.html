@@ -136,6 +136,12 @@
       .day-item.selected .selection {
         fill: var(--default-primary-color);
       }
+      .day-item.min-date .selection {
+        fill: var(--default-primary-min-date-color);
+      }
+      .day-item.max-date .selection {
+        fill: var(--default-primary-max-date-color);
+      }
       .day-item.selected + .day {
         color: var(--text-primary-color);
       }
@@ -389,6 +395,12 @@
         }
         if (this.date && this.date.getTime() === date.getTime()) {
           cssClass += ' selected';
+        }
+        if (this.minDate && date.getTime() == this.minDate.getTime()) {
+          cssClass += ' min-date';
+        }
+        if (this.maxDate && date.getTime() == this.maxDate.getTime()) {
+          cssClass += ' min-date';
         }
         return cssClass;
       },

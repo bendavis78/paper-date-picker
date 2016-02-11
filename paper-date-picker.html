@@ -36,7 +36,7 @@ If you include this element as part of `paper-dialog`, use the class
 `"paper-date-picker-dialog"` on the dialog element in order to give it proper
 styling:
 
-    <paper-dialog id="dialog" class="paper-date-picker-dialog" modal 
+    <paper-dialog id="dialog" class="paper-date-picker-dialog" modal
       on-iron-overlay-closed="dismissDialog">
       <paper-date-picker id="picker" date="[[date]]"></paper-date-picker>
       <div class="buttons">
@@ -93,11 +93,12 @@ styling:
         padding: 16px 24px;
       }
 
+      #yearSelector {height: 100%;}
       /** Heading ********************/
       #heading {
         padding: 16px;
         box-sizing: border-box;
-        color: var(--text-primary-color); 
+        color: var(--text-primary-color);
         background: var(--default-primary-color);
         @apply(--layout-vertical);
         @apply(--layout-around-justfied);
@@ -167,7 +168,7 @@ styling:
         color: var(--default-primary-color);
       }
       :host([isTouch]) #yearList::-webkit-scrollbar {
-        width: 0 !important 
+        width: 0 !important
       }
     </style>
     <iron-media-query query="{{_getMediaQuery(forceNarrow, responsiveWidth)}}" query-matches="{{_queryMatches}}"></iron-media-query>
@@ -180,7 +181,7 @@ styling:
           </template>
         </div>
       </div>
-      <neon-animated-pages id="pages" selected="{{_selectedPage}}" attr-for-selected="id" 
+      <neon-animated-pages id="pages" selected="{{_selectedPage}}" attr-for-selected="id"
         entry-animation="fade-in-animation" exit-animation="fade-out-animation">
         <neon-animatable id="chooseDate">
           <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}"
@@ -189,7 +190,7 @@ styling:
         </neon-animatable>
         <neon-animatable id="chooseYear">
           <div id="yearList" cross-fade>
-            <iron-selector id="yearSelector" attr-for-selected="label" 
+            <iron-selector id="yearSelector" attr-for-selected="label"
               on-iron-select="_yearSelected">
               <template is="dom-repeat" items="{{years}}" as="year">
                 <div class="year" label$="{{year}}" on-tap="_tapYear">{{year}}</div>

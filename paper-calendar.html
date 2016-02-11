@@ -255,7 +255,7 @@
           value: null
         },
         /**
-         * The currently selected month (1-12) 
+         * The currently selected month (1-12)
          */
         currentMonth: {
           type: Number
@@ -572,8 +572,17 @@
           this.date = date = oldValue;
         }
         if (!this._withinValidRange(date)) {
-          console.warn('Date outside of valid range: ' + date);
-          this.date = date = oldValue;
+          if (this.minDate && date < this.minDate) {
+            date = this.minDate;
+          } else {
+            if (this.maxDate && date > this.maxDate) {
+              date = this.maxDate
+            } else {
+              console.warn('Date outside of valid range: ' + date);
+              this.date = date = oldValue;
+              return;
+            }
+          }
         }
         if (oldValue && date.getTime && oldValue.getTime && date.getTime() === oldValue.getTime()) {
           return;
@@ -611,7 +620,7 @@
         }
         this._scrollWidth = (this.$.calendar.offsetWidth * this._months.length);
         this.$.months.style.minWidth = this._scrollWidth + 'px';
-        var i = ((this.currentYear * 12) + this.currentMonth) - 
+        var i = ((this.currentYear * 12) + this.currentMonth) -
                  ((this._months[0].year * 12) + this._months[0].month);
         this._translateX(-i * this._containerWidth);
       },

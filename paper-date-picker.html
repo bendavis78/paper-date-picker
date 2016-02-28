@@ -11,6 +11,7 @@
 <link rel="import" href="../moment-element/moment-with-locales-import.html">
 <link rel="import" href="paper-calendar.html">
 <link rel="import" href="paper-date-picker-dialog-style.html">
+<link rel="import" href="paper-year-list.html">
 
 <!--
 Material Design [Pickers](http://www.google.com/design/spec/components/pickers.html)
@@ -129,45 +130,18 @@ styling:
       }
 
       /** Calendar/Year picker ********/
+      :host([isTouch]) paper-year-list::-webkit-scrollbar {
+        width: 0 !important;
+      }
       #pages {
         flex: 1;
         width: auto;
         background: var(--default-background-color);
       }
-
       #calendar {
         --paper-calendar: {
           @apply(--paper-date-picker-calendar);
         }
-      }
-
-      /** Year List *******************/
-      #yearList {
-        @apply(--layout-vertical);
-        @apply(--layout-center-center);
-        display: block;
-        height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-      }
-      #yearList .year {
-        cursor: pointer;
-        height: 44px;
-        line-height: 44px;
-        text-align: center;
-        vertical-align: middle;
-      }
-      #yearList .iron-selected {
-        @apply(--paper-font-headline);
-      }
-      #yearList .year.iron-selected {
-        height: 58px;
-        line-height: 58px !important;
-        vertical-align: middle;
-        color: var(--default-primary-color);
-      }
-      :host([isTouch]) #yearList::-webkit-scrollbar {
-        width: 0 !important
       }
     </style>
     <iron-media-query query="{{_getMediaQuery(forceNarrow, responsiveWidth)}}" query-matches="{{_queryMatches}}"></iron-media-query>
@@ -188,14 +162,7 @@ styling:
           </paper-calendar>
         </neon-animatable>
         <neon-animatable id="chooseYear">
-          <div id="yearList" cross-fade>
-            <iron-selector id="yearSelector" attr-for-selected="label"
-              on-iron-select="_yearSelected">
-              <template is="dom-repeat" items="{{years}}" as="year">
-                <div class="year" label$="{{year}}" on-tap="_tapYear">{{year}}</div>
-              </template>
-            </iron-selector>
-          </div>
+          <paper-year-list id="yearList" date="{{date}}" on-tap="_tapHeadingDate" min="[[_minYear]]" max="[[_maxYear]]"></paper-year-list>
         </neon-animatable>
       </neon-animated-pages>
     </div>
@@ -267,10 +234,6 @@ styling:
           readOnly: true,
           reflectToAttribute: true
         },
-        years: {
-          type: Array,
-          computed: '_computeYears(minDate, maxDate)'
-        },
         _queryMatches: {
           type: Boolean,
           value: false
@@ -279,7 +242,15 @@ styling:
           type: String,
           value: '[,]'
         },
-        _selectedPage: String
+        _selectedPage: String,
+        _maxYear: {
+          type: Number,
+          computed: '_getFullYear(maxDate)'
+        },
+        _minYear: {
+          type: Number,
+          computed: '_getFullYear(minDate)'
+        }
       },
       behaviors: [
         Polymer.IronResizableBehavior
@@ -295,54 +266,28 @@ styling:
       dateFormat: function() {
         return this.$.calendar.dateFormat.apply(this.$.calendar, arguments);
       },
-      _tapYear: function() {
-        this._selectPage('chooseDate');
-      },
-      _yearSelected: function(e, detail) {
-        var year = parseInt(detail.item.getAttribute('label'));
-        var date = new Date(this.date);
-        if (year !== date.getFullYear()) {
-          date.setFullYear(year);
-          this.date = date;
-        }
-      },
       _tapHeadingDate: function() {
         if (this.$.pages.selected !== 'chooseDate') {
           this._selectPage('chooseDate');
         }
       },
       _tapHeadingYear: function() {
-        var year = this.date.getFullYear();
-        this.async(function() {
-          this._scrollToYear(year);
-        }.bind(this));
         if (this.$.pages.selected !== 'chooseYear') {
-          this.$.yearSelector.select(year.toString());
           this._selectPage('chooseYear');
+          this.$.yearList.centerSelected();
         }
       },
       _selectPage: function(page) {
         this.$.pages.selected = page;
-      },
-      _scrollToYear: function(year) {
-        var el = this.$.yearSelector.querySelector('.year[label="' + year + '"]');
-        var middle = this.$.chooseYear.offsetHeight / 2;
-        this.$.yearList.scrollTop = el.offsetTop - middle + (el.offsetHeight / 2);
-      },
-      _computeYears: function(minDate, maxDate) {
-        var minYear = minDate ? minDate.getFullYear() : 1900;
-        var maxYear = maxDate ? maxDate.getFullYear() : 2100;
-        var years = [];
-        for (var y = minYear; y <= maxYear; y++) {
-          years.push(y);
-        }
-        return years;
       },
       _getMediaQuery: function(forceNarrow, responsiveWidth) {
         return '(max-width: ' + (forceNarrow ? '' : responsiveWidth) + ')';
       },
       _getHeadingClass: function(pfx, selectedPage) {
         return pfx + ' pg-' + selectedPage;
+      },
+      _getFullYear: function(date) {
+        return date ? date.getFullYear() : null;
       },
       _splitHeadingDate: function(date, format, locale) {
         var re = new RegExp(this.headingBreak, 'g');

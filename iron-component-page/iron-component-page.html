@@ -89,7 +89,7 @@ documentation page including demos (if available).
         color: var(--paper-grey-800);
       }
 
-      #demo {
+      #demo iframe {
         @apply(--layout-fit);
       }
 
@@ -100,7 +100,6 @@ documentation page including demos (if available).
         color: var(--paper-grey-400);
       }
 
-      #demo,
       #demo iframe {
         border: 0;
         background: transparent;
@@ -170,10 +169,10 @@ documentation page including demos (if available).
         display: none;
       }
 
-      :host([_catalog]) [catalog-only] {
+      :host([catalog]) [catalog-only] {
         display: block;
       }
-      :host([_catalog]) [catalog-hidden] {
+      :host([catalog]) [catalog-hidden] {
         display: none;
       }
 
@@ -195,7 +194,7 @@ documentation page including demos (if available).
       <paper-toolbar catalog-hidden>
         <div class="docs-header">
           <!-- TODO: Replace with paper-dropdown-menu when available -->
-          <select id="active" value="{{active::change}}">
+          <select id="active" value="[[active]]" on-change="_handleMenuItemSelected">
             <template is="dom-repeat" items="[[docElements]]">
               <option value="[[item.is]]">[[item.is]]</option>
             </template>
@@ -215,7 +214,7 @@ documentation page including demos (if available).
             <div id="catalog-heading" catalog-only>
               <h2><span>[[active]]</span> <span class="version" hidden$="[[!version]]">[[version]]</span></h2>
             </div>
-            <iron-doc-viewer descriptor="{{_activeDescriptor}}"
+            <iron-doc-viewer prefix="[[_fragmentPrefix]]" id="viewer" descriptor="{{_activeDescriptor}}"
               on-iron-doc-viewer-component-selected="_handleComponentSelectedEvent"></iron-doc-viewer>
             <div id="nodocs" hidden$="[[_activeDescriptor]]" class="no-docs">
               No documentation found.
@@ -370,7 +369,7 @@ documentation page including demos (if available).
            * Toggle flag to be used when this element is being displayed in the
            * Polymer Elements catalog.
            */
-          _catalog: {
+          catalog: {
             type: Boolean,
             value: false,
             reflectToAttribute: true
@@ -428,6 +427,20 @@ documentation page including demos (if available).
           '_activeChanged(active, _analyzer)'
         ],
 
+        attached: function() {
+          // In the catalog, let the catalog do all the routing
+          if (!this.catalog) {
+            this._setActiveFromHash();
+            this.listen(window, 'hashchange', '_setActiveFromHash');
+          }
+        },
+
+        detached: function() {
+          if (!this.catalog) {
+            this.unlisten(window, 'hashchange', '_setActiveFromHash');
+          }
+        },
+
         ready: function() {
           var elements = this._loadJson();
           if (elements) {
@@ -435,7 +448,7 @@ documentation page including demos (if available).
             this._loading  = false;
           } else {
             // Make sure our change handlers trigger in all cases.
-            if (!this.src && !this._catalog) {
+            if (!this.src && !this.catalog) {
               this._srcChanged();
             }
           }
@@ -462,6 +475,25 @@ documentation page including demos (if available).
           } catch(error) {
             console.error('Failure when parsing JSON:', textContent, error);
             throw error;
+          }
+        },
+
+        /**
+         * Load the page identified in the fragment identifier.
+         */
+
+        _setActiveFromHash: function(hash) {
+          // hash is either element-name or element-name:{properties|methods|events} or
+          // element-name:{property|method|event}.member-name
+          var hash = window.location.hash;
+          if (hash) {
+            var elementDelimiter = hash.indexOf(':');
+            elementDelimiter = (elementDelimiter == -1) ? hash.length : elementDelimiter;
+            var el = hash.slice(1, elementDelimiter);
+            if (this.active != el) {
+              this.active = el;
+            }
+            this.$.viewer.scrollToAnchor(hash);
           }
         },
 
@@ -501,7 +533,7 @@ documentation page including demos (if available).
           var demoSrc = new URL(src, this.base).toString();
 
           // If you use history.pushState with iframe.src = url, you will create 2 history entries,
-          // but setting the `src` attribute imperatively will not.
+          // but creating a new iframe dynamically will prevent it.
 
           if (this._iframe) {
             Polymer.dom(this.$.demo).removeChild(this._iframe);
@@ -587,6 +619,15 @@ documentation page including demos (if available).
               if (this._activeDescriptor.is && !document.title) {
                 document.title = this._activeDescriptor.is + " documentation";
               }
+              if (this._activeDescriptor.is && !this.catalog) {
+                this._fragmentPrefix = this._activeDescriptor.is + ':';
+              } else {
+                this._fragmentPrefix = '';
+              }
+              // On initial load, scroll to the selected anchor (if any).
+              // This probably shouldn't be required when we're running
+              // in the catalog, but at the moment it is.
+              this.$.viewer.scrollToAnchor(window.location.hash);
             }
             this._setDocDemos(this._activeDescriptor ? this._activeDescriptor.demos : []);
           }
@@ -608,30 +649,16 @@ documentation page including demos (if available).
           if (!this._findDescriptor(this.active)) {
             this.active = this._getDefaultActive();
           }
-
-          // Scroll to element. Wait one frame so for page load case. Browser
-          // will attempt to jump to the element before it exists in DOM.
-          // TODO: support scrolling to hidden API properties/methods.
-          // TODO: deep link into non-default "active" view in select dropdown.
-          this.async(function() {
-            var hash = window.location.hash;
-            if (hash) {
-              var goToElement = null;
-              // Find element using native shadow dom. Otherwise, fall back to shady.
-              if (Polymer.Settings.useNativeShadow) {
-                goToElement = this.$.view.querySelector(':scope /deep/ ' + hash);
-              } else {
-                goToElement = this.querySelector(hash);
-              }
-              if (goToElement) {
-                goToElement.scrollIntoView(true);
-              }
-            }
-          });
         },
 
         _detectAnalyzer: function() {
           this._analyzer = this.docSrc ? this._ajaxDesc : this._hydroDesc;
+        },
+
+        _handleMenuItemSelected: function(e) {
+          if (e.target && e.target.value) {
+            window.location.hash = '#' + e.target.value;
+          }
         },
 
         _handleAjaxResponse: function(e, req) {

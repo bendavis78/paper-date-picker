@@ -16,7 +16,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 Material design: [Toolbars](https://www.google.com/design/spec/components/toolbars.html)
 
 `paper-toolbar` is a horizontal bar containing items that can be used for
-label, navigation, search and actions.  The items place inside the
+label, navigation, search and actions.  The items placed inside the
 `paper-toolbar` are projected into a `class="horizontal center layout"` container inside of
 `paper-toolbar`'s Shadow DOM.  You can use flex attributes to control the items'
 sizing.
@@ -32,7 +32,7 @@ Example:
 ```
 
 `paper-toolbar` has a standard height, but can made be taller by setting `tall`
-class on the `paper-toolbar`.  This will make the toolbar 3x the normal height.
+class on the `paper-toolbar`. This will make the toolbar 3x the normal height.
 
 ```html
 <paper-toolbar class="tall">
@@ -73,6 +73,9 @@ with `bottom`.
 </paper-toolbar>
 ```
 
+When inside a `paper-header-panel` element, the class `.animate` is toggled to animate
+the height change in the toolbar.
+
 ### Styling
 
 The following custom properties and mixins are available for styling:
@@ -80,13 +83,15 @@ The following custom properties and mixins are available for styling:
 Custom property | Description | Default
 ----------------|-------------|----------
 `--paper-toolbar-title`      | Mixin applied to the title of the toolbar | `{}`
-`--paper-toolbar-background` | Toolbar background color     | `--default-primary-color`
-`--paper-toolbar-color`      | Toolbar foreground color     | `--text-primary-color`
+`--paper-toolbar-background` | Toolbar background color     | `--primary-color`
+`--paper-toolbar-color`      | Toolbar foreground color     | `--dark-theme-text-color`
 `--paper-toolbar-height`     | Custom height for toolbar    | `64px`
 `--paper-toolbar-sm-height`  | Custom height for small screen toolbar | `56px`
 `--paper-toolbar`            | Mixin applied to the toolbar | `{}`
+`--paper-toolbar-content`    | Mixin applied to the content section of the toolbar | `{}`
 `--paper-toolbar-medium`     | Mixin applied to medium height toolbar | `{}`
 `--paper-toolbar-tall`       | Mixin applied to tall height toolbar | `{}`
+`--paper-toolbar-transition` | Transition applied to the `.animate` class | `height 0.18s ease-in`
 
 ### Accessibility
 
@@ -109,15 +114,15 @@ be used as the label of the toolbar via `aria-labelledby`.
         /* size */
         height: var(--paper-toolbar-height, 64px);
 
-        background: var(--paper-toolbar-background, --default-primary-color);
-        color: var(--paper-toolbar-color, --text-primary-color);
+        background: var(--paper-toolbar-background, --primary-color);
+        color: var(--paper-toolbar-color, --dark-theme-text-color);
 
         @apply(--paper-toolbar);
       }
 
       :host(.animate) {
         /* transition */
-        transition: height 0.18s ease-in;
+        transition: var(--paper-toolbar-transition, height 0.18s ease-in);
       }
 
       :host(.medium-tall) {
@@ -137,13 +142,14 @@ be used as the label of the toolbar via `aria-labelledby`.
         pointer-events: none;
         @apply(--layout-horizontal);
         @apply(--layout-center);
+        @apply(--paper-toolbar-content);
       }
 
       /*
        * TODO: Where should media query breakpoints live so they can be shared between elements?
        */
 
-      @media (max-width: 639px) {
+      @media (max-width: 600px) {
         :host {
           height: var(--paper-toolbar-sm-height, 56px);
         }
@@ -293,10 +299,6 @@ be used as the label of the toolbar via `aria-labelledby`.
          * Controls how the items are aligned horizontally when they are placed
          * at the bottom.
          * Options are `start`, `center`, `end`, `justified` and `around`.
-         *
-         * @attribute bottomJustify
-         * @type string
-         * @default ''
          */
         bottomJustify: {
           type: String,
@@ -306,10 +308,6 @@ be used as the label of the toolbar via `aria-labelledby`.
         /**
          * Controls how the items are aligned horizontally.
          * Options are `start`, `center`, `end`, `justified` and `around`.
-         *
-         * @attribute justify
-         * @type string
-         * @default ''
          */
         justify: {
           type: String,
@@ -320,10 +318,6 @@ be used as the label of the toolbar via `aria-labelledby`.
          * Controls how the items are aligned horizontally when they are placed
          * in the middle.
          * Options are `start`, `center`, `end`, `justified` and `around`.
-         *
-         * @attribute middleJustify
-         * @type string
-         * @default ''
          */
         middleJustify: {
           type: String,

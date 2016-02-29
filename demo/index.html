@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
 
   <title>paper-date-picker Demo</title>
-  
+
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
   <link rel="import" href="../paper-date-picker.html">
@@ -35,23 +35,24 @@
     </section>
   </template>
   <script>
-    var scope = Polymer.dom(document).querySelector('#scope');
-    scope.dateFormat = function(date, format) {
-      return moment(date).format(format);
-    };
-    scope.dismissDialog = function(event) {
-      if (event.detail.confirmed) {
-        scope.date = scope.$.picker.date;
-      }
-    };
-    scope.showDialog = function() {
-      this.$.dialog.toggle();
-    };
-    document.addEventListener('WebComponentsReady', function() {
-      scope.date = new Date(2017, 3, 13);
-      scope.showDialog();
+    HTMLImports.whenReady(function() {
+      var scope = Polymer.dom(document).querySelector('#scope');
+      scope.dateFormat = function(date, format) {
+        return moment(date).format(format);
+      };
+      scope.dismissDialog = function(event) {
+        if (event.detail.confirmed) {
+          scope.date = scope.$.picker.date;
+        }
+      };
+      scope.showDialog = function() {
+        this.$.dialog.toggle();
+      };
+      document.addEventListener('WebComponentsReady', function() {
+        scope.date = new Date(2017, 3, 13);
+        scope.showDialog();
+      });
     });
-
   </script>
 </body>
 </html>

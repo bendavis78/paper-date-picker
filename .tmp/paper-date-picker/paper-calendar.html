@@ -294,15 +294,14 @@
         return value.format(format);
       },
       _localeChanged: function(locale) {
-        // FIXME: use public API for getting locale-aware weekdays once moment/moment#2433 is fixed
-        var localeData = moment.localeData(locale);
-        var fdow = localeData._week.dow;
-        this.set('_firstDayOfWeek', fdow);
+        var localeMoment = moment();
+        localeMoment.locale(locale);
         var weekdays = [];
-        for (var i=fdow; i<7+fdow; i++) {
-          weekdays.push(localeData._weekdaysMin[i % 7]);
+        for (var i=0; i<7; i++) {
+          weekdays.push(localeMoment.weekday(i).format('dd'));
         }
-        this.set('_weekdays', weekdays);
+        this._weekdays = weekdays;
+        this._firstDayOfWeek = localeMoment.weekday(0).format('d');
       },
       _populate: function(currentYear, currentMonth, minDate, maxDate) {
         var date, month, weeks, day, d, dayInfo, monthData, months = [];
@@ -575,6 +574,8 @@
           console.warn('Date outside of valid range: ' + date);
           this.date = date = oldValue;
         }
+        this.currentYear = date.getFullYear();
+        this.currentMonth = date.getMonth() + 1;
         if (oldValue && date.getTime && oldValue.getTime && date.getTime() === oldValue.getTime()) {
           return;
         }
@@ -582,8 +583,6 @@
         date = new Date(date.getTime());
         date.setHours(0, 0, 0, 0);
         this.set('date', date);
-        this.currentYear = date.getFullYear();
-        this.currentMonth = date.getMonth() + 1;
       },
       _tapDay: function(event) {
         if (!this._withinValidRange(event.model.item.date)) {
@@ -618,7 +617,6 @@
       _resizeHandler: function() {
         this._containerWidth = this.$.calendar.offsetWidth;
         this._positionSlider();
-        this._updateToday();
       },
       _getDayName: function(date) {
         return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();

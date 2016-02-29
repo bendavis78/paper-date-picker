@@ -43,6 +43,12 @@ styling:
 </paper-dialog>
 ```
 
+# Reporting Bugs
+
+When filing a bug report, please provide an example of how to repoduce using
+plunker, jsbin, jsfiddle, etc. You can use the following plunker as a starting
+point: http://plnkr.co/edit/9c787GHiBzX7zI5x6gsX
+
 ---
 
 If you find this component useful, please show your support by donating to

@@ -17,10 +17,7 @@ var tagVersion = require('gulp-tag-version');
 var git = require('gulp-git');
 var filter = require('gulp-filter');
 var portfinder = require('portfinder');
-
-function getPackage() {
-  return JSON.parse(fs.readFileSync('bower.json', 'utf8')); 
-}
+var bowerPackage = require('./bower.json');
 
 function getBowerConfig() {
   if (fs.existsSync('.bowerrc')) {
@@ -73,7 +70,7 @@ gulp.task('release:major', _bump.bind(null, 'major'));
 
 // Watch Files For Changes & Reload
 gulp.task('serve', ['bower'], function () {
-  var pkgRoot = '/' + getPackage().name;
+  var pkgRoot = '/' + bowerPackage.name;
   var opts = {
     notify: false,
     snippetOptions: {
@@ -105,7 +102,7 @@ gulp.task('serve', ['bower'], function () {
 });
 
 gulp.task('gh-pages', function() {
-  var pkgName = getPackage().name;
+  var pkgName = bowerPackage.name;
   return merge(
     gulp.src(gitFiles())
       .pipe(copy('.tmp/' + pkgName)),

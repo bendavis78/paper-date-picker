@@ -62,7 +62,7 @@
         --webkit-transition-timing-function: var(--ease-out-sine);
       }
       .month {
-        flex: 1;
+        flex: 1 1 0;
         height: 100%;
         @apply(--layout-vertical);
         @apply(--layout-justified);
@@ -124,7 +124,7 @@
         @apply(--layout-center-center);
       }
       .day-item {
-        flex: 1;
+        flex: 1 1 0;
         object-fit: contain;
       }
       .day-item::selection {
@@ -135,6 +135,12 @@
       }
       .day-item.selected .selection {
         fill: var(--default-primary-color);
+      }
+      .day-item.min-date .selection {
+        fill: var(--primary-min-date-color);
+      }
+      .day-item.max-date .selection {
+        fill: var(--primary-max-date-color);
       }
       .day-item.selected + .day {
         color: var(--text-primary-color);
@@ -255,7 +261,7 @@
           value: null
         },
         /**
-         * The currently selected month (1-12) 
+         * The currently selected month (1-12)
          */
         currentMonth: {
           type: Number
@@ -281,8 +287,10 @@
       },
       ready: function() {
         this._updateToday();
-        this.currentMonth = this.date.getMonth() + 1;
-        this.currentYear = this.date.getFullYear();
+
+        var date = this.date || new Date();
+        this.currentMonth = date.getMonth() + 1;
+        this.currentYear = date.getFullYear();
         this._transitionEvent = this.style.WebkitTransition ? 'transitionEnd' : 'webkitTransitionEnd';
       },
       dateFormat: function(date, format, locale) {
@@ -387,10 +395,16 @@
         if (this.date && this.date.getTime() === date.getTime()) {
           cssClass += ' selected';
         }
+        if (this.minDate && date.getTime() == this.minDate.getTime()) {
+          cssClass += ' min-date';
+        }
+        if (this.maxDate && date.getTime() == this.maxDate.getTime()) {
+          cssClass += ' max-date';
+        }
         return cssClass;
       },
       _isDisabled: function(day, date) {
-        return !day || !this._withinValidRange(date);
+        return !day || !this._withinValidRange(date) || date.getUTCDay() === 5 || date.getUTCDay() === 6;
       },
       _getMonthClass: function(name, month) {
         return name + ' month-' + month.year + '-' + month.month;
@@ -566,6 +580,16 @@
         this._incrMonth(1);
       },
       _dateChanged: function(date, oldValue) {
+        if (!date) {
+          // Ensure binded values are set to null too.
+          this.set('date', null);
+
+          var curr = new Date();
+          this.currentYear = curr.getFullYear();
+          this.currentMonth = curr.getMonth() + 1;
+          return;
+        }
+
         if (!this._isValidDate(date)) {
           console.warn('Invalid date: ' + date);
           this.date = date = oldValue;
@@ -610,7 +634,7 @@
         }
         this._scrollWidth = (this.$.calendar.offsetWidth * this._months.length);
         this.$.months.style.minWidth = this._scrollWidth + 'px';
-        var i = ((this.currentYear * 12) + this.currentMonth) - 
+        var i = ((this.currentYear * 12) + this.currentMonth) -
                  ((this._months[0].year * 12) + this._months[0].month);
         this._translateX(-i * this._containerWidth);
       },

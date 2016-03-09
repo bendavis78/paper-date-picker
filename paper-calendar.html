@@ -6,6 +6,7 @@
 <link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../moment-element/moment-with-locales-import.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
 
 <dom-module id="paper-calendar">
   <template>
@@ -13,7 +14,7 @@
       :host {
         display: block;
         box-sizing: border-box;
-        padding: 12px 0;
+        padding: 12px;
         position: relative;
         width: 100%;
         height: 100%;
@@ -46,9 +47,6 @@
         height: 100%;
         @apply(--layout-horizontal);
       }
-      #months.animating .month-nav {
-        opacity: 1;
-      }
       #months.animating {
         transition-property: transform, opacity;
         transition-duration: 300ms;
@@ -62,16 +60,14 @@
         --webkit-transition-timing-function: var(--ease-out-sine);
       }
       .month {
-        flex: 1;
         height: 100%;
+        @apply(--layout-flex);
         @apply(--layout-vertical);
-        @apply(--layout-justified);
       }
 
-      .month-row, .month-nav {
-        height: calc(100%/8);
-        box-sizing: border-box;
-        padding: 0 calc(100%/36);
+      .month-row {
+        @apply(--layout-horizontal);
+        @apply(--layout-flex);
       }
 
       .month-col {
@@ -80,38 +76,20 @@
         @apply(--layout-flex);
       }
 
-      .month-nav {
+      #monthNav {
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+        @apply(--layout-center);
         position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
+        left:0;
+        right: 0;
         opacity: 1;
-      }
-      .month-nav .col {
-        position: relative;
-        @apply(--layout-vertical);
-        @apply(--layout-center-center);
-      }
-      .month-nav .btn .icon {
-        cursor: pointer;
-      }
-      .month-nav .btn .ripple {
-        position: absolute;
-        width: 48px;
-        height: 48px;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-      }
-      .month-nav .btn.right {
-        text-align: right;
       }
       .month-name {
         line-height: 24px;
-        vertical-align: middle;
-        text-align: center;
         font-weight: bold;
         @apply(--paper-font-body2);
+        @apply(--layout-center-center);
       }
       .month-weekdays {
         color: var(--secondary-text-color);
@@ -124,8 +102,8 @@
         @apply(--layout-center-center);
       }
       .day-item {
-        flex: 1;
         object-fit: contain;
+        @apply(--layout-flex);
       }
       .day-item::selection {
         background: none;
@@ -156,18 +134,18 @@
       <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
         <template is="dom-repeat" items="{{_months}}" as="month">
           <div class$="{{_getMonthClass('month', month)}}">
-            <div class="month-row month-name layout horizontal center-center flex">
+            <div class="month-row month-name">
               <span>{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
             </div>
-            <div class="month-row month-weekdays week layout horizontal justified flex">
+            <div class="month-row month-weekdays week">
               <template is="dom-repeat" items="{{_weekdays}}">
-                <div class="month-col layout vertical flex">
+                <div class="month-col">
                   <div class="day">{{item.0}}</div>
                 </div>
               </template>
             </div>
             <template is="dom-repeat" items="{{month.weeks}}" as="row">
-              <div class="month-row layout horizontal justified flex">
+              <div class="month-row">
                 <template is="dom-repeat" items="{{row}}">
                   <div class="month-col">
                     <svg version="1.1" viewBox="0 0 100 100"
@@ -184,20 +162,11 @@
           </div>
         </template>
       </div>
-      <div id="monthNav" class="month-nav layout horizontal center">
-        <div class="flex col self-stretch">
-          <div class="btn" on-tap="_prevMonth">
-            <paper-ripple center class="ripple circle"></paper-ripple>
-            <iron-icon class="icon flex" icon="chevron-left"></iron-icon>
-          </div>
-        </div>
-        <div class="flex-5"></div>
-        <div class="flex col self-stretch">
-          <div class="btn" on-tap="_nextMonth">
-            <paper-ripple center class="ripple circle"></paper-ripple>
-            <iron-icon class="icon flex" icon="chevron-right"></iron-icon>
-          </div>
-        </div>
+      <div id="monthNav">
+        <paper-icon-button icon="chevron-left" on-tap="_swipePrevMonth">
+        </paper-icon-button>
+        <paper-icon-button icon="chevron-right" on-tap="_swipeNextMonth">
+        </paper-icon-button>
       </div>
     </div>
   </template>

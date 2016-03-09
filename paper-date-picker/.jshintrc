@@ -16,6 +16,7 @@
   "globals": {
     "wrap": true,
     "unwrap": true,
+    "HTMLImports": true,
     "Polymer": true,
     "Platform": true,
     "moment": true

@@ -1,10 +1,10 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
-<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
 <link rel="import" href="../paper-styles/paper-styles.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
-<link rel="import" href="../iron-selector/iron-selector.html">
 <link rel="import" href="../moment-element/moment-with-locales-import.html">
 
 <dom-module id="paper-calendar">
@@ -206,6 +206,7 @@
 
     // Ignore movement within this distance (px)
     var WIGGLE_THRESHOLD = 4;
+    var WIGGLE_THRESHOLD_SQUARE = WIGGLE_THRESHOLD * WIGGLE_THRESHOLD;
 
     // what constitues a flick (px/ms)
     var FLICK_SPEED = 0.5;
@@ -378,14 +379,8 @@
         this._positionSlider();
       },
       _getDayClass: function(cssClass, date) {
-        if (!date) {
-          return cssClass;
-        }
-        if (date.getTime() === this.today.getTime()) {
+        if (date && date.getTime() === this.today.getTime()) {
           cssClass += ' today';
-        }
-        if (this.date && this.date.getTime() === date.getTime()) {
-          cssClass += ' selected';
         }
         return cssClass;
       },
@@ -418,8 +413,8 @@
           this._moveQueue.push(event);
 
           // ignore movement within WIGGLE_THRESHOLD
-          var distance = Math.sqrt((dx * dx) + (dy * dy));
-          if (!this._gesture && distance > WIGGLE_THRESHOLD) {
+          var distance = (dx * dx) + (dy * dy);
+          if (!this._gesture && distance > WIGGLE_THRESHOLD_SQUARE) {
             this._gesture = adx > ady ? 'pan-x' : 'pan-y';
           }
 
@@ -521,19 +516,19 @@
       _getFastestMovement: function(event) {
         // detect flick based on fastest segment of movement
         var l = this._moveQueue.length;
-        var dt, tx, ty, tv, x = 0, y = 0, v = 0;
+        var dt, tx, ty, tv2, x = 0, y = 0, v2 = 0;
         for (var i = 0, m; i < l && (m = this._moveQueue[i]); i++) {
           dt = event.timeStamp - m.timeStamp;
           tx = (event.detail.x - m.detail.x) / dt;
           ty = (event.detail.y - m.detail.y) / dt;
-          tv = Math.sqrt(tx * tx + ty * ty);
-          if (tv > v) {
+          tv2 = tx * tx + ty * ty;
+          if (tv2 > v2) {
             x = tx;
             y = ty;
-            v = tv;
+            v2 = tv2;
           }
         }
-        return {x: x, y: y, v: v};
+        return {x: x, y: y, v: Math.sqrt(v2)};
       },
       _onSwipe: function(event) {
         if (event.detail.direction === 'right') {
@@ -589,6 +584,7 @@
           return false;
         }
         this.date = event.model.item.date;
+        this.toggleClass('selected', true, Polymer.dom(event.target).parentNode);
       },
       _isValidDate: function(date) {
         return date && date.getTime && !isNaN(date.getTime());

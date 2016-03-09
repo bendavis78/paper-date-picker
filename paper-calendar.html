@@ -14,7 +14,7 @@
       :host {
         display: block;
         box-sizing: border-box;
-        padding: 12px 0;
+        padding: 12px;
         position: relative;
         width: 100%;
         height: 100%;
@@ -60,16 +60,14 @@
         --webkit-transition-timing-function: var(--ease-out-sine);
       }
       .month {
-        flex: 1;
         height: 100%;
+        @apply(--layout-flex);
         @apply(--layout-vertical);
-        @apply(--layout-justified);
       }
 
       .month-row {
-        height: calc(100%/8);
-        box-sizing: border-box;
-        padding: 0 calc(100%/36);
+        @apply(--layout-horizontal);
+        @apply(--layout-flex);
       }
 
       .month-col {
@@ -85,16 +83,13 @@
         position: absolute;
         left:0;
         right: 0;
-        padding: 0 calc(100%/36);
-        height: calc(100%/8);
         opacity: 1;
       }
       .month-name {
         line-height: 24px;
-        vertical-align: middle;
-        text-align: center;
         font-weight: bold;
         @apply(--paper-font-body2);
+        @apply(--layout-center-center);
       }
       .month-weekdays {
         color: var(--secondary-text-color);
@@ -107,8 +102,8 @@
         @apply(--layout-center-center);
       }
       .day-item {
-        flex: 1;
         object-fit: contain;
+        @apply(--layout-flex);
       }
       .day-item::selection {
         background: none;
@@ -139,18 +134,18 @@
       <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
         <template is="dom-repeat" items="{{_months}}" as="month">
           <div class$="{{_getMonthClass('month', month)}}">
-            <div class="month-row month-name layout horizontal center-center flex">
+            <div class="month-row month-name">
               <span>{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
             </div>
-            <div class="month-row month-weekdays week layout horizontal justified flex">
+            <div class="month-row month-weekdays week">
               <template is="dom-repeat" items="{{_weekdays}}">
-                <div class="month-col layout vertical flex">
+                <div class="month-col">
                   <div class="day">{{item.0}}</div>
                 </div>
               </template>
             </div>
             <template is="dom-repeat" items="{{month.weeks}}" as="row">
-              <div class="month-row layout horizontal justified flex">
+              <div class="month-row">
                 <template is="dom-repeat" items="{{row}}">
                   <div class="month-col">
                     <svg version="1.1" viewBox="0 0 100 100"

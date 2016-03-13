@@ -85,8 +85,16 @@ documentation page including demos (if available).
         margin: -2px 5px 0 0;
       }
 
-      paper-toolbar a:hover, paper-toolbar a:hover iron-icon, paper-toolbar a.iron-selected, paper-toolbar a.iron-selected iron-icon {
+      paper-toolbar a.iron-selected, paper-toolbar a.iron-selected iron-icon {
         color: var(--paper-grey-800);
+      }
+
+      paper-toolbar a:hover, paper-toolbar a:hover iron-icon {
+        color: var(--paper-pink-500);
+      }
+
+      select {
+        cursor: pointer;
       }
 
       #demo iframe {
@@ -364,6 +372,8 @@ documentation page including demos (if available).
            * @type {!hydrolysis.ElementDescriptor}
            */
           _activeDescriptor: Object,
+
+          _fragmentPrefix: String,
 
           /**
            * Toggle flag to be used when this element is being displayed in the

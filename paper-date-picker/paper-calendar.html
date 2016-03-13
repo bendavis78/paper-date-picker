@@ -62,10 +62,10 @@
         --webkit-transition-timing-function: var(--ease-out-sine);
       }
       .month {
-        flex: 1;
         height: 100%;
         @apply(--layout-vertical);
         @apply(--layout-justified);
+        @apply(--layout-flex);
       }
 
       .month-row, .month-nav {
@@ -123,32 +123,36 @@
         @apply(--layout-vertical);
         @apply(--layout-center-center);
       }
+      .month-col {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        @apply(--layout-center-center);
+      }
       .day-item {
-        flex: 1;
-        object-fit: contain;
+        border-radius: 100%;
+        width: 100%;
+        height: 100%;
       }
       .day-item::selection {
         background: none;
       }
-      .day-item .selection {
-        fill: rgba(0,0,0,0);
+      .day-item.selected {
+        background: var(--default-primary-color);
       }
-      .day-item.selected .selection {
-        fill: var(--default-primary-color);
-      }
-      .day-item.selected + .day {
+      .day-item.selected .day {
         color: var(--text-primary-color);
       }
       .day-item:not([disabled]) {
         cursor: pointer;
       }
-      .day-item[disabled] + .day {
+      .day-item[disabled] .day {
         color: var(--text-disabled-color, #9d9d9d);
       }
-      .day-item.today + .day {
+      .day-item.today .day {
         color: var(--default-primary-color);
       }
-      .day-item.selected.today + .day {
+      .day-item.selected.today .day {
         color: var(--text-primary-color);
       }
     </style>
@@ -170,13 +174,11 @@
               <div class="month-row layout horizontal justified flex">
                 <template is="dom-repeat" items="{{row}}">
                   <div class="month-col">
-                    <svg version="1.1" viewBox="0 0 100 100"
-                      class$="{{_getDayClass('day-item', item.date, today, date)}}"
+                    <div class$="{{_getDayClass('day-item selection', item.date, today, date)}}"
                       disabled$="{{_isDisabled(item.day, item.date, minDate, maxDate)}}"
                       on-tap="_tapDay" date$="{{item.name}}">
-                      <circle cx="50" cy="50" r="49" class="selection"></circle>
-                    </svg>
-                    <div class="day">{{item.day}}</div>
+                      <div class="day">{{item.day}}</div>
+                    </div>
                   </div>
                 </template>
               </div>
@@ -186,14 +188,14 @@
       </div>
       <div id="monthNav" class="month-nav layout horizontal center">
         <div class="flex col self-stretch">
-          <div class="btn" on-tap="_prevMonth">
+          <div class="btn" on-tap="_swipePrevMonth">
             <paper-ripple center class="ripple circle"></paper-ripple>
             <iron-icon class="icon flex" icon="chevron-left"></iron-icon>
           </div>
         </div>
         <div class="flex-5"></div>
         <div class="flex col self-stretch">
-          <div class="btn" on-tap="_nextMonth">
+          <div class="btn" on-tap="_swipeNextMonth">
             <paper-ripple center class="ripple circle"></paper-ripple>
             <iron-icon class="icon flex" icon="chevron-right"></iron-icon>
           </div>
@@ -371,16 +373,29 @@
 
           monthData.weeks = weeks;
           months.push(monthData);
+
         }
         if (!months.length) {
           return;
         }
         this.set('_months', months);
-        this._positionSlider();
+        this.async(function() {
+          this._updateSelection();
+          this._positionSlider();
+        });
       },
       _getDayClass: function(cssClass, date) {
-        if (date && date.getTime() === this.today.getTime()) {
-          cssClass += ' today';
+        if (date) {
+          var timestamp = date.getTime();
+          if (timestamp === this.today.getTime()) {
+            cssClass += ' today';
+          }
+          if (timestamp === this.date.getTime()) {
+            cssClass += ' selected';
+            this.async(function() {
+              this._updateSelection();
+            });
+          }
         }
         return cssClass;
       },
@@ -391,86 +406,97 @@
         return name + ' month-' + month.year + '-' + month.month;
       },
       _onTrack: function(event) {
-        var detail = event.detail;
-        var state = detail.state;
         var dx = event.detail.dx;
         var dy = event.detail.dy;
         var adx = Math.abs(dx);
         var ady = Math.abs(dy);
         var width = this._containerWidth;
 
-        if (state === 'start') {
-          this._trackStartTime = (new Date()).getTime();
-          this._startPos = this._currentPos;
-          this._moveQueue = [];
-        }
+        switch (event.detail.state) {
+          case 'start':
+            this._trackStartTime = (new Date()).getTime();
+            this._startPos = this._currentPos;
+            this._moveQueue = [];
+          break;
 
-        var x = this._startPos + dx;
-        if (state === 'track') {
-          if (this._moveQueue.length >= 4) {
-            this._moveQueue.shift();
-          }
-          this._moveQueue.push(event);
-
-          // ignore movement within WIGGLE_THRESHOLD
-          var distance = (dx * dx) + (dy * dy);
-          if (!this._gesture && distance > WIGGLE_THRESHOLD_SQUARE) {
-            this._gesture = adx > ady ? 'pan-x' : 'pan-y';
-          }
-
-          // only drag during pan-x gesture
-          if (this._gesture !== 'pan-x') {
-            return;
-          }
-
-          this._dragging = true;
-          var fullWidth = width * this._months.length;
-
-          // If we're dragging outside the bounds, add some resistence
-          if (x > 0 || x < (-fullWidth + width)) {
-            if (isNaN(parseInt(this._resistStart))) {
-              this._resistStart = adx;
+          case 'track':
+            if (this._moveQueue.length >= 4) {
+              this._moveQueue.shift();
             }
-            var rdx = adx - this._resistStart;
-            var p, d, max = RESIST_LENGTH;
-            p = rdx > width ? 1 : rdx / width;
-            d = max * (1 - Math.pow(1 - p, RESIST_FACTOR));
-            x = (dx < 0 ? -this._scrollWidth + width - d : d);
-          } else {
-            this._resistStart = null;
-          }
-          this._translateX(x);
-        }
-        if (state === 'end') {
-          this._resistStart = null;
-          var lastIdx = this._getMonthIdx(this._startPos);
-          var idx = this._getMonthIdx(this._currentPos);
-          var speed = this._getFastestMovement(event).v;
-          var move = idx !== lastIdx || speed > FLICK_SPEED;
-          if (!this._resistStart && this._gesture === 'pan-x' && move) {
-            if (speed > FLICK_SPEED) {
-              // calculate an ideal transition duration based on current speed of swipe
-              var remainingDistance = width - adx;
-              var newDuration = remainingDistance / speed;
-              if (newDuration > 300) {
-                newDuration = 300;
+            this._moveQueue.push(event);
+
+            // ignore movement within WIGGLE_THRESHOLD
+            var distance = (dx * dx) + (dy * dy);
+            if (!this._gesture && distance > WIGGLE_THRESHOLD_SQUARE) {
+              this._gesture = adx > ady ? 'pan-x' : 'pan-y';
+            }
+
+            // only drag during pan-x gesture
+            if (this._gesture !== 'pan-x') {
+              return;
+            }
+
+            this._dragging = true;
+            var fullWidth = width * this._months.length;
+            var x = this._startPos + dx;
+
+            // If we're dragging outside the bounds, add some resistence
+            if (x > 0 || x < (-fullWidth + width)) {
+              if (isNaN(parseInt(this._resistStart))) {
+                this._resistStart = adx;
               }
-              this._transitionDuration = newDuration;
+              var rdx = adx - this._resistStart;
+              var p, d, max = RESIST_LENGTH;
+              p = rdx > width ? 1 : rdx / width;
+              d = max * (1 - Math.pow(1 - p, RESIST_FACTOR));
+              x = (dx < 0 ? -this._scrollWidth + width - d : d);
+            } else {
+              this._resistStart = null;
             }
+            this._translateX(x);
+          break;
 
-            var newX = width * idx * -1;
-            var direction = (dx < 0) ? 'left' : 'right';
+          case 'end':
+            this._resistStart = null;
+            var lastIdx = this._getMonthIdx(this._startPos);
+            var idx = this._getMonthIdx(this._currentPos);
+            var speed = this._getFastestMovement(event).v;
+            var move = idx !== lastIdx || speed > FLICK_SPEED;
+            if (!this._resistStart && this._gesture === 'pan-x' && move) {
+              if (speed > FLICK_SPEED) {
+                // calculate an ideal transition duration based on current speed of swipe
+                var remainingDistance = width - adx;
+                var newDuration = remainingDistance / speed;
+                if (newDuration > 300) {
+                  newDuration = 300;
+                }
+                this._transitionDuration = newDuration;
+              }
 
-            this._translateX(newX, 'swipe', function() {
-              this.set('_contentClass', '');
-              this.transform('translateX(' + this._startPos + 'px)', this.$.months);
-              this.fire('swiped', {direction: direction});
-            }.bind(this));
-          } else {
-            this._translateX(this._startPos, 'reset');
-          }
-          this._gesture = null;
+              if (dx > 0) {
+                this._swipePrevMonth();
+              } else {
+                this._swipeNextMonth();
+              }
+            } else {
+              this._translateX(this._startPos, 'reset');
+            }
+            this._gesture = null;
         }
+      },
+      _swipePrevMonth: function() {
+        this._translateX(0, 'swipe', function() {
+          this.set('_contentClass', '');
+          this.transform('translateX(' + this._startPos + 'px)', this.$.months);
+          this.fire('swiped', {direction: 'right'});
+        }.bind(this));
+      },
+      _swipeNextMonth: function() {
+        this._translateX(-this._containerWidth * 2, 'swipe', function() {
+          this.set('_contentClass', '');
+          this.transform('translateX(' + this._startPos + 'px)', this.$.months);
+          this.fire('swiped', {direction: 'left'});
+        }.bind(this));
       },
       _getMonthIdx: function(pos) {
         // returns the index for the visible month according to the given position
@@ -578,13 +604,13 @@
         date = new Date(date.getTime());
         date.setHours(0, 0, 0, 0);
         this.set('date', date);
+        this._updateSelection();
       },
       _tapDay: function(event) {
         if (!this._withinValidRange(event.model.item.date)) {
           return false;
         }
         this.date = event.model.item.date;
-        this.toggleClass('selected', true, Polymer.dom(event.target).parentNode);
       },
       _isValidDate: function(date) {
         return date && date.getTime && !isNaN(date.getTime());
@@ -610,9 +636,29 @@
                  ((this._months[0].year * 12) + this._months[0].month);
         this._translateX(-i * this._containerWidth);
       },
+      _updateSelection: function() {
+        // Force the day selection circle to maintain a 1:1 ratio
+        var selected = this.$$('.day-item.selected');
+        if (!selected) {
+          return;
+        }
+        selected.style.height = '';
+        selected.style.width = '';
+        var w = selected.parentElement.offsetWidth;
+        var h = selected.parentElement.offsetHeight;
+        selected.style.flex = '';
+        window.requestAnimationFrame(function() {
+          if (w < h) {
+            selected.style.height = w + 'px';
+          } else {
+            selected.style.width = h + 'px';
+          }
+        });
+      },
       _resizeHandler: function() {
         this._containerWidth = this.$.calendar.offsetWidth;
         this._positionSlider();
+        this._updateSelection();
       },
       _getDayName: function(date) {
         return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();

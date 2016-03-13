@@ -101,19 +101,19 @@
        * Scroll in the years list to center the selected year.
        */
       centerSelected: function() {
-        if (this.selected != null) {
+        if (this.selected !== null) {
           var selectedYearIdx = this.selected - this.min;
           this.$.yearList.scrollToIndex(selectedYearIdx);
           // see https://github.com/PolymerElements/iron-list/issues/140
           this.$.yearList._render();
           this.async(function() {
             var selectedPos = selectedYearIdx * this._physicalAverage + 1;
-            if (selectedPos != this.scrollTop) {
+            if (selectedPos !== this.scrollTop) {
               this._update();
               this.scrollTop = selectedPos;
               this._refresh();
             }
-            if (this.scrollHeight - this.offsetHeight != this.scrollTop) {
+            if (this.scrollHeight - this.offsetHeight !== this.scrollTop) {
               this.scrollTop += (this._physicalAverage - this.offsetHeight) / 2;
               this._refresh();
             }
@@ -123,7 +123,7 @@
       /**
        * Return the selected class if needed.
        */
-      _addSelectedClass(selected) {
+      _addSelectedClass: function(selected) {
         if (selected) {
           return ' selected';
         }
@@ -132,9 +132,9 @@
        * Compute the years array passed to the iron-list.
        */
       _computeYears: function(min, max) {
-        if (!(typeof min == 'number') || !(typeof max == 'number')) {
+        if (typeof min !== 'number' || typeof max !== 'number') {
           return;
-        } 
+        }
         var years = [];
         for (;min <= max; min++) {
           years.push({year: min});
@@ -149,12 +149,12 @@
         this.selected = this._withinRange(newYear) ? newYear : null;
       },
       _maxChange: function(max) {
-        if (!(typeof max == 'number')) {
+        if (typeof max !== 'number') {
           this.max = 2100;
         }
       },
       _minChange: function(min) {
-        if (!(typeof min == 'number')) {
+        if (typeof min !== 'number') {
           this.min = 1900;
         }
       },
@@ -163,11 +163,11 @@
        * else select it in iron-list and synchronize 'date' attribute.
        */
       _selectedChange: function(selected) {
-        if (selected == null) {
+        if (selected === null) {
           this.$.yearList.clearSelection();
           return;
         }
-        if (selected != this.date.getFullYear()) {
+        if (selected !== this.date.getFullYear()) {
           // set the year using a new Date instance for notifying to work
           this.date = new Date(this.date.setFullYear(selected));
         }
@@ -187,7 +187,7 @@
       _tappedYearHandler: function(e) {
         var yearItem = e.model.__data__.item;
         var year = yearItem.year;
-        if (this.selected != year) {
+        if (this.selected !== year) {
           this.$.yearList.selectItem(yearItem);
           this.selected = year;
         }

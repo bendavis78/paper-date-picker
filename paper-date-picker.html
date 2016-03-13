@@ -156,7 +156,8 @@ styling:
         </div>
       </div>
       <neon-animated-pages id="pages" selected="{{_selectedPage}}" attr-for-selected="id"
-        entry-animation="fade-in-animation" exit-animation="fade-out-animation">
+        entry-animation="fade-in-animation" exit-animation="fade-out-animation"
+        on-iron-select="_pageSelected">
         <neon-animatable id="chooseDate">
           <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}"
             min-date="{{minDate}}" max-date="{{maxDate}}">
@@ -306,6 +307,9 @@ styling:
       },
       _computeNarrow: function(queryMatches, forceNarrow) {
         return queryMatches || forceNarrow;
+      },
+      _pageSelected: function() {
+        this._resizeHandler();
       },
       _resizeHandler: function() {
         if (this._resizing) {

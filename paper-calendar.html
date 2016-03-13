@@ -123,32 +123,36 @@
         @apply(--layout-vertical);
         @apply(--layout-center-center);
       }
+      .month-col {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        @apply(--layout-center-center);
+      }
       .day-item {
-        flex: 1;
-        object-fit: contain;
+        border-radius: 100%;
+        width: 100%;
+        height: 100%;
       }
       .day-item::selection {
         background: none;
       }
-      .day-item .selection {
-        fill: rgba(0,0,0,0);
+      .day-item.selected {
+        background: var(--default-primary-color);
       }
-      .day-item.selected .selection {
-        fill: var(--default-primary-color);
-      }
-      .day-item.selected + .day {
+      .day-item.selected .day {
         color: var(--text-primary-color);
       }
       .day-item:not([disabled]) {
         cursor: pointer;
       }
-      .day-item[disabled] + .day {
+      .day-item[disabled] .day {
         color: var(--text-disabled-color, #9d9d9d);
       }
-      .day-item.today + .day {
+      .day-item.today .day {
         color: var(--default-primary-color);
       }
-      .day-item.selected.today + .day {
+      .day-item.selected.today .day {
         color: var(--text-primary-color);
       }
     </style>
@@ -170,13 +174,11 @@
               <div class="month-row layout horizontal justified flex">
                 <template is="dom-repeat" items="{{row}}">
                   <div class="month-col">
-                    <svg version="1.1" viewBox="0 0 100 100"
-                      class$="{{_getDayClass('day-item', item.date, today, date)}}"
+                    <div class$="{{_getDayClass('day-item selection', item.date, today, date)}}"
                       disabled$="{{_isDisabled(item.day, item.date, minDate, maxDate)}}"
                       on-tap="_tapDay" date$="{{item.name}}">
-                      <circle cx="50" cy="50" r="49" class="selection"></circle>
-                    </svg>
-                    <div class="day">{{item.day}}</div>
+                      <div class="day">{{item.day}}</div>
+                    </div>
                   </div>
                 </template>
               </div>
@@ -371,16 +373,29 @@
 
           monthData.weeks = weeks;
           months.push(monthData);
+
         }
         if (!months.length) {
           return;
         }
         this.set('_months', months);
-        this._positionSlider();
+        this.async(function() {
+          this._updateSelection();
+          this._positionSlider();
+        });
       },
       _getDayClass: function(cssClass, date) {
-        if (date && date.getTime() === this.today.getTime()) {
-          cssClass += ' today';
+        if (date) {
+          var timestamp = date.getTime();
+          if (timestamp === this.today.getTime()) {
+            cssClass += ' today';
+          }
+          if (timestamp === this.date.getTime()) {
+            cssClass += ' selected';
+            this.async(function() {
+              this._updateSelection();
+            });
+          }
         }
         return cssClass;
       },
@@ -589,13 +604,13 @@
         date = new Date(date.getTime());
         date.setHours(0, 0, 0, 0);
         this.set('date', date);
+        this._updateSelection();
       },
       _tapDay: function(event) {
         if (!this._withinValidRange(event.model.item.date)) {
           return false;
         }
         this.date = event.model.item.date;
-        this.toggleClass('selected', true, Polymer.dom(event.target).parentNode);
       },
       _isValidDate: function(date) {
         return date && date.getTime && !isNaN(date.getTime());
@@ -621,9 +636,29 @@
                  ((this._months[0].year * 12) + this._months[0].month);
         this._translateX(-i * this._containerWidth);
       },
+      _updateSelection: function() {
+        // Force the day selection circle to maintain a 1:1 ratio
+        var selected = this.$$('.day-item.selected');
+        if (!selected) {
+          return;
+        }
+        selected.style.height = '';
+        selected.style.width = '';
+        var w = selected.parentElement.offsetWidth;
+        var h = selected.parentElement.offsetHeight;
+        selected.style.flex = '';
+        window.requestAnimationFrame(function() {
+          if (w < h) {
+            selected.style.height = w + 'px';
+          } else {
+            selected.style.width = h + 'px';
+          }
+        });
+      },
       _resizeHandler: function() {
         this._containerWidth = this.$.calendar.offsetWidth;
         this._positionSlider();
+        this._updateSelection();
       },
       _getDayName: function(date) {
         return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();

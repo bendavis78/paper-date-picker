@@ -1,4 +1,4 @@
-paper-date-picker
+polymer-paper-date-picker
 =================
 Material Design date picker, compatible with *Polymer 1.0*
 

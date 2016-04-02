@@ -597,12 +597,13 @@
         }
         this.currentYear = date.getFullYear();
         this.currentMonth = date.getMonth() + 1;
+        // Clone the date object to force Polymer binding to notice a change.
+        // But only trigger a notification if there actually is a difference.
+        date = new Date(date.getTime());
+        date.setHours(0, 0, 0, 0);
         if (oldValue && date.getTime && oldValue.getTime && date.getTime() === oldValue.getTime()) {
           return;
         }
-        // clone the date object so as not to have unintended effects on bindings
-        date = new Date(date.getTime());
-        date.setHours(0, 0, 0, 0);
         this.set('date', date);
         this._updateSelection();
       },

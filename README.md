@@ -56,6 +56,9 @@ up the review process, pull requests will not be merged if they include
 multiple unrelated changes (eg: "Fix for XYZ and other tweaks"). Also, don't
 include "opinionated" changes that aren't necessary for the feature or bugfix.
 
+When submitting a PR for a bugfix, please reference the issue number in the
+commit message. For example: "Fixes issue #123".
+
 
 ---
 

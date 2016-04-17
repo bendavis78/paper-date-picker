@@ -386,11 +386,14 @@
       },
       _getDayClass: function(cssClass, date) {
         if (date) {
-          var timestamp = date.getTime();
+          var timestamp           = date.getTime(),
+              date_formatted      = moment(timestamp).format('YYYY-MM-DD'),
+              selected_formatted  = moment(this.date).format('YYYY-MM-DD');
+
           if (timestamp === this.today.getTime()) {
             cssClass += ' today';
           }
-          if (timestamp === this.date.getTime()) {
+          if(date_formatted === selected_formatted) {
             cssClass += ' selected';
             this.async(function() {
               this._updateSelection();
@@ -600,10 +603,6 @@
         if (oldValue && date.getTime && oldValue.getTime && date.getTime() === oldValue.getTime()) {
           return;
         }
-        // clone the date object so as not to have unintended effects on bindings
-        date = new Date(date.getTime());
-        date.setHours(0, 0, 0, 0);
-        this.set('date', date);
         this._updateSelection();
       },
       _tapDay: function(event) {
@@ -637,11 +636,16 @@
         this._translateX(-i * this._containerWidth);
       },
       _updateSelection: function() {
-        // Force the day selection circle to maintain a 1:1 ratio
+        /**
+         *  Force the day selection circle to maintain a 1:1 ratio
+         *  
+         */
         var selected = this.$$('.day-item.selected');
+
         if (!selected) {
           return;
         }
+
         selected.style.height = '';
         selected.style.width = '';
         var w = selected.parentElement.offsetWidth;

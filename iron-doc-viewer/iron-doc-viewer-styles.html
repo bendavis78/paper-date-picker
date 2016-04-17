@@ -53,7 +53,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       #api a {
         @apply(--paper-font-button);
 
-        color: var(--var(--paper-grey-200)-800);
+        color: var(--paper-grey-800);
         cursor: pointer;
         display: block;
         padding: 4px 16px;
@@ -117,6 +117,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
 
       #summary .markdown-html a {
+        background: none;
+        @apply(--paper-font-body1);
         color: var(--paper-indigo-a200);
         font-weight: 500;
         text-decoration: none;
@@ -144,12 +146,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin-bottom: 20px;
       }
 
-      .card > header {
+      .card a {
         font-size: 20px;
         font-weight: 400;
         line-height: 28px;
-        padding: 14px 0;
+        line-height: 48px;
+      }
 
+      .card > header {
         @apply(--iron-doc-viewer-header);
       }
 

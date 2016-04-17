@@ -33,7 +33,7 @@
     "tag": "v1.4.1",
     "commit": "97b0eb5a1a74760c5c0f37f82116679b33876634"
   },
-  "_source": "git://github.com/LeaVerou/prism.git",
+  "_source": "https://github.com/LeaVerou/prism.git",
   "_target": "*",
   "_originalSource": "prism"
 }

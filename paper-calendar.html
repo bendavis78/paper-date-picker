@@ -258,7 +258,7 @@
           value: null
         },
         /**
-         * The currently selected month (1-12) 
+         * The currently selected month (1-12)
          */
         currentMonth: {
           type: Number
@@ -632,7 +632,7 @@
         }
         this._scrollWidth = (this.$.calendar.offsetWidth * this._months.length);
         this.$.months.style.minWidth = this._scrollWidth + 'px';
-        var i = ((this.currentYear * 12) + this.currentMonth) - 
+        var i = ((this.currentYear * 12) + this.currentMonth) -
                  ((this._months[0].year * 12) + this._months[0].month);
         this._translateX(-i * this._containerWidth);
       },
@@ -648,9 +648,10 @@
         var h = selected.parentElement.offsetHeight;
         selected.style.flex = '';
         window.requestAnimationFrame(function() {
-          if (w < h) {
+          if (w > 0 && w < h) {
             selected.style.height = w + 'px';
-          } else {
+          }
+          else if (h > 0) {
             selected.style.width = h + 'px';
           }
         });

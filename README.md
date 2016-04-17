@@ -49,6 +49,14 @@ When filing a bug report, please provide an example of how to repoduce using
 plunker, jsbin, jsfiddle, etc. You can use the following plunker as a starting
 point: http://plnkr.co/edit/9c787GHiBzX7zI5x6gsX
 
+# Contributing
+
+Pull requests are welcome and greatly appreciated. However, in order to speed
+up the review process, pull requests will not be merged if they include
+multiple unrelated changes (eg: "Fix for XYZ and other tweaks"). Also, don't
+include "opinionated" changes that aren't necessary for the feature or bugfix.
+
+
 ---
 
 If you find this component useful, please show your support by donating to

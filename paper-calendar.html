@@ -286,7 +286,7 @@
         this._updateToday();
         this.currentMonth = this.date.getMonth() + 1;
         this.currentYear = this.date.getFullYear();
-        this._transitionEvent = this.style.WebkitTransition ? 'transitionEnd' : 'webkitTransitionEnd';
+        this._transitionEvent = this._whichTransitionEnd();
       },
       dateFormat: function(date, format, locale) {
         if (!date) {
@@ -669,6 +669,20 @@
         this.today = new Date();
         this.today.setHours(0, 0, 0, 0);
       },
+      _whichTransitionEnd: function() {
+        var transitions = {
+          'WebkitTransition' : 'webkitTransitionEnd',
+          'MozTransition'    : 'transitionend',
+          'OTransition'      : 'oTransitionEnd otransitionend',
+          'transition'       : 'transitionend'
+        };
+
+        for (var t in transitions) {
+          if (this.style[t] !== undefined){
+            return transitions[t];
+          }
+        }
+      }
     });
    })();
   </script>

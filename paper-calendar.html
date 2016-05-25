@@ -465,7 +465,7 @@
 
             // If we're dragging outside the bounds, add some resistence
             if (x > 0 || x < (-fullWidth + width)) {
-              if (isNaN(parseInt(this._resistStart))) {
+              if (isNaN(parseInt(this._resistStart, 10))) {
                 this._resistStart = adx;
               }
               var rdx = adx - this._resistStart;
@@ -528,7 +528,7 @@
         return i < 0 ? 0 : i;
       },
       _translateX: function(x, transition, cb) {
-        if (isNaN(parseInt(x))) {
+        if (isNaN(parseInt(x, 10))) {
           throw new Error('Not a number: ' + x);
         }
         this._currentPos = x;

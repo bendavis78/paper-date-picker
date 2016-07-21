@@ -163,11 +163,11 @@ styling:
         on-iron-select="_pageSelected">
         <neon-animatable id="chooseDate">
           <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}"
-            min-date="{{minDate}}" max-date="{{maxDate}}">
+            min-date="{{minDate}}" max-date="{{maxDate}}" use-utc="{{useUtc}}">
           </paper-calendar>
         </neon-animatable>
         <neon-animatable id="chooseYear">
-          <paper-year-list id="yearList" date="{{date}}" on-tap="_tapHeadingDate" min="[[_minYear]]" max="[[_maxYear]]"></paper-year-list>
+          <paper-year-list id="yearList" date="{{date}}" on-tap="_tapHeadingDate" min="[[_minYear]]" max="[[_maxYear]]" use-utc="{{useUtc}}"></paper-year-list>
         </neon-animatable>
       </neon-animated-pages>
     </div>
@@ -183,6 +183,13 @@ styling:
         date: {
           type: Date,
           notify: true
+        },
+        /**
+         * Whether to use UTC instead of the local timezone.
+         */
+        useUtc: {
+          type: Boolean,
+          value: false
         },
         /**
          * Maximum screen width at which the picker uses a vertical layout
@@ -250,11 +257,11 @@ styling:
         _selectedPage: String,
         _maxYear: {
           type: Number,
-          computed: '_getFullYear(maxDate)'
+          computed: '_getFullYear(maxDate, useUtc)'
         },
         _minYear: {
           type: Number,
-          computed: '_getFullYear(minDate)'
+          computed: '_getFullYear(minDate, useUtc)'
         }
       },
       behaviors: [
@@ -291,8 +298,11 @@ styling:
       _getHeadingClass: function(pfx, selectedPage) {
         return pfx + ' pg-' + selectedPage;
       },
-      _getFullYear: function(date) {
-        return date ? date.getFullYear() : null;
+      _getFullYear: function(date, useUtc) {
+        if (!date) {
+          return null;
+        }
+        return useUtc ? date.getUTCFullYear() : date.getFullYear();
       },
       _splitHeadingDate: function(date, format, locale) {
         var re = new RegExp(this.headingBreak, 'g');

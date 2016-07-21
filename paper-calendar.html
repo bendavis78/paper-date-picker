@@ -267,6 +267,13 @@
           observer: '_localeChanged'
         },
         /**
+         * Whether to use UTC instead of the local timezone.
+         */
+        useUtc: {
+          type: Boolean,
+          value: false
+        },
+        /**
          * The minimum allowed date
          */
         minDate: {
@@ -300,7 +307,7 @@
         Polymer.IronResizableBehavior
       ],
       observers: [
-        '_populate(currentYear, currentMonth, minDate, maxDate, locale)',
+        '_populate(currentYear, currentMonth, minDate, maxDate, locale, useUtc)',
       ],
       listeners: {
         'iron-resize': '_resizeHandler',
@@ -308,17 +315,48 @@
       },
       ready: function() {
         this._updateToday();
-        this.currentMonth = this.date.getMonth() + 1;
-        this.currentYear = this.date.getFullYear();
+        this.currentMonth = this._getMonth(this.date) + 1;
+        this.currentYear = this._getFullYear(this.date);
         this._transitionEvent = this._whichTransitionEnd();
       },
       dateFormat: function(date, format, locale) {
         if (!date) {
           return '';
         }
-        var value = moment(date);
+        var value = this.useUtc ? moment.utc(date) : moment(date);
         value.locale(locale || this.locale);
         return value.format(format);
+      },
+      _makeDate: function(year, month, day) {
+        return this.useUtc ?
+            new Date(Date.UTC(year, month, day)) :
+            new Date(year, month, day);
+      },
+      _getFullYear: function(date) {
+        return this.useUtc ? date.getUTCFullYear() : date.getFullYear();
+      },
+      _getMonth: function(date) {
+        return this.useUtc ? date.getUTCMonth() : date.getMonth();
+      },
+      _getDay: function(date) {
+        return this.useUtc ? date.getUTCDay() : date.getDay();
+      },
+      _getDate: function(date) {
+        return this.useUtc ? date.getUTCDate() : date.getDate();
+      },
+      _setDate: function(date, day) {
+        if (this.useUtc) {
+          date.setUTCDate(day);
+        } else {
+          date.setDate(day);
+        }
+      },
+      _setHours: function(date, hours, minutes, seconds, millis) {
+        if (this.useUtc) {
+          date.setUTCHours(hours, minutes, seconds, millis);
+        } else {
+          date.setDate(hours, minutes, seconds, millis);
+        }
       },
       _localeChanged: function(locale) {
         var localeMoment = moment();
@@ -334,24 +372,24 @@
         var date, month, weeks, day, d, dayInfo, monthData, months = [];
 
         // Make sure currentYear/currentMonth are in min/max range
-        if (minDate && new Date(currentYear, currentMonth, 0) < minDate) {
-          this.currentYear = minDate.getFullYear();
-          this.currentMonth = minDate.getMonth() + 1;
+        if (minDate && this._makeDate(currentYear, currentMonth, 0) < minDate) {
+          this.currentYear = this._getFullYear(minDate);
+          this.currentMonth = this._getMonth(minDate) + 1;
           return;
-        } else if (maxDate && new Date(currentYear, currentMonth - 1, 1) > maxDate) {
-          this.currentYear = maxDate.getFullYear();
-          this.currentMonth = maxDate.getMonth() + 1;
+        } else if (maxDate && this._makeDate(currentYear, currentMonth - 1, 1) > maxDate) {
+          this.currentYear = this._getFullYear(maxDate);
+          this.currentMonth = this._getMonth(maxDate) + 1;
           return;
         }
 
         for (var i=-PRELOAD_MONTHS; i<=PRELOAD_MONTHS; i++) {
           weeks = [[]];
           day = 1;
-          date = new Date(currentYear, currentMonth - 1 + i, 1);
-          month = date.getMonth();
+          date = this._makeDate(currentYear, currentMonth - 1 + i, 1);
+          month = this._getMonth(date);
           monthData = {
-            year: date.getFullYear(),
-            month: date.getMonth() + 1,
+            year: this._getFullYear(date),
+            month: month + 1,
             date: new Date(date)
           };
 
@@ -360,7 +398,7 @@
           }
 
           // add "padding" days
-          var firstDay = date.getDay() - this._firstDayOfWeek;
+          var firstDay = this._getDay(date) - this._firstDayOfWeek;
           if (firstDay < 0) {
             firstDay = 7 + firstDay;
           }
@@ -369,20 +407,20 @@
           }
 
           // add actual days
-          while (date.getMonth() === month) {
+          while (this._getMonth(date) === month) {
             if (weeks[0].length && d % 7 === 0) {
               // start new week
               weeks.push([]);
             }
             dayInfo = {
-              date: new Date(date.getFullYear(), month, day),
+              date: this._makeDate(date.getFullYear(), month, day),
               name: this.dateFormat(date,'YYYY-MM-DD'),
               year: currentYear,
               month: month,
               day: day,
             };
             weeks[weeks.length-1].push(dayInfo);
-            date.setDate(++day);
+            this._setDate(date, ++day);
             d++;
           }
 
@@ -596,9 +634,9 @@
         node.addEventListener(eventName, onceCallback);
       },
       _incrMonth: function(i) {
-        var date = new Date(this.currentYear, this.currentMonth - 1 + i);
-        var year = date.getFullYear();
-        var month = date.getMonth() + 1;
+        var date = this._makeDate(this.currentYear, this.currentMonth - 1 + i, 1);
+        var year = this._getFullYear(date);
+        var month = this._getMonth(date) + 1;
         if (this._monthWithinValidRange(year, month)) {
           this.currentYear = year;
           this.currentMonth = month;
@@ -624,7 +662,7 @@
         // Clone the date object to force Polymer binding to notice a change.
         // But only trigger a notification if there actually is a difference.
         date = new Date(date.getTime());
-        date.setHours(0, 0, 0, 0);
+        this._setHours(date, 0, 0, 0, 0);
         if (oldValue && date.getTime && oldValue.getTime && date.getTime() === oldValue.getTime()) {
           return;
         }
@@ -647,8 +685,8 @@
         return false;
       },
       _monthWithinValidRange: function(year, month) {
-        var monthStart = new Date(year, month-1, 1);
-        var monthEnd = new Date(year, month, 0);
+        var monthStart = this._makeDate(year, month-1, 1);
+        var monthEnd = this._makeDate(year, month, 0);
         return this._withinValidRange(monthStart) || this._withinValidRange(monthEnd);
       },
       _positionSlider: function() {
@@ -687,11 +725,11 @@
         this._updateSelection();
       },
       _getDayName: function(date) {
-        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+        return this._getFullYear(date) + '-' + (this._getMonth(date) + 1) + '-' + this._getDate(date);
       },
       _updateToday: function() {
         this.today = new Date();
-        this.today.setHours(0, 0, 0, 0);
+        this._setHours(this.today, 0, 0, 0, 0);
       },
       _whichTransitionEnd: function() {
         var transitions = {

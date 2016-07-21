@@ -177,13 +177,8 @@
         var year =
             this.useUtc ? this.date.getUTCFullYear() : this.date.getFullYear();
         if (selected !== year) {
-          if (this.useUtc) {
-            this.date.setUTCFullYear(selected);
-          } else {
-            this.date.setFullYear(selected);
-          }
           // set the year using a new Date instance for notifying to work
-          this.date = new Date(this.date);
+          this.date = new Date(this.useUtc ? this.date.setUTCFullYear(selected) : this.date.setFullYear(selected));
         }
         this._selectYearInList(selected);
       },

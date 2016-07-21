@@ -345,18 +345,12 @@
         return this.useUtc ? date.getUTCDate() : date.getDate();
       },
       _setDate: function(date, day) {
-        if (this.useUtc) {
-          date.setUTCDate(day);
-        } else {
-          date.setDate(day);
-        }
+        return this.useUtc ? date.setUTCDate(day) : date.setDate(day);
       },
       _setHours: function(date, hours, minutes, seconds, millis) {
-        if (this.useUtc) {
-          date.setUTCHours(hours, minutes, seconds, millis);
-        } else {
-          date.setHours(hours, minutes, seconds, millis);
-        }
+        return this.useUtc ?
+            date.setUTCHours(hours, minutes, seconds, millis) :
+            date.setHours(hours, minutes, seconds, millis);
       },
       _localeChanged: function(locale) {
         var localeMoment = moment();

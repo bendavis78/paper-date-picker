@@ -355,7 +355,7 @@
         if (this.useUtc) {
           date.setUTCHours(hours, minutes, seconds, millis);
         } else {
-          date.setDate(hours, minutes, seconds, millis);
+          date.setHours(hours, minutes, seconds, millis);
         }
       },
       _localeChanged: function(locale) {

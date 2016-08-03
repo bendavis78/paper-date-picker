@@ -104,8 +104,6 @@
         if (this.selected !== null) {
           var selectedYearIdx = this.selected - this.min;
           this.$.yearList.scrollToIndex(selectedYearIdx);
-          // see https://github.com/PolymerElements/iron-list/issues/140
-          this.$.yearList._render();
           this.async(function() {
             var selectedPos = selectedYearIdx * this._physicalAverage + 1;
             if (selectedPos !== this.scrollTop) {

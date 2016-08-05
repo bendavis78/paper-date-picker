@@ -109,11 +109,9 @@
             if (selectedPos !== this.scrollTop) {
               this._update();
               this.scrollTop = selectedPos;
-              this._refresh();
             }
             if (this.scrollHeight - this.offsetHeight !== this.scrollTop) {
               this.scrollTop += (this._physicalAverage - this.offsetHeight) / 2;
-              this._refresh();
             }
           }.bind(this.$.yearList));
         }

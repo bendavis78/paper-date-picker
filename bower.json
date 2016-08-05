@@ -17,7 +17,7 @@
   "homepage": "http://bendavis78.github.io/paper-date-picker/",
   "ignore": [
     "/.*",
-    "/tests/"
+    "/test/"
   ],
   "dependencies": {
     "moment-element": "bendavis78/moment-element#^1.1.0",
@@ -38,7 +38,8 @@
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "paper-dialog": "PolymerElements/paper-dialog#^1.0.0",
     "paper-button": "PolymerElements/paper-button#^1.0.0",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
+    "web-component-tester": "Polymer/web-component-tester#^4.2.2"
   },
   "resolutions": {
     "polymer": "^1.0.0",

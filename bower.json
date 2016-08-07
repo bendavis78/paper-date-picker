@@ -32,7 +32,7 @@
     "paper-ripple": "PolymerElements/paper-ripple#^1.0.5",
     "paper-styles": "PolymerElements/paper-styles#^1.0.0",
     "paper-icon-button": "PolymerElements/paper-icon-button#^1.0.0",
-    "iron-list": "PolymerElements/iron-list#~1.1.7"
+    "iron-list": "PolymerElements/iron-list#^1.2.8"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

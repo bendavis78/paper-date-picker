@@ -1,7 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
-<link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../paper-ripple/paper-ripple.html">
 <link rel="import" href="../paper-styles/color.html">
 <link rel="import" href="../paper-styles/default-theme.html">
@@ -9,6 +8,7 @@
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../moment-element/moment-with-locales-import.html">
+<link rel="import" href="paper-date-picker-icons.html">
 
 <dom-module id="paper-calendar">
   <template>
@@ -213,14 +213,14 @@
         <div class="flex col self-stretch">
           <div class="btn" on-tap="_swipePrevMonth">
             <paper-ripple center class="ripple circle"></paper-ripple>
-            <iron-icon class="icon flex" icon="chevron-left"></iron-icon>
+            <iron-icon class="icon flex" icon="date-picker:chevron-left"></iron-icon>
           </div>
         </div>
         <div class="flex-5"></div>
         <div class="flex col self-stretch">
           <div class="btn" on-tap="_swipeNextMonth">
             <paper-ripple center class="ripple circle"></paper-ripple>
-            <iron-icon class="icon flex" icon="chevron-right"></iron-icon>
+            <iron-icon class="icon flex" icon="date-picker:chevron-right"></iron-icon>
           </div>
         </div>
       </div>

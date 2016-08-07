@@ -274,6 +274,11 @@ styling:
       _tapHeadingDate: function() {
         if (this.$.pages.selected !== 'chooseDate') {
           this._selectPage('chooseDate');
+        } else {
+          // tapping the date header while already viewing months brings you back
+          // to the selected month
+          this.$.calendar.currentMonth = this.date.getMonth() + 1;
+          this.$.calendar.currentYear = this.date.getFullYear();
         }
       },
       _tapHeadingYear: function() {

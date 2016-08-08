@@ -49,6 +49,13 @@
           observer: '_dateChange'
         },
         /**
+         * Whether to use UTC instead of the local timezone.
+         */
+        useUtc: {
+          type: Boolean,
+          value: false
+        },
+        /**
          * Maximum allowed year.
          */
         max: {
@@ -141,7 +148,7 @@
        * Set 'selected' attribute to the new date's year if it is within range, else set it to null.
        */
       _dateChange: function(date) {
-        var newYear = date.getFullYear();
+        var newYear = this.useUtc ? date.getUTCFullYear() : date.getFullYear();
         this.selected = this._withinRange(newYear) ? newYear : null;
       },
       _maxChange: function(max) {
@@ -163,9 +170,11 @@
           this.$.yearList.clearSelection();
           return;
         }
-        if (selected !== this.date.getFullYear()) {
+        var year =
+            this.useUtc ? this.date.getUTCFullYear() : this.date.getFullYear();
+        if (selected !== year) {
           // set the year using a new Date instance for notifying to work
-          this.date = new Date(this.date.setFullYear(selected));
+          this.date = new Date(this.useUtc ? this.date.setUTCFullYear(selected) : this.date.setFullYear(selected));
         }
         this._selectYearInList(selected);
       },

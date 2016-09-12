@@ -243,6 +243,14 @@
     // Number of months to preload on both sides of the current month
     var PRELOAD_MONTHS = 1;
 
+    function dateDiff(a, b) {
+      a = new Date(a.getTime());
+      b = new Date(b.getTime());
+      a.setHours(0, 0, 0, 0);
+      b.setHours(0, 0, 0, 0);
+      return (a.getTime() - b.getTime()) / 86400000;
+    }
+
     Polymer({
       is: 'paper-calendar',
       properties: {
@@ -410,11 +418,10 @@
       },
       _getDayClass: function(cssClass, date) {
         if (date) {
-          var timestamp = date.getTime();
-          if (timestamp === this.today.getTime()) {
+          if (dateDiff(date, this.today) === 0) {
             cssClass += ' today';
           }
-          if (timestamp === this.date.getTime()) {
+          if (dateDiff(date, this.date) === 0) {
             cssClass += ' selected';
             this.async(function() {
               this._updateSelection();
@@ -623,21 +630,22 @@
         }
         this.currentYear = date.getFullYear();
         this.currentMonth = date.getMonth() + 1;
-        // Clone the date object to force Polymer binding to notice a change.
-        // But only trigger a notification if there actually is a difference.
-        date = new Date(date.getTime());
-        date.setHours(0, 0, 0, 0);
+        // Only trigger a notification if there actually is a difference.
         if (oldValue && date.getTime && oldValue.getTime && date.getTime() === oldValue.getTime()) {
           return;
         }
-        this.set('date', date);
         this._updateSelection();
       },
       _tapDay: function(event) {
         if (!this._withinValidRange(event.model.item.date)) {
           return false;
         }
-        this.date = event.model.item.date;
+        var item = event.model.item;
+        var newDate = new Date(this.date.getTime());
+        newDate.setYear(item.year);
+        newDate.setMonth(item.month);
+        newDate.setDate(item.day);
+        this.date = newDate;
       },
       _isValidDate: function(date) {
         return date && date.getTime && !isNaN(date.getTime());

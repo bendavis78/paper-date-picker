@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+        <link rel="import" href="../../paper-date-picker/paper-date-picker.html">
+        <link rel="import" href="../../paper-time-picker/paper-time-picker.html">
+    </head>
+
+    <body>
+        <template is="dom-bind">
+            <h2>Date</h2>
+            <paper-date-picker date={{date}}></paper-date-picker>
+
+            <h2>Time</h2>
+            <paper-time-picker id="time"></paper-time-picker>
+            <button on-tap="saveTime">Save time</button>
+
+            <h2>Selected datetime</h2>
+            [[date]]
+        </template>
+
+        <script>
+            var scope = document.querySelector("template[is=dom-bind]");
+            scope.date = new Date();
+            scope.saveTime = function(e) {
+                var newDate = new Date(this.date.getTime());
+                newDate.setHours(this.$.time.hour, this.$.time.minute);
+                scope.date = newDate;
+            };
+        </script>
+    </body>
+</html>

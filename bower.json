@@ -20,7 +20,7 @@
     "/test/"
   ],
   "dependencies": {
-    "moment-element": "bendavis78/moment-element#^1.1.0",
+    "moment-element": "bendavis78/moment-element#^1.1.1",
     "polymer": "Polymer/polymer#^1.1.0",
     "iron-icon": "PolymerElements/iron-icon#^1.0.7",
     "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.0.9",

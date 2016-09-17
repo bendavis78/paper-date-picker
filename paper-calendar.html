@@ -516,6 +516,7 @@
         }
       },
       _swipePrevMonth: function() {
+        this.fire('swipe-start', {direction: 'right'});
         this._translateX(0, 'swipe', function() {
           this.set('_contentClass', '');
           this.transform('translateX(' + this._startPos + 'px)', this.$.months);
@@ -524,6 +525,7 @@
       },
       _swipeNextMonth: function() {
         if (!this.maxDate || this.currentMonth < this.maxDate.getMonth() + 1) {
+          this.fire('swipe-start', {direction: 'left'});
           this._translateX(-this._containerWidth * 2, 'swipe', function() {
             this.set('_contentClass', '');
             this.transform('translateX(' + this._startPos + 'px)', this.$.months);

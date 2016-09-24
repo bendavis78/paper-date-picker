@@ -628,7 +628,10 @@
           console.warn('Date outside of valid range: ' + date);
           if(date.getFullYear() == this.maxDate.getFullYear()) {
             this.date = this.maxDate;
-          }
+          } else if(date.getFullYear() == this.minDate.getFullYear()){
+            this.date = this.minDate;
+          } else {
+            this.date = date = oldValue;
         }
         this.currentYear = date.getFullYear();
         this.currentMonth = date.getMonth() + 1;

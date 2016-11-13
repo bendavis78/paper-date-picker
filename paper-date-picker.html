@@ -297,7 +297,7 @@ styling:
         return pfx + ' pg-' + selectedPage;
       },
       _getFullYear: function(date) {
-        return date ? date.getFullYear() : null;
+        return date ? new Date(date).getFullYear() : null;
       },
       _splitHeadingDate: function(date, format, locale) {
         var re = new RegExp(this.headingBreak, 'g');

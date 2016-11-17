@@ -523,7 +523,7 @@
         }.bind(this));
       },
       _swipeNextMonth: function() {
-        if (!this.maxDate || this.currentMonth < this.maxDate.getMonth() + 1) {
+        if (!this.maxDate || moment([this.currentYear, this.currentMonth, 1]).isSameOrBefore(this.maxDate, 'month')) {
           this._translateX(-this._containerWidth * 2, 'swipe', function() {
             this.set('_contentClass', '');
             this.transform('translateX(' + this._startPos + 'px)', this.$.months);
@@ -612,6 +612,8 @@
           this.currentYear = year;
           this.currentMonth = month;
         }
+        console.log('ON SWIPE');
+        console.log(this.currentMonth);
       },
       _prevMonth: function() {
         this._incrMonth(-1);

@@ -21,6 +21,16 @@
     </template>
   </test-fixture>
 
+  <test-fixture id="max-date-on-next-year-fixture">
+    <template>
+      <paper-date-picker
+        id="picker"
+        date="November 1, 2016"
+        max-date="February 28, 2017">
+      </paper-date-picker>
+    </template>
+  </test-fixture>
+
   <script>
 
     describe('paper-date-picker', function() {
@@ -59,6 +69,27 @@
           }, 500);
         });
 
+      });
+
+      context('with max-date on next year', function () {
+        beforeEach(function() {
+          element = fixture('max-date-on-next-year-fixture');
+        });
+
+        it('should swipe until max date', function(done) {
+          // Try to swipe after the max bound
+          var calendar = element.$$('paper-calendar');
+          calendar._swipeNextMonth();
+          calendar._swipeNextMonth();
+          calendar._swipeNextMonth();
+          calendar._swipeNextMonth();
+
+          setTimeout(function() {
+            expect(calendar.currentMonth).to.equal(2);
+            expect(calendar.currentYear).to.equal(2017);
+            done();
+          }, 500);
+        });
       });
 
     });

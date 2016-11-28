@@ -13,6 +13,10 @@ component aims to be a clone of the date picker introduced in Android Lollipop.
 See the [component page](http://bendavis78.github.io/paper-date-picker/) for 
 full documentation.
 
+```js
+bower install polymer-paper-datepicker -S
+```
+
 ## Examples:
 
 Default picker:

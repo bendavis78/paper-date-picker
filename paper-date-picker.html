@@ -80,10 +80,10 @@ styling:
         width: 512px;
         height: 248px;
         @apply(--layout-horizontal);
+        @apply(--paper-date-picker);
       }
       #heading {
         width: 168px;
-        @apply(--paper-date-picker-heading);
       }
 
       /** Narrow *********************/
@@ -91,6 +91,7 @@ styling:
         width: 328px;
         height: 428px;
         @apply(--layout-vertical);
+        @apply(--paper-date-picker);
       }
       :host([narrow]) #heading {
         width: auto;
@@ -106,6 +107,7 @@ styling:
         background: var(--default-primary-color);
         @apply(--layout-vertical);
         @apply(--layout-around-justfied);
+        @apply(--paper-date-picker-heading);
       }
       #heading .date,
       #heading .year {

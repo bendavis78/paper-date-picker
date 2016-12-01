@@ -21,6 +21,15 @@
     </template>
   </test-fixture>
 
+  <test-fixture id="a11y-fixture">
+    <template>
+      <paper-date-picker
+        id="picker2"
+        date="January 10, 2010">
+      </paper-date-picker>
+    </template>
+  </test-fixture>
+
   <script>
 
     describe('paper-date-picker', function() {
@@ -58,6 +67,133 @@
             done();
           }, 500);
         });
+
+      });
+
+      context ('a11y structure according to wai-aria 1.1 (https://www.w3.org/TR/wai-aria-practices-1.1/#datepicker)', function() {
+        /**
+         * To do:
+         * - use contexts for wai-aria rules, "it"s for tests
+         * - use page object
+         */
+        var calendar;
+
+        beforeEach(function() {
+          element = fixture('a11y-fixture');
+          calendar = element.$$('paper-calendar');
+        });
+
+        it ('The current month has a label representing the month and year. It is advisable to use a role heading but is not essential. This "label" should have a unique ID.', function(done) {
+          flush(function() {
+            var currentMonth = calendar.$$('#months :nth-child(2) .month-name');
+
+            expect(currentMonth).to.be.not.null;
+
+            expect(currentMonth.attributes).to.have.ownProperty('role');
+            expect(currentMonth.getAttribute('role')).to.equal('heading');
+
+            expect(currentMonth.attributes).to.have.ownProperty('aria-labelledby');
+
+            var label = calendar.$$('#' + currentMonth.getAttribute('aria-labelledby'));
+            expect(label.innerText).to.equal('January 2010');
+
+            done();
+          });
+        });
+
+        it ('If the author would like to ensure that a label is announced by a screen reader, as the label changes, include live region properties with the label element: aria-live="assertive" and aria-atomic="true".', function(done) {
+          flush(function() {
+            var currentMonth = calendar.$$('#months :nth-child(2) .month-name');
+            var label = calendar.$$('#' + currentMonth.getAttribute('aria-labelledby'));
+
+            expect(label.attributes).to.have.ownProperty('aria-live');
+            expect(label.getAttribute('aria-live')).to.equal('assertive');
+            expect(label.attributes).to.have.ownProperty('aria-atomic');
+            expect(label.getAttribute('aria-atomic')).to.equal('true');
+
+            done();
+          });
+        });
+
+        it ('The container for the day of week headers and numeric days of the week has a role of grid.', function(done) {
+          flush(function() {
+            var weeksContainer = calendar.$$('.weeks-container');
+            expect(weeksContainer).to.be.not.null;
+            expect(weeksContainer.attributes).to.have.ownProperty('role');
+            expect(weeksContainer.getAttribute('role')).to.equal('grid');
+            done();
+          });
+        });
+
+        it ('The grid has an aria-labelledby property with a value equivalent to the id of the label for the grid.', function(done) {
+          flush(function() {
+            var currentGrid = calendar.$$('#months :nth-child(2) .weeks-container');
+
+            expect(currentGrid).to.be.not.null;
+
+            expect(currentGrid.attributes).to.have.ownProperty('role');
+            expect(currentGrid.getAttribute('role')).to.equal('grid');
+
+            expect(currentGrid.attributes).to.have.ownProperty('aria-labelledby');
+
+            var label = calendar.$$('#' + currentGrid.getAttribute('aria-labelledby'));
+            expect(label.innerText).to.equal('January 2010');
+
+            done();
+          });
+        });
+
+        it ('Each name for the day of the week has a role columnheader and is not navigable via the keyboard.', function(done) {
+          flush(function() {
+            var weekdays = calendar.querySelectorAll('.month-weekdays .month-cell');
+            expect(weekdays).to.be.not.null;
+            weekdays.forEach(function(weekday) {
+              expect(weekday).to.be.not.null;
+              expect(weekday.attributes).to.have.ownProperty('role');
+              expect(weekday.getAttribute('role')).to.equal('columnheader');
+            });
+            done();
+          });
+        });
+
+        it ('Each numeric day of the week has the role gridcell.', function(done) {
+          flush(function() {
+            var days = calendar.querySelectorAll('.month-days .month-cell');
+            expect(days).to.be.not.null;
+            days.forEach(function(day) {
+              expect(day).to.be.not.null;
+              expect(day.attributes).to.have.ownProperty('role');
+              expect(day.getAttribute('role')).to.equal('gridcell');
+            });
+            done();
+          });
+        });
+
+        it ('When a day is selected its aria-selected is set to true, otherwise it is set to false or removed.', function(done) {
+          flush(function() {
+            var currentCell = calendar.$$('.day-item.selected').parentElement,
+              nextCell = currentCell.nextElementSibling;
+
+            expect(currentCell.attributes).to.have.ownProperty('aria-selected');
+            expect(currentCell.getAttribute('aria-selected')).to.equal('true');
+
+            expect(nextCell.attributes).to.have.ownProperty('aria-selected');
+            expect(nextCell.getAttribute('aria-selected')).to.equal('false');
+
+            done();
+          });
+        });
+
+        it ('Changes in aria states, identified here, as well as focus, are clearly styled to show the user where their point of regard is and what days are selected.', function() {
+
+        });
+      });
+
+      context('when using the keyboard to navigate the datepicker', function() {
+        it ('tabs to the months, current date, cancel, and ok buttuns, in order', function() {
+
+        });
+
 
       });
 

@@ -31,6 +31,11 @@
   </test-fixture>
 
   <script>
+    /**
+     * Fix for IE nodelist foreach function
+     */
+    NodeList.prototype.forEach = Array.prototype.forEach;
+
     describe('paper-date-picker', function () {
       var element;
 
@@ -64,13 +69,11 @@
             done();
           }, 500);
         });
-
       });
 
       context('a11y structure according to wai-aria 1.1 (https://www.w3.org/TR/wai-aria-practices-1.1/#datepicker)', function () {
         /**
          * To do:
-         * - use contexts for wai-aria rules, "it"s for tests
          * - use page object
          */
 
@@ -315,17 +318,15 @@
           });
         });
 
-        //
-        //     it('Changes in aria states, identified here, as well as focus, are clearly styled to show the user where their point of regard is and what days are selected.', function () {
-        //
-        //     });
-        //   });
-        //
-        //   context('when using the keyboard to navigate the datepicker', function () {
-        //     it('tabs to the months, current date, cancel, and ok buttuns, in order', function () {
-        //
-        //     });
-        //
+        // =====================================================================
+        // TODO:
+        // =====================================================================
+        // Changes in aria states, identified here, as well as focus, are clearly styled to show the user where their point of regard is and what days are selected.
+        // when using the keyboard to navigate the datepicker
+        //  tabs to the months
+        //  current date
+        //  cancel
+        //  ok buttuns
 
       });
     });

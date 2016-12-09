@@ -192,6 +192,8 @@
     </div>
   </template>
   <script>
+    /* global TrackBehavior */
+
     /**
      * Number of months to pre-render on both sides of the current month
      */
@@ -411,8 +413,8 @@
         }
         this.set('_months', months);
         this.async(function () {
-          this._updateSelection();
-          this._positionSlider();
+          this._recalculateSelectionCircle();
+          this._positionMonths();
         });
       },
 
@@ -428,7 +430,7 @@
           if (dateDiff(date, this.date) === 0) {
             cssClass += ' selected';
             this.async(function () {
-              this._updateSelection();
+              this._recalculateSelectionCircle();
             });
           }
         }
@@ -436,17 +438,13 @@
       },
 
       _getAriaSelected: function (date) {
-        if (date && dateDiff(date, this.date) === 0) {
-          return 'true';
-        }
-        return 'false';
+        return date && dateDiff(date, this.date) === 0;
       },
 
       _getTabIndex: function (date) {
-        if (date && dateDiff(date, this.date) === 0) {
-          return 0;
-        }
-        return -1;
+        return date && dateDiff(date, this.date)
+          ? 0
+          : -1;
       },
 
       _getDisabledState: function (day, date) {
@@ -515,7 +513,7 @@
         if (oldValue && this.date.getTime && oldValue.getTime && this.date.getTime() === oldValue.getTime()) {
           return;
         }
-        this._updateSelection();
+        this._recalculateSelectionCircle();
         this._setActiveWeekDescendant(this.date);
       },
 
@@ -549,7 +547,7 @@
         return this._withinValidRange(monthStart) || this._withinValidRange(monthEnd);
       },
 
-      _positionSlider: function () {
+      _positionMonths: function () {
         if (!this._months || !this._containerWidth) {
           return;
         }
@@ -559,7 +557,7 @@
         this._translateX(-i * this._containerWidth);
       },
 
-      _updateSelection: function () {
+      _recalculateSelectionCircle: function () {
         // Force the day selection circle to maintain a 1:1 ratio
         var selected = this.$$('.day-item.selected');
         if (!selected) {
@@ -580,8 +578,8 @@
 
       _resizeHandler: function () {
         this._containerWidth = this.$.calendar.offsetWidth;
-        this._positionSlider();
-        this._updateSelection();
+        this._positionMonths();
+        this._recalculateSelectionCircle();
       },
 
       _getDayName: function (date) {

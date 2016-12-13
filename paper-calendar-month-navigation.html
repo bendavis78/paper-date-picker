@@ -55,14 +55,17 @@
 
     </style>
     <div class="flex col self-stretch">
-      <button type="button" on-tap="_navigateToPrevious">
+      <button type="button" on-tap="_navigateToPrevious" tabindex="-1">
         <paper-ripple center class="ripple circle"></paper-ripple>
         <iron-icon class="icon flex" icon="date-picker:chevron-left"></iron-icon>
       </button>
     </div>
     <div class="flex-5"></div>
     <div class="flex col self-stretch">
-      <button type="button" on-tap="_navigateToNext">
+      <button
+            type="button"
+            on-tap="_navigateToNext"
+            tabindex="-1">
         <paper-ripple center class="ripple circle"></paper-ripple>
         <iron-icon class="icon flex" icon="date-picker:chevron-right"></iron-icon>
       </button>
@@ -84,5 +87,6 @@
         this.dispatchEvent(event);
       }
     });
+
   </script>
 </dom-module>

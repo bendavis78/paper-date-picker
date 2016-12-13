@@ -169,11 +169,12 @@
       this._gesture = null;
     },
 
-    _swipePrevMonth: function () {
+    _swipePrevMonth: function (callback) {
       this._translateX(0, 'swipe', function () {
         this.set('_contentClass', '');
         this.transform('translateX(' + this._startPos + 'px)', this.$.months);
         this.fire('swiped', {direction: 'right'});
+        // callback && callback();
       }.bind(this));
     },
 
@@ -183,6 +184,7 @@
           this.set('_contentClass', '');
           this.transform('translateX(' + this._startPos + 'px)', this.$.months);
           this.fire('swiped', {direction: 'left'});
+        //   callback && callback();
         }.bind(this));
       }
     },

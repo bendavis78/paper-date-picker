@@ -6,11 +6,13 @@
 <link rel="import" href="../paper-styles/default-theme.html">
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="../paper-styles/typography.html">
-<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../moment-element/moment-import.html">
 <link rel="import" href="paper-date-picker-icons.html">
-<link rel="import" href="paper-calendar-track-behavior.html">
 <link rel="import" href="paper-calendar-month-navigation.html">
+
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="paper-calendar-track-behavior.html">
+<link rel="import" href="paper-calendar-a11y-behavior.html">
 
 <dom-module id="paper-calendar">
   <template>
@@ -157,16 +159,16 @@
       }
 
     </style>
-    <div id="calendar">
-      <paper-calendar-month-navigation id="monthNav" class="month-nav" role="heading" aria-labelledby$="month-label-[[currentMonth]]-[[currentYear]]" aria-live="assertive"></paper-calendar-month-navigation>
+    <div id="calendar" aria-activedescendant$="{{_activeWeekDescendant}}" aria-labelledby$="{{_activeWeekDescendant}}">
+      <paper-calendar-month-navigation id="monthNav" class="month-nav"></paper-calendar-month-navigation>
       <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
         <template is="dom-repeat" items="{{_months}}" as="month">
           <div class$="{{_getMonthClass('month', month)}}">
-            <div class="month-name">
+            <div class="month-name" aria-hidden="true">
               <span id="month-label-[[month.month]]-[[month.year]]">{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
             </div>
-            <table class="weeks-container" role="grid" aria-activedescendant$="{{_activeWeekDescendant}}" aria-labelledby="month-label-[[month.month]]-[[month.year]]">
-              <tr class="month-weekdays month-row week">
+            <table class="weeks-container" role="grid">
+              <tr class="month-weekdays month-row week" aria-hidden="true">
                 <template is="dom-repeat" items="{{_weekdays}}">
                   <td class="month-cell" role="columnheader">
                     <div class="day">{{item.0}}</div>
@@ -177,7 +179,7 @@
                 <tr class="month-days month-row">
                   <template is="dom-repeat" items="{{row}}">
                     <td class="month-cell">
-                      <div id="day-[[item.day]]-[[month.month]]" class$="{{_getDayClass('day-item selection', item.date, today, date)}}" role="gridcell" tabindex$="{{_getTabIndex(item.date, date)}}" aria-selected$="{{_getAriaSelected(item.date, date)}}" aria-label$="{{dateFormat(item.date, 'D MMMM YYYY', locale)}}" on-tap="_tapDay" disabled$="{{_getDisabledState(item.day, item.date, minDate, maxDate)}}">
+                      <div id$="{{_getDayId(item.date)}}" class$="{{_getDayClass('day-item selection', item.date, today, date)}}" role="gridcell" tabindex$="{{_getTabIndex(item.date, date)}}" aria-live="assertive" aria-selected$="{{_isSameDate(item.date, date)}}" aria-label$="{{_getAriaDayLabel(item.date, locale)}}" on-tap="_tapDay" disabled$="{{_getDisabledState(item.day, item.date, minDate, maxDate)}}">
                         <div class="day" aria-hidden="true">{{item.day}}</div>
                       </div>
                     </td>
@@ -185,33 +187,24 @@
                 </tr>
               </template>
             </table>
-
           </div>
         </template>
       </div>
     </div>
   </template>
   <script>
-    /* global TrackBehavior */
+    /* global TrackBehavior, A11yBehavior */
 
     /**
      * Number of months to pre-render on both sides of the current month
      */
     var PRERENDER_MONTHS = 1;
 
-    function dateDiff(a, b) {
-      var date1 = new Date(a.getTime());
-      var date2 = new Date(b.getTime());
-      date1.setHours(0, 0, 0, 0);
-      date2.setHours(0, 0, 0, 0);
-      return (date1.getTime() - date2.getTime()) / 86400000;
-    }
-
     Polymer({
       is: 'paper-calendar',
 
       behaviors: [
-        Polymer.IronResizableBehavior, TrackBehavior
+        Polymer.IronResizableBehavior, TrackBehavior, A11yBehavior
       ],
 
       observers: ['_populate(currentYear, currentMonth, minDate, maxDate, locale)'],
@@ -219,7 +212,8 @@
       listeners: {
         'iron-resize': '_resizeHandler',
         'swiped': '_onSwipe',
-        'monthNav.navigate': '_onMonthNavigation'
+        'monthNav.navigate': '_onMonthNavigation',
+        'scroll': '_resetScroll'
       },
 
       properties: {
@@ -303,8 +297,8 @@
           return '';
         }
         var value = moment(date);
-        value.locale(locale || this.locale);
-        return value.format(format);
+
+        return value.locale(locale || this.locale).format(format);
       },
 
       /**
@@ -312,6 +306,10 @@
          * PRIVATE
          *
          */
+
+      _isSameDate: function (dateA, dateB) {
+        return dateA && dateB && dateA.toDateString() === dateB.toDateString();
+      },
 
       _localeChanged: function (locale) {
         var localeMoment = moment();
@@ -412,6 +410,7 @@
           return;
         }
         this.set('_months', months);
+
         this.async(function () {
           this._recalculateSelectionCircle();
           this._positionMonths();
@@ -419,15 +418,21 @@
       },
 
       _setActiveWeekDescendant: function (date) {
-        this._activeWeekDescendant = 'day-' + date.getDate() + '-' + (date.getMonth() + 1);
+        this._activeWeekDescendant = this._getDayId(date);
+      },
+
+      _getDayId: function (date) {
+        if (date) {
+          return 'day-' + date.getDate() + '-' + (date.getMonth() + 1);
+        }
       },
 
       _getDayClass: function (cssClass, date) {
         if (date) {
-          if (dateDiff(date, this.today) === 0) {
+          if (this._isSameDate(date, this.today)) {
             cssClass += ' today';
           }
-          if (dateDiff(date, this.date) === 0) {
+          if (this._isSameDate(date, this.date)) {
             cssClass += ' selected';
             this.async(function () {
               this._recalculateSelectionCircle();
@@ -437,12 +442,8 @@
         return cssClass;
       },
 
-      _getAriaSelected: function (date) {
-        return date && dateDiff(date, this.date) === 0;
-      },
-
       _getTabIndex: function (date) {
-        return date && dateDiff(date, this.date)
+        return this._isSameDate(date, this.date)
           ? 0
           : -1;
       },
@@ -580,6 +581,11 @@
         this._containerWidth = this.$.calendar.offsetWidth;
         this._positionMonths();
         this._recalculateSelectionCircle();
+      },
+
+      _resetScroll: function () {
+        this.scrollTop = 0;
+        this.scrollLeft = 0;
       },
 
       _getDayName: function (date) {

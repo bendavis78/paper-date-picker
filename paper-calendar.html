@@ -82,8 +82,13 @@
       }
 
       .weeks-container {
+        display: table;
         height: calc(100%*7/8);
         width: 100%;
+      }
+
+      .month-row {
+        display: table-row;
       }
 
       .month-cell {
@@ -122,6 +127,7 @@
       }
 
       .month-cell {
+        display: table-cell;
         padding: 0;
       }
       .month-cell .day {
@@ -159,34 +165,34 @@
       }
 
     </style>
-    <div id="calendar" aria-activedescendant$="{{_activeWeekDescendant}}" aria-labelledby$="{{_activeWeekDescendant}}">
-      <paper-calendar-month-navigation id="monthNav" class="month-nav"></paper-calendar-month-navigation>
+    <div id="calendar" aria-live="assertive">
+      <paper-calendar-month-navigation id="monthNav" class="month-nav" label-previous="[[labelPreviousMonth]]" label-next="[[labelNextMonth]]" role="heading" aria-live="assertive" aria-labelledby$="month-label-[[currentMonth]]-[[currentYear]]"></paper-calendar-month-navigation>
       <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
         <template is="dom-repeat" items="{{_months}}" as="month">
           <div class$="{{_getMonthClass('month', month)}}">
             <div class="month-name" aria-hidden="true">
               <span id="month-label-[[month.month]]-[[month.year]]">{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
             </div>
-            <table class="weeks-container" role="grid">
-              <tr class="month-weekdays month-row week" aria-hidden="true">
+            <div class="weeks-container" role="grid">
+              <div class="month-weekdays month-row week" aria-hidden="true">
                 <template is="dom-repeat" items="{{_weekdays}}">
-                  <td class="month-cell" role="columnheader">
+                  <div class="month-cell" role="columnheader">
                     <div class="day">{{item.0}}</div>
-                  </td>
+                  </div>
                 </template>
-              </tr>
+              </div>
               <template is="dom-repeat" items="{{month.weeks}}" as="row">
-                <tr class="month-days month-row">
+                <div class="month-days month-row" role="row">
                   <template is="dom-repeat" items="{{row}}">
-                    <td class="month-cell">
+                    <div class="month-cell">
                       <div id$="{{_getDayId(item.date)}}" class$="{{_getDayClass('day-item selection', item.date, today, date)}}" role="gridcell" tabindex$="{{_getTabIndex(item.date, date)}}" aria-live="assertive" aria-selected$="{{_isSameDate(item.date, date)}}" aria-label$="{{_getAriaDayLabel(item.date, locale)}}" on-tap="_tapDay" disabled$="{{_getDisabledState(item.day, item.date, minDate, maxDate)}}">
                         <div class="day" aria-hidden="true">{{item.day}}</div>
                       </div>
-                    </td>
+                    </div>
                   </template>
-                </tr>
+                </div>
               </template>
-            </table>
+            </div>
           </div>
         </template>
       </div>
@@ -217,9 +223,9 @@
       },
 
       properties: {
-        /*
-           * The selected date
-           */
+        /**
+          * The selected date
+          */
         date: {
           type: Date,
           notify: true,
@@ -230,8 +236,8 @@
         },
 
         /**
-           * The current locale
-           */
+          * The current locale
+          */
         locale: {
           type: String,
           value: 'en',
@@ -240,46 +246,54 @@
         },
 
         /**
-           * The minimum allowed date
-           */
+          * The minimum allowed date
+          */
         minDate: {
           type: Date,
           value: null
         },
 
         /**
-           * The maximum allowed date
-           */
+          * The maximum allowed date
+          */
         maxDate: {
           type: Date,
           value: null
         },
 
         /**
-           * The current selected day
-           * @type {Number}
-           */
+          * The current selected day
+          * @type {Number}
+          */
         currentDay: {
           type: Number
         },
 
         /**
-           * The currently selected month (1-12)
-           */
+          * The currently selected month (1-12)
+          */
         currentMonth: {
           type: Number
         },
 
         /**
-           * The currently selected year
-           */
+          * The currently selected year
+          */
         currentYear: {
           type: Number
         },
 
+        labelNextMonth: {
+          type: String
+        },
+
+        labelPreviousMonth: {
+          type: String
+        },
+
         /**
-           * Private variables
-           */
+          * Private variables
+          */
         _contentClass: String,
         _months: Array,
         _firstDayOfWeek: Number,
@@ -302,10 +316,10 @@
       },
 
       /**
-         *
-         * PRIVATE
-         *
-         */
+        *
+        * PRIVATE
+        *
+        */
 
       _isSameDate: function (dateA, dateB) {
         return dateA && dateB && dateA.toDateString() === dateB.toDateString();
@@ -443,7 +457,7 @@
       },
 
       _getTabIndex: function (date) {
-        return this._isSameDate(date, this.date)
+        return this._isSameDate(date, this._focusDate)
           ? 0
           : -1;
       },
@@ -468,8 +482,10 @@
       _onMonthNavigation: function (event) {
         if (event.direction === 'previous') {
           this._swipePrevMonth();
+          this._focusToPreviousMonth();
         } else {
           this._swipeNextMonth();
+          this._focusToNextMonth();
         }
       },
 
@@ -516,6 +532,7 @@
         }
         this._recalculateSelectionCircle();
         this._setActiveWeekDescendant(this.date);
+        this._focusDate = this.date;
       },
 
       _tapDay: function (event) {

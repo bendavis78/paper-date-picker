@@ -1,7 +1,7 @@
 <script>
   window.A11yBehavior = {
     listeners: {
-      'keydown': '_keyHandler'
+      'months.keydown': '_keyHandler'
     },
 
     properties: {
@@ -41,7 +41,7 @@
       var month = targetDate.getMonth();
       var year = targetDate.getFullYear();
 
-      switch (event.key) {
+      switch (event.code) {
         case 'ArrowUp':
           targetDate.setDate(date - 7);
           break;
@@ -77,14 +77,42 @@
           targetDate.setMonth(month - 1);
           break;
         case 'Enter':
+        case 'Space':
           this.date = targetDate;
           break;
+
         case 'Escape':
           break;
         default:
           return;
       }
 
+      this._focusDate = targetDate;
+
+      setTimeout(function () {
+        this.$$('#' + this._getDayId(this._focusDate)).focus();
+      }.bind(this), 0);
+    },
+
+    /**
+     * Sets the focus date to next month`
+     */
+    _focusToNextMonth: function () {
+      var targetDate = new Date(this._focusDate || this.date);
+      var month = targetDate.getMonth();
+
+      targetDate.setMonth(month + 1);
+      this._focusDate = targetDate;
+    },
+
+    /**
+     * Sets the focus date to previous month`
+     */
+    _focusToPreviousMonth: function () {
+      var targetDate = new Date(this._focusDate || this.date);
+      var month = targetDate.getMonth();
+
+      targetDate.setMonth(month - 1);
       this._focusDate = targetDate;
     },
 
@@ -96,16 +124,22 @@
     },
 
     /**
-     * When the focusDate changes it will focus
-     * on the element with a slight delay due to rendering
+     * When the focusDate changes
      */
-    _focusDateChanged: function (date) {
-      this.currentYear = date.getFullYear();
-      this.currentMonth = date.getMonth() + 1;
+    _focusDateChanged: function (newValue, oldValue) {
+      this.currentYear = newValue.getFullYear();
+      this.currentMonth = newValue.getMonth() + 1;
 
-      setTimeout(function () {
-        this.$$('#' + this._getDayId(date)).focus();
-      }.bind(this), 50);
+      var oldFocusElement = this.$$('#' + this._getDayId(oldValue || this.date));
+      var newFocusElement = this.$$('#' + this._getDayId(newValue));
+
+      if (oldFocusElement) {
+        oldFocusElement.tabIndex = -1;
+      }
+
+      if (newFocusElement) {
+        newFocusElement.tabIndex = 0;
+      }
     }
   };
 </script>

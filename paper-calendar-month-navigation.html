@@ -55,17 +55,14 @@
 
     </style>
     <div class="flex col self-stretch">
-      <button type="button" on-tap="_navigateToPrevious" tabindex="-1">
+      <button type="button" on-tap="_navigateToPrevious" aria-label$="[[labelPreviousMonth]]">
         <paper-ripple center class="ripple circle"></paper-ripple>
         <iron-icon class="icon flex" icon="date-picker:chevron-left"></iron-icon>
       </button>
     </div>
     <div class="flex-5"></div>
     <div class="flex col self-stretch">
-      <button
-            type="button"
-            on-tap="_navigateToNext"
-            tabindex="-1">
+      <button type="button" on-tap="_navigateToNext" aria-label$="[[labelNextMonth]]">
         <paper-ripple center class="ripple circle"></paper-ripple>
         <iron-icon class="icon flex" icon="date-picker:chevron-right"></iron-icon>
       </button>
@@ -74,6 +71,18 @@
   <script>
     Polymer({
       is: 'paper-calendar-month-navigation',
+
+      properties: {
+        labelNextMonth: {
+          type: String,
+          value: 'next month'
+        },
+
+        labelPreviousMonth: {
+          type: String,
+          value: 'previous month'
+        }
+      },
 
       _navigateToPrevious: function () {
         var event = new Event('navigate');
@@ -87,6 +96,5 @@
         this.dispatchEvent(event);
       }
     });
-
   </script>
 </dom-module>

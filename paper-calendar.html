@@ -27,8 +27,8 @@
         -webkit-tap-highlight-color: rgba(0,0,0,0);
         --ease-in-sine: cubic-bezier(0.47, 0, 0.745, 0.715);
         --ease-out-sine: cubic-bezier(0.39, 0.575, 0.565, 1);
-        @apply(--paper-font-body1);
-        @apply(--paper-calendar);
+        @apply --paper-font-body1;
+        @apply --paper-calendar;
         overflow: hidden;
         -webkit-touch-callout: none;
         -webkit-user-select: none;
@@ -37,17 +37,17 @@
         -ms-user-select: none;
         user-select: none;
 
-        @apply(--paper-calendar);
+        @apply --paper-calendar;
       }
       #calendar {
         position: relative;
         width: 100%;
         height: 100%;
-        @apply(--layout-horizontal);
+        @apply --layout-horizontal;
       }
       #months {
         height: 100%;
-        @apply(--layout-horizontal);
+        @apply --layout-horizontal;
       }
       #months.animating .month-nav {
         opacity: 1;
@@ -66,21 +66,25 @@
       }
       .month {
         height: 100%;
-        @apply(--layout-vertical);
-        @apply(--layout-justified);
-        @apply(--layout-flex);
+        @apply --layout-vertical;
+        @apply --layout-justified;
+        @apply --layout-flex;
       }
 
-      .month-row, .month-nav {
+      .month-name, .month-nav {
         height: calc(100%/8);
         box-sizing: border-box;
         padding: 0 calc(100%/36);
       }
 
-      .month-col {
-        position: relative;
-        @apply(--layout-vertical);
-        @apply(--layout-flex);
+      .weeks-container {
+        height: calc(100%*7/8);
+        width: 100%;
+      }
+
+      .month-cell {
+        vertical-align: middle;
+        text-align: center;
       }
 
       .month-nav {
@@ -89,13 +93,13 @@
         left: 0;
         width: 100%;
         opacity: 1;
-        @apply(--layout-horizontal);
-        @apply(--layout-center);
+        @apply --layout-horizontal;
+        @apply --layout-center;
       }
       .month-nav .col {
         position: relative;
-        @apply(--layout-vertical);
-        @apply(--layout-center-center);
+        @apply --layout-vertical;
+        @apply --layout-center-center;
       }
       .month-nav .btn .icon {
         cursor: pointer;
@@ -116,40 +120,29 @@
         vertical-align: middle;
         text-align: center;
         font-weight: bold;
-        @apply(--paper-font-body2);
-        @apply(--layout-horizontal);
-        @apply(--layout-center);
-        @apply(--layout-center-justified);
-        @apply(--layout-flex);
+        @apply --paper-font-body2;
+        @apply --layout-horizontal;
+        @apply --layout-center;
+        @apply --layout-center-justified;
+        @apply --layout-flex;
       }
       .month-weekdays {
         color: var(--secondary-text-color);
-        @apply(--layout-horizontal);
-        @apply(--layout-justified);
-        @apply(--layout-flex);
       }
-      .month-days {
-        @apply(--layout-horizontal);
-        @apply(--layout-justified);
-        @apply(--layout-flex);
-      }
-      .month-col .day {
+      .month-cell .day {
         cursor: default;
         pointer-events: none;
-        @apply(--layout-fit);
-        @apply(--layout-vertical);
-        @apply(--layout-center-center);
-      }
-      .month-col {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        @apply(--layout-center-center);
+        line-height: 200%;
+     }
+      .month-cell {
+        /*position: relative;*/
+        padding: 0;
       }
       .day-item {
         border-radius: 100%;
-        width: 100%;
         height: 100%;
+        width: 100%;
+        display: inline-block;
       }
       .day-item::selection {
         background: none;
@@ -173,39 +166,42 @@
         color: var(--text-primary-color);
       }
       .flex {
-        @apply(--layout-flex);
+        @apply --layout-flex;
       }
       .flex-5 {
-        @apply(--layout-flex-5);
+        @apply --layout-flex-5;
       }
     </style>
     <div id="calendar">
       <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
         <template is="dom-repeat" items="{{_months}}" as="month">
           <div class$="{{_getMonthClass('month', month)}}">
-            <div class="month-row month-name">
-              <span>{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
+            <div class="month-name" role="heading" aria-labelledby$="month-label-[[month.month]]-[[month.year]]">
+              <span id="month-label-[[month.month]]-[[month.year]]" aria-live="assertive" aria-atomic="true">{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
             </div>
-            <div class="month-row month-weekdays week">
-              <template is="dom-repeat" items="{{_weekdays}}">
-                <div class="month-col layout vertical flex">
-                  <div class="day">{{item.0}}</div>
-                </div>
-              </template>
-            </div>
-            <template is="dom-repeat" items="{{month.weeks}}" as="row">
-              <div class="month-row month-days">
-                <template is="dom-repeat" items="{{row}}">
-                  <div class="month-col">
-                    <div class$="{{_getDayClass('day-item selection', item.date, today, date)}}"
-                      disabled$="{{_isDisabled(item.day, item.date, minDate, maxDate)}}"
-                      on-tap="_tapDay" date$="{{item.name}}">
-                      <div class="day">{{item.day}}</div>
-                    </div>
-                  </div>
+            <table class="weeks-container" role="grid" aria-labelledby$="month-label-[[month.month]]-[[month.year]]">
+              <tr class="month-weekdays month-row week">
+                <template is="dom-repeat" items="{{_weekdays}}">
+                  <td class="month-cell" role="columnheader">
+                    <div class="day">{{item.0}}</div>
+                  </td>
                 </template>
-              </div>
-            </template>
+              </tr>
+              <template is="dom-repeat" items="{{month.weeks}}" as="row">
+                <tr class="month-days month-row">
+                  <template is="dom-repeat" items="{{row}}">
+                    <td class="month-cell" role="gridcell" aria-selected$="{{_getAriaSelected(item.date, date)}}">
+                      <div class$="{{_getDayClass('day-item selection', item.date, today, date)}}"
+                        disabled$="{{_isDisabled(item.day, item.date, minDate, maxDate)}}"
+                        tabindex$="{{_getTabIndex(item.date, date)}}"
+                        on-tap="_tapDay" date$="{{item.name}}">
+                        <div class="day">{{item.day}}</div>
+                      </div>
+                    </td>
+                  </template>
+                </tr>
+              </template>
+            </table>
           </div>
         </template>
       </div>
@@ -429,6 +425,18 @@
           }
         }
         return cssClass;
+      },
+      _getAriaSelected: function(date) {
+        if (date && dateDiff(date, this.date) === 0) {
+          return 'true';
+        }
+        return 'false';
+      },
+      _getTabIndex: function(date) {
+        if (date && dateDiff(date, this.date) === 0) {
+          return 0;
+        }
+        return -1;
       },
       _isDisabled: function(day, date) {
         return !day || !this._withinValidRange(date);
@@ -681,13 +689,12 @@
         selected.style.width = '';
         var w = selected.parentElement.offsetWidth;
         var h = selected.parentElement.offsetHeight;
-        selected.style.flex = '';
         window.requestAnimationFrame(function() {
           if (w > 0 && w < h) {
             selected.style.height = w + 'px';
           }
           else if (h > 0) {
-            selected.style.width = h + 'px';
+            selected.style.width = (h / w) * 100 + '%';
           }
         });
       },

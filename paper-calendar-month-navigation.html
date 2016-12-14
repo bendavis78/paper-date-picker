@@ -10,8 +10,8 @@
     <style>
       :host {
         width: 100%;
-        @apply(--layout-horizontal);
-        @apply(--layout-center);
+        @apply --layout-horizontal;
+        @apply --layout-center;
         height: calc(100%/8);
         box-sizing: border-box;
         padding: 0 calc(100%/36);
@@ -19,8 +19,8 @@
 
       .col {
         position: relative;
-        @apply(--layout-vertical);
-        @apply(--layout-center-center);
+        @apply --layout-vertical;
+        @apply --layout-center-center;
       }
 
       button {
@@ -46,11 +46,11 @@
       }
 
       .flex {
-        @apply(--layout-flex);
+        @apply --layout-flex;
       }
 
       .flex-5 {
-        @apply(--layout-flex-5);
+        @apply --layout-flex-5;
       }
 
     </style>

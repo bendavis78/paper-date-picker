@@ -1,69 +1,322 @@
 <!doctype html>
 <html>
 
-<head>
-  <meta charset="utf-8">
-  <script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
-  <script src="../bower_components/web-component-tester/browser.js"></script>
-  <!-- import the element to test -->
-  <link rel="import" href="../paper-date-picker.html">
-</head>
+  <head>
+    <meta charset="utf-8">
+    <script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../bower_components/web-component-tester/browser.js"></script>
+    <!-- import the element to test -->
+    <link rel="import" href="../paper-date-picker.html">
+  </head>
 
-<body>
+  <body>
 
-  <test-fixture id="max-date-fixture">
-    <template>
-      <paper-date-picker
-        id="picker"
-        date="January 1, 2016"
-        max-date="February 28, 2016">
-      </paper-date-picker>
-    </template>
-  </test-fixture>
+    <test-fixture id="max-date-fixture">
+      <template>
+        <paper-date-picker id="picker" date="January 1, 2016" max-date="February 28, 2016"></paper-date-picker>
+      </template>
+    </test-fixture>
 
-  <script>
+    <test-fixture id="a11y-fixture">
+      <template>
+        <paper-date-picker id="picker2" date="January 10, 2010"></paper-date-picker>
+      </template>
+    </test-fixture>
 
-    describe('paper-date-picker', function() {
-      var element;
+    <script>
+      /* global describe, context, beforeEach, expect, it, fixture, flush */
 
-      context('with a max-date', function() {
+      /**
+     * Fix for IE nodelist foreach function
+     */
+      NodeList.prototype.forEach = Array.prototype.forEach;
 
-        beforeEach(function() {
-          element = fixture('max-date-fixture');
+      describe('paper-date-picker', function () {
+        var element;
+
+        context('with a max-date', function () {
+          beforeEach(function () {
+            element = fixture('max-date-fixture');
+          });
+
+          it('should not swipe after the max bound', function (done) {
+            // Check initialization
+            expect(element.date).to.be.not.null;
+            expect(element.maxDate).to.be.not.null;
+
+            // Try to swipe after the max bound
+            var calendar = element.$$('paper-calendar');
+            calendar._swipeNextMonth();
+            calendar._swipeNextMonth();
+            calendar._swipeNextMonth();
+            calendar._swipeNextMonth();
+
+            // Check after all animation that the calendar has been transformed
+            // once
+            setTimeout(function () {
+              // When the max bound is reached, the div `months` contains only two
+              // months. So we check that the current position is equal to the
+              // half of the width, else it means the calendar has undergone too
+              // much transformations
+              expect(calendar._currentPos).to.equal(-(calendar.$.months.clientWidth / 2));
+              done();
+            }, 500);
+          });
         });
 
-        it('should not swipe after the max bound', function(done) {
+        context('a11y structure according to wai-aria 1.1 (https://www.w3.org/TR/wai-aria-practices-1.1/#datepicker)', function () {
+          describe('The current month has a label representing the month and year. It is advisable to use a role heading but is not essential. This "label" should have a unique ID.', function () {
+            var el;
+            var calendar;
+            var currentMonth;
 
-          // Check initialization
-          expect(element.date).to.be.not.null;
-          expect(element.maxDate).to.be.not.null;
+            beforeEach(function (done) {
+              var beforeDone = function () {
+                currentMonth = calendar.$$('#months :nth-child(2) .month-name');
+                done();
+              };
 
-          // Try to swipe after the max bound
-          var calendar = element.$$('paper-calendar');
-          calendar._swipeNextMonth();
-          calendar._swipeNextMonth();
-          calendar._swipeNextMonth();
-          calendar._swipeNextMonth();
+              flush(function () {
+                el = fixture('a11y-fixture');
+                calendar = el.$$('paper-calendar');
+                setTimeout(beforeDone, 0);
+              });
+            });
 
-          // Check after all animation that the calendar has been transformed
-          // once
-          setTimeout(function() {
-            // When the max bound is reached, the div `months` contains only two
-            // months. So we check that the current position is equal to the
-            // half of the width, else it means the calendar has undergone too
-            // much transformations
-            expect(calendar._currentPos).to.equal(
-              -(calendar.$.months.clientWidth / 2)
-            );
-            done();
-          }, 500);
+            it('should expect the current month to be not null', function () {
+              expect(currentMonth).to.be.not.null;
+            });
+
+            it('should expect the current month to be null', function () {
+              expect(currentMonth.attributes).to.have.ownProperty('role');
+            });
+
+            it('should expect role to be heading', function () {
+              expect(currentMonth.getAttribute('role')).to.equal('heading');
+            });
+
+            it('should have the property: "aria-labelledby"', function () {
+              expect(currentMonth.attributes).to.have.ownProperty('aria-labelledby');
+            });
+
+            it('should expect aria-labelledby to be January 2010', function () {
+              var label = calendar.$$('#' + currentMonth.getAttribute('aria-labelledby'));
+              expect(label.innerText).to.equal('January 2010');
+            });
+          });
+
+          describe('If the author would like to ensure that a label is announced by a screen reader, as the label changes, include live region properties with the label element: aria-live="assertive" and aria-atomic="true".', function () {
+            var el;
+            var calendar;
+            var currentMonth;
+            var label;
+
+            beforeEach(function (done) {
+              var beforeDone = function () {
+                currentMonth = calendar.$$('#months :nth-child(2) .month-name');
+                label = calendar.$$('#' + currentMonth.getAttribute('aria-labelledby'));
+                done();
+              };
+
+              flush(function () {
+                el = fixture('a11y-fixture');
+                calendar = el.$$('paper-calendar');
+                setTimeout(beforeDone, 0);
+              });
+            });
+
+            it('should have the property: "aria-live"', function () {
+              expect(label.attributes).to.have.ownProperty('aria-live');
+            });
+
+            it('should expect aria-live to be assertive', function () {
+              expect(label.getAttribute('aria-live')).to.equal('assertive');
+            });
+
+            it('should have the property: "aria-atomic"', function () {
+              expect(label.attributes).to.have.ownProperty('aria-atomic');
+            });
+
+            it('should expect aria-atomic to be true', function () {
+              expect(label.getAttribute('aria-atomic')).to.equal('true');
+            });
+          });
+
+          describe('The container for the day of week headers and numeric days of the week has a role of grid.', function () {
+            var el;
+            var calendar;
+            var weeksContainer;
+
+            beforeEach(function (done) {
+              var beforeDone = function () {
+                weeksContainer = calendar.$$('.weeks-container');
+                done();
+              };
+
+              flush(function () {
+                el = fixture('a11y-fixture');
+                calendar = el.$$('paper-calendar');
+                setTimeout(beforeDone, 0);
+              });
+            });
+
+            it('should expect the weeks container to be not null', function () {
+              expect(weeksContainer).to.be.not.null;
+            });
+
+            it('should have the property: "role"', function () {
+              expect(weeksContainer.attributes).to.have.ownProperty('role');
+            });
+
+            it('should expect role to be grid', function () {
+              expect(weeksContainer.getAttribute('role')).to.equal('grid');
+            });
+          });
+
+          describe('The grid has an aria-labelledby property with a value equivalent to the id of the label for the grid.', function () {
+            var el;
+            var calendar;
+            var currentGrid;
+
+            beforeEach(function (done) {
+              var beforeDone = function () {
+                currentGrid = calendar.$$('#months :nth-child(2) .weeks-container');
+                done();
+              };
+
+              flush(function () {
+                el = fixture('a11y-fixture');
+                calendar = el.$$('paper-calendar');
+                setTimeout(beforeDone, 0);
+              });
+            });
+
+            it('should expect the current grid to be not null', function () {
+              expect(currentGrid).to.be.not.null;
+            });
+
+            it('should have the property: "role"', function () {
+              expect(currentGrid.attributes).to.have.ownProperty('role');
+            });
+
+            it('should expect role to be grid', function () {
+              expect(currentGrid.getAttribute('role')).to.equal('grid');
+            });
+          });
+
+          describe('Each name for the day of the week has a role columnheader and is not navigable via the keyboard.', function () {
+            var el;
+            var calendar;
+            var weekdays;
+
+            beforeEach(function (done) {
+              var beforeDone = function () {
+                weekdays = calendar.querySelectorAll('.month-weekdays .month-cell');
+
+                done();
+              };
+
+              flush(function () {
+                el = fixture('a11y-fixture');
+                calendar = el.$$('paper-calendar');
+                setTimeout(beforeDone, 0);
+              });
+            });
+
+            it('should expect the weekdays to be not null', function () {
+              expect(weekdays).to.be.not.null;
+            });
+
+            it('should expect all weekdays to have role with columnheader', function () {
+              weekdays.forEach(function (weekday) {
+                expect(weekday).to.be.not.null;
+                expect(weekday.attributes).to.have.ownProperty('role');
+                expect(weekday.getAttribute('role')).to.equal('columnheader');
+              });
+            });
+          });
+
+          describe('Each numeric day of the week has the role gridcell.', function () {
+            var el;
+            var calendar;
+            var days;
+
+            beforeEach(function (done) {
+              var beforeDone = function () {
+                days = calendar.querySelectorAll('.month-days .month-cell');
+                done();
+              };
+
+              flush(function () {
+                el = fixture('a11y-fixture');
+                calendar = el.$$('paper-calendar');
+                setTimeout(beforeDone, 0);
+              });
+            });
+
+            it('should expect the days to be not null', function () {
+              expect(days).to.be.not.null;
+            });
+
+            it('should expect all days to have role with gridcell', function () {
+              days.forEach(function (day) {
+                expect(day).to.be.not.null;
+                expect(day.attributes).to.have.ownProperty('role');
+                expect(day.getAttribute('role')).to.equal('gridcell');
+              });
+            });
+          });
+
+          describe('When a day is selected its aria-selected is set to true, otherwise it is set to false or removed.', function () {
+            var el;
+            var calendar;
+            var currentCell;
+            var nextCell;
+
+            beforeEach(function (done) {
+              var beforeDone = function () {
+                currentCell = calendar.$$('.day-item.selected');
+                nextCell = currentCell.parentElement.nextElementSibling.querySelector('.day-item');
+                done();
+              };
+
+              flush(function () {
+                el = fixture('a11y-fixture');
+                calendar = el.$$('paper-calendar');
+                setTimeout(beforeDone, 0);
+              });
+            });
+
+            it('should expect the current cell to be not null', function () {
+              expect(currentCell.attributes).to.be.not.null;
+            });
+
+            it('should have the property: "aria-selected"', function () {
+              expect(currentCell.attributes).to.have.ownProperty('aria-selected');
+            });
+
+            it('should expect the next cell to be not null', function () {
+              expect(nextCell.attributes).to.be.not.null;
+              console.log(nextCell);
+            });
+
+            it('should to not have the property: "aria-selected"', function () {
+              expect(nextCell.attributes).to.not.have.ownProperty('aria-selected');
+            });
+          });
+
+          // =====================================================================
+          // TODO:
+          // =====================================================================
+          // Changes in aria states, identified here, as well as focus, are clearly styled to show the user where their point of regard is and what days are selected.
+          // when using the keyboard to navigate the datepicker
+          //  tabs to the months
+          //  current date
+          //  cancel
+          //  ok buttuns
         });
-
       });
-
-    });
-
-  </script>
-</body>
+    </script>
+  </body>
 
 </html>

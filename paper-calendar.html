@@ -575,8 +575,10 @@
         this._translateX(-i * this._containerWidth);
       },
 
+      /**
+       * Force the day selection circle to maintain an 1:1 ratio
+       */
       _recalculateSelectionCircle: function () {
-        // Force the day selection circle to maintain a 1:1 ratio
         var selected = this.$$('.day-item.selected');
         if (!selected) {
           return;

@@ -166,12 +166,12 @@
 
     </style>
     <div id="calendar" aria-live="assertive">
-      <paper-calendar-month-navigation id="monthNav" class="month-nav" label-previous="[[labelPreviousMonth]]" label-next="[[labelNextMonth]]" role="heading" aria-live="assertive" aria-labelledby$="month-label-[[currentMonth]]-[[currentYear]]"></paper-calendar-month-navigation>
+      <paper-calendar-month-navigation id="monthNav" class="month-nav" label-previous="[[labelPreviousMonth]]" label-next="[[labelNextMonth]]"></paper-calendar-month-navigation>
       <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
         <template is="dom-repeat" items="{{_months}}" as="month">
           <div class$="{{_getMonthClass('month', month)}}">
-            <div class="month-name" aria-hidden="true">
-              <span id="month-label-[[month.month]]-[[month.year]]">{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
+            <div class="month-name" role="heading" aria-labelledby$="month-label-[[month.month]]-[[month.year]]">
+              <span id="month-label-[[month.month]]-[[month.year]]" aria-live="assertive" aria-atomic="true">{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
             </div>
             <div class="weeks-container" role="grid">
               <div class="month-weekdays month-row week" aria-hidden="true">
@@ -183,9 +183,9 @@
               </div>
               <template is="dom-repeat" items="{{month.weeks}}" as="row">
                 <div class="month-days month-row" role="row">
-                  <template is="dom-repeat" items="{{row}}">
-                    <div class="month-cell">
-                      <div id$="{{_getDayId(item.date)}}" class$="{{_getDayClass('day-item selection', item.date, today, date)}}" role="gridcell" tabindex$="{{_getTabIndex(item.date, date)}}" aria-live="assertive" aria-selected$="{{_isSameDate(item.date, date)}}" aria-label$="{{_getAriaDayLabel(item.date, locale)}}" on-tap="_tapDay" disabled$="{{_getDisabledState(item.day, item.date, minDate, maxDate)}}">
+                  <template is="dom-repeat" items="{{row}}" as="item">
+                    <div class="month-cell" role="gridcell">
+                      <div id$="{{_getDayId(item.date)}}" class$="{{_getDayClass('day-item selection', item.date, today, date)}}" aria-live="assertive" aria-label$="{{_getAriaDayLabel(item.date, locale)}}" aria-selected$="{{_isSameDate(item.date, date)}}" tabindex$="{{_getTabIndex(item.date, date)}}" on-tap="_tapDay" disabled$="{{_getDisabledState(item.day, item.date, minDate, maxDate)}}">
                         <div class="day" aria-hidden="true">{{item.day}}</div>
                       </div>
                     </div>
@@ -481,11 +481,9 @@
 
       _onMonthNavigation: function (event) {
         if (event.direction === 'previous') {
-          this._swipePrevMonth();
-          this._focusToPreviousMonth();
+          this._swipePrevMonth(this._focusToPreviousMonth.bind(this));
         } else {
-          this._swipeNextMonth();
-          this._focusToNextMonth();
+          this._swipeNextMonth(this._focusToNextMonth.bind(this));
         }
       },
 

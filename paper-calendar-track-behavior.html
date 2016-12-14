@@ -174,17 +174,17 @@
         this.set('_contentClass', '');
         this.transform('translateX(' + this._startPos + 'px)', this.$.months);
         this.fire('swiped', {direction: 'right'});
-        // callback && callback();
+        callback && callback();
       }.bind(this));
     },
 
-    _swipeNextMonth: function () {
+    _swipeNextMonth: function (callback) {
       if (!this.maxDate || this.currentMonth < this.maxDate.getMonth() + 1) {
         this._translateX(-this._containerWidth * 2, 'swipe', function () {
           this.set('_contentClass', '');
           this.transform('translateX(' + this._startPos + 'px)', this.$.months);
           this.fire('swiped', {direction: 'left'});
-        //   callback && callback();
+          callback && callback();
         }.bind(this));
       }
     },

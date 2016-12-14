@@ -202,15 +202,6 @@
             it('should expect role to be grid', function () {
               expect(currentGrid.getAttribute('role')).to.equal('grid');
             });
-
-            it('should have the property: "aria-labelledby"', function () {
-              expect(currentGrid.attributes).to.have.ownProperty('aria-labelledby');
-            });
-
-            it('should expect aria-labelledby to be January 2010', function () {
-              var label = calendar.$$('#' + currentGrid.getAttribute('aria-labelledby'));
-              expect(label.innerText).to.equal('January 2010');
-            });
           });
 
           describe('Each name for the day of the week has a role columnheader and is not navigable via the keyboard.', function () {
@@ -284,8 +275,8 @@
 
             beforeEach(function (done) {
               var beforeDone = function () {
-                currentCell = calendar.$$('.day-item.selected').parentElement;
-                nextCell = currentCell.nextElementSibling;
+                currentCell = calendar.$$('.day-item.selected');
+                nextCell = currentCell.parentElement.nextElementSibling.querySelector('.day-item');
                 done();
               };
 
@@ -304,20 +295,13 @@
               expect(currentCell.attributes).to.have.ownProperty('aria-selected');
             });
 
-            it('should expect aria-selected to be true', function () {
-              expect(currentCell.getAttribute('aria-selected')).to.equal('true');
-            });
-
             it('should expect the next cell to be not null', function () {
               expect(nextCell.attributes).to.be.not.null;
+              console.log(nextCell);
             });
 
-            it('should have the property: "aria-selected"', function () {
-              expect(nextCell.attributes).to.have.ownProperty('aria-selected');
-            });
-
-            it('should expect aria-selected to be true', function () {
-              expect(nextCell.getAttribute('aria-selected')).to.equal('false');
+            it('should to not have the property: "aria-selected"', function () {
+              expect(nextCell.attributes).to.not.have.ownProperty('aria-selected');
             });
           });
 

@@ -11,8 +11,8 @@
 <link rel="import" href="paper-calendar-month-navigation.html">
 
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
-<link rel="import" href="paper-calendar-track-behavior.html">
-<link rel="import" href="paper-calendar-a11y-behavior.html">
+<link rel="import" href="behaviors/track-behavior.html">
+<link rel="import" href="behaviors/a11y-behavior.html">
 
 <dom-module id="paper-calendar">
   <template>
@@ -200,7 +200,7 @@
     </div>
   </template>
   <script>
-    /* global TrackBehavior, A11yBehavior */
+    /* global PaperCalendarBehaviors */
 
     /**
      * Number of months to pre-render on both sides of the current month
@@ -211,7 +211,7 @@
       is: 'paper-calendar',
 
       behaviors: [
-        Polymer.IronResizableBehavior, TrackBehavior, A11yBehavior
+        Polymer.IronResizableBehavior, PaperCalendarBehaviors.TrackBehavior, PaperCalendarBehaviors.A11yBehavior
       ],
 
       observers: ['_populate(currentYear, currentMonth, minDate, maxDate, locale)'],

@@ -11,7 +11,8 @@
   var RESIST_LENGTH = 40;
   var RESIST_FACTOR = 2;
 
-  window.TrackBehavior = {
+  window.PaperCalendarBehaviors = window.PaperCalendarBehaviors || {};
+  window.PaperCalendarBehaviors.TrackBehavior = {
     ready: function () {
       this._transitionEvent = this._whichTransitionEnd();
     },

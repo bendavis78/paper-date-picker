@@ -76,11 +76,11 @@
           break;
 
         case 'track':
-          this._track(dx, dy, adx, ady, width);
+          this._track(dx, dy, adx, ady, width, event);
           break;
 
         case 'end':
-          this._trackEnd(dx, dy, adx, ady, width);
+          this._trackEnd(dx, dy, adx, ady, width, event);
           break;
 
         default:
@@ -94,7 +94,7 @@
       this._moveQueue = [];
     },
 
-    _track: function (dx, dy, adx, ady, width) {
+    _track: function (dx, dy, adx, ady, width, event) {
       if (this._moveQueue.length >= 4) {
         this._moveQueue.shift();
       }
@@ -141,7 +141,7 @@
       this._translateX(x);
     },
 
-    _trackEnd: function (dx, dy, adx, ady, width) {
+    _trackEnd: function (dx, dy, adx, ady, width, event) {
       this._resistStart = null;
       var lastIdx = this._getMonthIdx(this._startPos);
       var idx = this._getMonthIdx(this._currentPos);

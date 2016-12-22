@@ -101,6 +101,7 @@
 
         case keys.Escape:
           targetDate = this.date;
+          this.dispatchEvent(new Event('cancel', {bubbles: true}));
           break;
         default:
           return;

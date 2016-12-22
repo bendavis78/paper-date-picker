@@ -531,13 +531,11 @@
         }.bind(this));
       },
       _swipeNextMonth: function() {
-        if (!this.maxDate || this.currentMonth < this.maxDate.getMonth() + 1) {
-          this._translateX(-this._containerWidth * 2, 'swipe', function() {
+          this._translateX(-this._containerWidth * (this._months.length < 3 ? 1 : 2), 'swipe', function() {
             this.set('_contentClass', '');
             this.transform('translateX(' + this._startPos + 'px)', this.$.months);
             this.fire('swiped', {direction: 'left'});
           }.bind(this));
-        }
       },
       _getMonthIdx: function(pos) {
         // returns the index for the visible month according to the given position
@@ -660,6 +658,7 @@
       },
       _withinValidRange: function(date) {
         if (this._isValidDate(date)) {
+
           return (!this.minDate || date >= this.minDate) && (!this.maxDate || date <= this.maxDate);
         }
         return false;

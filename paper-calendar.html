@@ -76,9 +76,7 @@
 
       .month {
         height: 100%;
-        @apply --layout-vertical;
-        @apply --layout-justified;
-        @apply --layout-flex;
+        width: 100%;
       }
 
       .weeks-container {
@@ -141,6 +139,9 @@
         height: 100%;
         width: 100%;
         display: inline-block;
+      }
+      .day-item.blank {
+        outline: 0;
       }
       .day-item::selection {
         background: none;
@@ -452,6 +453,8 @@
               this._recalculateSelectionCircle();
             });
           }
+        } else {
+          cssClass += ' blank';
         }
         return cssClass;
       },
@@ -537,6 +540,7 @@
         if (!this._withinValidRange(event.model.item.date)) {
           return false;
         }
+
         var item = event.model.item;
         var newDate = new Date(this.date.getTime());
         newDate.setYear(item.year);

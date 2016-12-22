@@ -1,4 +1,18 @@
 <script>
+  var keys = {
+    ArrowUp: 38,
+    ArrowRight: 39,
+    ArrowDown: 40,
+    ArrowLeft: 37,
+    Home: 36,
+    End: 35,
+    PageUp: 33,
+    PageDown: 34,
+    Enter: 13,
+    Space: 32,
+    Escape: 27
+  };
+
   window.A11yBehavior = {
     listeners: {
       'months.keydown': '_keyHandler'
@@ -41,47 +55,47 @@
       var month = targetDate.getMonth();
       var year = targetDate.getFullYear();
 
-      switch (event.code) {
-        case 'ArrowUp':
+      switch (event.keyCode) {
+        case keys.ArrowUp:
           targetDate.setDate(date - 7);
           break;
-        case 'ArrowRight':
+        case keys.ArrowRight:
           targetDate.setDate(date + 1);
           break;
-        case 'ArrowDown':
+        case keys.ArrowDown:
           targetDate.setDate(date + 7);
           break;
-        case 'ArrowLeft':
+        case keys.ArrowLeft:
           targetDate.setDate(date - 1);
           break;
 
-        case 'Home':
+        case keys.Home:
           targetDate.setDate(date - targetDate.getDay());
           break;
-        case 'End':
+        case keys.End:
           targetDate.setDate(date + (6 - targetDate.getDay()));
           break;
 
-        case 'PageUp':
+        case keys.PageUp:
           if (event.altKey) {
             targetDate.setYear(year + 1);
             break;
           }
           targetDate.setMonth(month + 1);
           break;
-        case 'PageDown':
+        case keys.PageDown:
           if (event.altKey) {
             targetDate.setYear(year - 1);
             break;
           }
           targetDate.setMonth(month - 1);
           break;
-        case 'Enter':
-        case 'Space':
+        case keys.Enter:
+        case keys.Space:
           this.date = targetDate;
           break;
 
-        case 'Escape':
+        case keys.Escape:
           targetDate = this.date;
           break;
         default:

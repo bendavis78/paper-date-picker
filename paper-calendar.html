@@ -542,6 +542,7 @@
         this._recalculateSelectionCircle();
         this._setActiveWeekDescendant(this.date);
         this._focusDate = this.date;
+        this.dispatchEvent(new Event('change', {bubbles: true}));
       },
 
       _tapDay: function (event) {

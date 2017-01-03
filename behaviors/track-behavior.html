@@ -1,5 +1,4 @@
 <script>
-
   // Ignore movement within this distance (px)
   var WIGGLE_THRESHOLD = 4;
   var WIGGLE_THRESHOLD_SQUARE = WIGGLE_THRESHOLD * WIGGLE_THRESHOLD;
@@ -104,9 +103,9 @@
       // ignore movement within WIGGLE_THRESHOLD
       var distance = (dx * dx) + (dy * dy);
       if (!this._gesture && distance > WIGGLE_THRESHOLD_SQUARE) {
-        this._gesture = adx > ady
-          ? 'pan-x'
-          : 'pan-y';
+        this._gesture = adx > ady ?
+          'pan-x' :
+          'pan-y';
       }
 
       // only drag during pan-x gesture
@@ -129,13 +128,13 @@
         var d;
         var max = RESIST_LENGTH;
 
-        p = rdx > width
-          ? 1
-          : rdx / width;
+        p = rdx > width ?
+          1 :
+          rdx / width;
         d = max * (1 - Math.pow(1 - p, RESIST_FACTOR));
-        x = (dx < 0
-          ? -this._scrollWidth + width - d
-          : d);
+        x = (dx < 0 ?
+          -this._scrollWidth + width - d :
+          d);
       } else {
         this._resistStart = null;
       }
@@ -174,17 +173,17 @@
       this._translateX(0, 'swipe', function () {
         this.set('_contentClass', '');
         this.transform('translateX(' + this._startPos + 'px)', this.$.months);
-        this.fire('swiped', {direction: 'right'});
+        this.fire('swiped', { direction: 'right' });
         callback && callback();
       }.bind(this));
     },
 
     _swipeNextMonth: function (callback) {
       if (!this.maxDate || this.currentMonth < this.maxDate.getMonth() + 1) {
-        this._translateX(-this._containerWidth * 2, 'swipe', function () {
+        this._translateX(-this._containerWidth * (this._months.length < 3 ? 1 : 2), 'swipe', function () {
           this.set('_contentClass', '');
           this.transform('translateX(' + this._startPos + 'px)', this.$.months);
-          this.fire('swiped', {direction: 'left'});
+          this.fire('swiped', { direction: 'left' });
           callback && callback();
         }.bind(this));
       }
@@ -214,7 +213,7 @@
         }
       });
 
-      return {x: x, y: y, v: Math.sqrt(v2)};
+      return { x: x, y: y, v: Math.sqrt(v2) };
     },
 
     _whichTransitionEnd: function () {
@@ -231,5 +230,5 @@
         }
       }
     }
-};
+  };
 </script>

@@ -564,6 +564,7 @@
 
       _withinValidRange: function (date) {
         if (this._isValidDate(date)) {
+
           return (!this.minDate || date >= this.minDate) && (!this.maxDate || date <= this.maxDate);
         }
         return false;

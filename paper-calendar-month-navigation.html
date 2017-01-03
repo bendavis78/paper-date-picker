@@ -1,0 +1,99 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
+<link rel="import" href="paper-date-picker-icons.html">
+
+<dom-module id="paper-calendar-month-navigation">
+  <template>
+    <style>
+      :host {
+        width: 100%;
+        @apply --layout-horizontal;
+        @apply --layout-center;
+        height: calc(100%/8);
+        box-sizing: border-box;
+        padding: 0 calc(100%/36);
+      }
+
+      .col {
+        position: relative;
+        @apply --layout-vertical;
+        @apply --layout-center-center;
+      }
+
+      button {
+        background: 0;
+        border: 0;
+      }
+
+      button .icon {
+        cursor: pointer;
+      }
+
+      button .ripple {
+        position: absolute;
+        width: 48px;
+        height: 48px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      button.right {
+        text-align: right;
+      }
+
+      .flex {
+        @apply --layout-flex;
+      }
+
+      .flex-5 {
+        @apply --layout-flex-5;
+      }
+
+    </style>
+    <div class="flex col self-stretch">
+      <button type="button" on-tap="_navigateToPrevious" aria-label$="[[labelPreviousMonth]]">
+        <paper-ripple center class="ripple circle"></paper-ripple>
+        <iron-icon class="icon flex" icon="date-picker:chevron-left"></iron-icon>
+      </button>
+    </div>
+    <div class="flex-5"></div>
+    <div class="flex col self-stretch">
+      <button type="button" on-tap="_navigateToNext" aria-label$="[[labelNextMonth]]">
+        <paper-ripple center class="ripple circle"></paper-ripple>
+        <iron-icon class="icon flex" icon="date-picker:chevron-right"></iron-icon>
+      </button>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'paper-calendar-month-navigation',
+
+      properties: {
+        labelNextMonth: {
+          type: String,
+          value: 'next month'
+        },
+
+        labelPreviousMonth: {
+          type: String,
+          value: 'previous month'
+        }
+      },
+
+      _navigateToPrevious: function () {
+        var event = new Event('navigate');
+        event.direction = 'previous';
+        this.dispatchEvent(event);
+      },
+
+      _navigateToNext: function () {
+        var event = new Event('navigate');
+        event.direction = 'next';
+        this.dispatchEvent(event);
+      }
+    });
+  </script>
+</dom-module>

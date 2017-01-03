@@ -12,7 +12,7 @@
         display: block;
         box-sizing: border-box;
         height: 100%;
-        @apply(--paper-font-common-base);
+        @apply --paper-font-common-base;
         /* for iron-list to fit */
         position: relative;
       }
@@ -28,7 +28,7 @@
         font-size: 24px;
       }
       iron-list {
-        @apply(--layout-fit);
+        @apply --layout-fit;
       }
     </style>
     <iron-list id="yearList" items="[[_years]]">

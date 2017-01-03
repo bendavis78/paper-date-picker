@@ -17,7 +17,7 @@
 <dom-module id="paper-calendar">
   <template>
     <style>
-      :host {
+       :host {
         display: block;
         box-sizing: border-box;
         padding: 12px 0;
@@ -28,7 +28,7 @@
         min-height: 160px;
         color: var(--primary-text-color);
         -webkit-font-smoothing: antialiased;
-        -webkit-tap-highlight-color: rgba(0,0,0,0);
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         --ease-in-sine: cubic-bezier(0.47, 0, 0.745, 0.715);
         --ease-out-sine: cubic-bezier(0.39, 0.575, 0.565, 1);
         @apply --paper-font-body1;
@@ -128,6 +128,7 @@
         display: table-cell;
         padding: 0;
       }
+
       .month-cell .day {
         cursor: default;
         pointer-events: none;
@@ -140,31 +141,38 @@
         width: 100%;
         display: inline-block;
       }
+
       .day-item.blank {
         outline: 0;
       }
+
       .day-item::selection {
         background: none;
       }
+
       .day-item.selected {
         background: var(--default-primary-color);
       }
+
       .day-item.selected .day {
         color: var(--text-primary-color);
       }
+
       .day-item:not([disabled]) {
         cursor: pointer;
       }
+
       .day-item[disabled] .day {
         color: var(--text-disabled-color, #9d9d9d);
       }
+
       .day-item.today .day {
         color: var(--default-primary-color);
       }
+
       .day-item.selected.today .day {
         color: var(--text-primary-color);
       }
-
     </style>
     <div id="calendar" aria-live="assertive">
       <paper-calendar-month-navigation id="monthNav" class="month-nav" label-previous="[[labelPreviousMonth]]" label-next="[[labelNextMonth]]"></paper-calendar-month-navigation>
@@ -225,8 +233,8 @@
 
       properties: {
         /**
-          * The selected date
-          */
+         * The selected date
+         */
         date: {
           type: Date,
           notify: true,
@@ -237,8 +245,8 @@
         },
 
         /**
-          * The current locale
-          */
+         * The current locale
+         */
         locale: {
           type: String,
           value: 'en',
@@ -247,39 +255,39 @@
         },
 
         /**
-          * The minimum allowed date
-          */
+         * The minimum allowed date
+         */
         minDate: {
           type: Date,
           value: null
         },
 
         /**
-          * The maximum allowed date
-          */
+         * The maximum allowed date
+         */
         maxDate: {
           type: Date,
           value: null
         },
 
         /**
-          * The current selected day
-          * @type {Number}
-          */
+         * The current selected day
+         * @type {Number}
+         */
         currentDay: {
           type: Number
         },
 
         /**
-          * The currently selected month (1-12)
-          */
+         * The currently selected month (1-12)
+         */
         currentMonth: {
           type: Number
         },
 
         /**
-          * The currently selected year
-          */
+         * The currently selected year
+         */
         currentYear: {
           type: Number
         },
@@ -293,8 +301,8 @@
         },
 
         /**
-          * Private variables
-          */
+         * Private variables
+         */
         _contentClass: String,
         _months: Array,
         _firstDayOfWeek: Number,
@@ -317,10 +325,10 @@
       },
 
       /**
-        *
-        * PRIVATE
-        *
-        */
+       *
+       * PRIVATE
+       *
+       */
 
       _isSameDate: function (dateA, dateB) {
         return dateA && dateB && dateA.toDateString() === dateB.toDateString();
@@ -364,7 +372,7 @@
           firstDay = 7 + firstDay;
         }
         for (d = 0; d < firstDay; d++) {
-          weeks[0].push({day: null, date: null});
+          weeks[0].push({ day: null, date: null });
         }
 
         // add actual days
@@ -390,7 +398,7 @@
           if (d % 7 === 0) {
             weeks.push([]);
           }
-          weeks[weeks.length - 1].push({day: null, date: null});
+          weeks[weeks.length - 1].push({ day: null, date: null });
           d += 1;
         }
 
@@ -460,9 +468,9 @@
       },
 
       _getTabIndex: function (date) {
-        return this._isSameDate(date, this._focusDate)
-          ? 0
-          : -1;
+        return this._isSameDate(date, this._focusDate) ?
+          0 :
+          -1;
       },
 
       _getDisabledState: function (day, date) {
@@ -477,9 +485,9 @@
         // returns the index for the visible month according to the given position
         var width = this._containerWidth;
         var i = Math.floor((-pos + (width / 2)) / width);
-        return i < 0
-          ? 0
-          : i;
+        return i < 0 ?
+          0 :
+          i;
       },
 
       _onMonthNavigation: function (event) {

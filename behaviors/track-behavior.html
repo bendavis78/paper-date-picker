@@ -10,6 +10,8 @@
   var RESIST_LENGTH = 40;
   var RESIST_FACTOR = 2;
 
+  var ANIMATING = false;
+
   window.PaperCalendarBehaviors = window.PaperCalendarBehaviors || {};
   window.PaperCalendarBehaviors.TrackBehavior = {
     ready: function () {
@@ -27,6 +29,7 @@
     },
 
     _translateX: function (x, transition, cb) {
+
       if (isNaN(parseInt(x, 10))) {
         throw new Error('Not a number: ' + x);
       }
@@ -43,6 +46,7 @@
           if (cb) {
             cb();
           }
+          ANIMATING = false;
         }.bind(this), this.$.months);
         this.set('_contentClass', 'animating ' + transition);
         this.$.monthNav.style.removeProperty('opacity');
@@ -142,11 +146,11 @@
     },
 
     _trackEnd: function (dx, dy, adx, ady, width, event) {
-      this._resistStart = null;
       var lastIdx = this._getMonthIdx(this._startPos);
       var idx = this._getMonthIdx(this._currentPos);
       var speed = this._getFastestMovement(event).v;
       var move = idx !== lastIdx || speed > FLICK_SPEED;
+
       if (!this._resistStart && this._gesture === 'pan-x' && move) {
         if (speed > FLICK_SPEED) {
           // calculate an ideal transition duration based on current speed of swipe
@@ -167,6 +171,7 @@
         this._translateX(this._startPos, 'reset');
       }
       this._gesture = null;
+      this._resistStart = null;
     },
 
     _swipePrevMonth: function (callback) {

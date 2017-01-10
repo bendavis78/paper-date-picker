@@ -542,7 +542,7 @@
         this._recalculateSelectionCircle();
         this._setActiveWeekDescendant(this.date);
         this._focusDate = this.date;
-        this.dispatchEvent(new Event('change', {bubbles: true}));
+        this.dispatchEvent(new Event('change', { bubbles: true }));
       },
 
       _tapDay: function (event) {
@@ -564,11 +564,8 @@
       },
 
       _withinValidRange: function (date) {
-        if (this._isValidDate(date)) {
-
-          return (!this.minDate || date >= this.minDate) && (!this.maxDate || date <= this.maxDate);
-        }
-        return false;
+        return this._isValidDate(date) &&
+          (!this.minDate || date >= this.minDate) && (!this.maxDate || date <= this.maxDate);
       },
 
       _monthWithinValidRange: function (year, month) {

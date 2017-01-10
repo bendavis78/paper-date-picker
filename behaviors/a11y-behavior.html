@@ -101,17 +101,19 @@
 
         case keys.Escape:
           targetDate = this.date;
-          this.dispatchEvent(new Event('cancel', {bubbles: true}));
+          this.dispatchEvent(new Event('cancel', { bubbles: true }));
           break;
         default:
           return;
       }
 
-      this._focusDate = targetDate;
+      if (this._withinValidRange(targetDate)) {
+        this._focusDate = targetDate;
 
-      setTimeout(function () {
-        this.$$('#' + this._getDayId(this._focusDate)).focus();
-      }.bind(this), 0);
+        setTimeout(function () {
+          this.$$('#' + this._getDayId(this._focusDate)).focus();
+        }.bind(this), 0);
+      }
     },
 
     /**
@@ -122,7 +124,12 @@
       var month = targetDate.getMonth();
 
       targetDate.setMonth(month + 1);
-      this._focusDate = targetDate;
+
+      if (this._withinValidRange(targetDate)) {
+        this._focusDate = targetDate;
+      } else {
+        this._focusDate = this.maxDate;
+      }
     },
 
     /**
@@ -133,7 +140,12 @@
       var month = targetDate.getMonth();
 
       targetDate.setMonth(month - 1);
-      this._focusDate = targetDate;
+
+      if (this._withinValidRange(targetDate)) {
+        this._focusDate = targetDate;
+      } else {
+        this._focusDate = this.minDate;
+      }
     },
 
     /**
@@ -147,9 +159,6 @@
      * When the focusDate changes
      */
     _focusDateChanged: function (newValue, oldValue) {
-      this.currentYear = newValue.getFullYear();
-      this.currentMonth = newValue.getMonth() + 1;
-
       var oldFocusElement = this.$$('#' + this._getDayId(oldValue || this.date));
       var newFocusElement = this.$$('#' + this._getDayId(newValue));
 

@@ -26,7 +26,7 @@
       <h1>{{dateFormat(date, 'LL')}}</h1>
       <paper-button class="btn" on-tap="showDialog" raised>Change Date</paper-button>
       <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog" aria-label="clear">
-        <paper-date-picker id="picker" date="[[date]]"></paper-date-picker>
+        <paper-date-picker id="picker" date="[[date]]" min-date="[[minDate]]" max-date="[[maxDate]]"></paper-date-picker>
         <div class="buttons">
           <paper-button dialog-dismiss>Cancel</paper-button>
           <paper-button dialog-confirm>OK</paper-button>
@@ -50,6 +50,8 @@
       };
       document.addEventListener('WebComponentsReady', function() {
         scope.date = new Date(2017, 3, 13);
+        scope.minDate = new Date(2017, 1, 13);
+        scope.maxDate = new Date(2017, 4, 13);
         scope.showDialog();
       });
     });

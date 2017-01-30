@@ -10,9 +10,16 @@
   var RESIST_LENGTH = 40;
   var RESIST_FACTOR = 2;
 
-  var ANIMATING = false;
-
   window.PaperCalendarBehaviors = window.PaperCalendarBehaviors || {};
+
+  /**
+   *   `PaperCalendarBehaviors.TrackBehavior` is meant to be put on components that want to incorporate user input tracking functionality
+   *
+   *    @demo demo/index.html
+   *    @element track-behavior
+   *    @polymerBehavior
+   */
+
   window.PaperCalendarBehaviors.TrackBehavior = {
     ready: function () {
       this._transitionEvent = this._whichTransitionEnd();
@@ -46,7 +53,6 @@
           if (cb) {
             cb();
           }
-          ANIMATING = false;
         }.bind(this), this.$.months);
         this.set('_contentClass', 'animating ' + transition);
         this.$.monthNav.style.removeProperty('opacity');

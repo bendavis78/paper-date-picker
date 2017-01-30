@@ -17,6 +17,15 @@
   //        tried to do it unsuccessfully with dynamicly linking the aria-labelledby
 
   window.PaperCalendarBehaviors = window.PaperCalendarBehaviors || {};
+
+  /**
+   *   `PaperCalendarBehaviors.A11yBehavior` is meant to be put on components that want to incorporate a11y for the calendar layout
+   *
+   *    @demo demo/index.html
+   *    @element a11y-behavior
+   *    @polymerBehavior
+   */
+
   window.PaperCalendarBehaviors.A11yBehavior = {
     listeners: {
       'months.keydown': '_keyHandler'

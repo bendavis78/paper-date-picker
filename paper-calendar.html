@@ -642,6 +642,7 @@
         }
         var item = event.model.item;
         var newDate = new Date(this.date.getTime());
+        newDate.setDate(1);
         newDate.setYear(item.year);
         newDate.setMonth(item.month);
         newDate.setDate(item.day);

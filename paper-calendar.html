@@ -551,11 +551,12 @@
         }
 
         var item = event.model.item;
-        var newDate = new Date(this.date.getTime());
-        newDate.setDate(1);
-        newDate.setYear(item.year);
-        newDate.setMonth(item.month);
-        newDate.setDate(item.day);
+        var newDate = new Date(item.year, item.month, item.day);
+        if (this.date.getMilliseconds() === 0) {
+          // hack to make sure date comparison never gets equality
+          // so that tap on currently selected date worked as expected
+          newDate.setMilliseconds(1);
+        }
         this.currentDay = item.day;
         this.date = newDate;
       },

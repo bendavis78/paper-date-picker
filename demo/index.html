@@ -20,13 +20,14 @@
     }
   </style>
 </head>
+
 <body unresolved>
   <template is="dom-bind" id="scope">
     <section>
       <h1>{{dateFormat(date, 'LL')}}</h1>
       <paper-button class="btn" on-tap="showDialog" raised>Change Date</paper-button>
-      <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog">
-        <paper-date-picker id="picker" date="[[date]]"></paper-date-picker>
+      <paper-dialog id="dialog" class="paper-date-picker-dialog" modal on-iron-overlay-closed="dismissDialog" aria-label="clear">
+        <paper-date-picker id="picker" date="[[date]]" min-date="[[minDate]]" max-date="[[maxDate]]"></paper-date-picker>
         <div class="buttons">
           <paper-button dialog-dismiss>Cancel</paper-button>
           <paper-button dialog-confirm>OK</paper-button>
@@ -35,21 +36,23 @@
     </section>
   </template>
   <script>
-    HTMLImports.whenReady(function() {
+    HTMLImports.whenReady(function () {
       var scope = Polymer.dom(document).querySelector('#scope');
-      scope.dateFormat = function(date, format) {
+      scope.dateFormat = function (date, format) {
         return moment(date).format(format);
       };
-      scope.dismissDialog = function(event) {
+      scope.dismissDialog = function (event) {
         if (event.detail.confirmed) {
           scope.date = scope.$.picker.date;
         }
       };
-      scope.showDialog = function() {
+      scope.showDialog = function () {
         this.$.dialog.toggle();
       };
-      document.addEventListener('WebComponentsReady', function() {
-        scope.date = new Date(2017, 3, 13);
+      document.addEventListener('WebComponentsReady', function () {
+        scope.date = new Date(2018, 0, 24);
+        scope.minDate = new Date(2017, 10, 20);
+        scope.maxDate = new Date(2018, 3, 20);
         scope.showDialog();
       });
     });

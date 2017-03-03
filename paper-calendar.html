@@ -140,7 +140,13 @@
         height: 100%;
         width: 100%;
         display: inline-block;
+
+        @apply --paper-calendar-day-item;
       }
+
+       .day-item .day {
+         @apply --paper-calendar-day;
+       }
 
       .day-item.blank {
         outline: 0;

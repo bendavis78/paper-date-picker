@@ -15,618 +15,637 @@
 <link rel="import" href="behaviors/a11y-behavior.html">
 
 <dom-module id="paper-calendar">
-  <template>
-    <style>
-       :host {
-        display: block;
-        box-sizing: border-box;
-        padding: 12px 0;
-        position: relative;
-        width: 100%;
-        height: 100%;
-        min-width: 160px;
-        min-height: 160px;
-        color: var(--primary-text-color);
-        -webkit-font-smoothing: antialiased;
-        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-        --ease-in-sine: cubic-bezier(0.47, 0, 0.745, 0.715);
-        --ease-out-sine: cubic-bezier(0.39, 0.575, 0.565, 1);
-        @apply --paper-font-body1;
-        @apply --paper-calendar;
-        overflow: hidden;
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        @apply --paper-calendar;
-      }
+    <template>
+        <style>
+            :host {
+                display: block;
+                box-sizing: border-box;
+                padding: 12px 0;
+                position: relative;
+                width: 100%;
+                height: 100%;
+                min-width: 160px;
+                min-height: 160px;
+                color: var(--primary-text-color);
+                -webkit-font-smoothing: antialiased;
+                -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+                --ease-in-sine: cubic-bezier(0.47, 0, 0.745, 0.715);
+                --ease-out-sine: cubic-bezier(0.39, 0.575, 0.565, 1);
+                @apply --paper-font-body1;
+                @apply --paper-calendar;
+                overflow: hidden;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                @apply --paper-calendar;
+            }
 
-      #calendar {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        @apply --layout-horizontal;
-      }
+            #calendar {
+                position: relative;
+                width: 100%;
+                height: 100%;
+                @apply --layout-horizontal;
+            }
 
-      #months {
-        height: 100%;
-        @apply --layout-horizontal;
-      }
+            #months {
+                height: 100%;
+                @apply --layout-horizontal;
+            }
 
-      #months.animating .month-nav {
-        opacity: 1;
-      }
+            #months.animating .month-nav {
+                opacity: 1;
+            }
 
-      #months.animating {
-        transition-property: transform, opacity;
-        transition-duration: 300ms;
-      }
+            #months.animating {
+                transition-property: transform, opacity;
+                transition-duration: 300ms;
+            }
 
-      #months.animating.swipe {
-        transition-timing-function: var(--ease-in-sine);
-        --webkit-transition-timing-function: var(--ease-in-sine);
-      }
+            #months.animating.swipe {
+                transition-timing-function: var(--ease-in-sine);
+                --webkit-transition-timing-function: var(--ease-in-sine);
+            }
 
-      #months.animating.reset {
-        transition-timing-function: var(--ease-out-sine);
-        --webkit-transition-timing-function: var(--ease-out-sine);
-      }
+            #months.animating.reset {
+                transition-timing-function: var(--ease-out-sine);
+                --webkit-transition-timing-function: var(--ease-out-sine);
+            }
 
-      .month {
-        height: 100%;
-        width: 100%;
-      }
+            .month {
+                height: 100%;
+                width: 100%;
+            }
 
-      .weeks-container {
-        display: table;
-        height: calc(100%*7/8);
-        width: 100%;
-      }
+            .weeks-container {
+                display: table;
+                height: calc(100% * 7 / 8);
+                width: 100%;
+            }
 
-      .month-row {
-        display: table-row;
-      }
+            .month-row {
+                display: table-row;
+            }
 
-      .month-cell {
-        vertical-align: middle;
-        text-align: center;
-      }
+            .month-cell {
+                vertical-align: middle;
+                text-align: center;
+            }
 
-      .month-nav {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        opacity: 1;
-        z-index: 1;
-        @apply --layout-horizontal;
-        @apply --layout-center;
-      }
+            .month-nav {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                opacity: 1;
+                z-index: 1;
+                @apply --layout-horizontal;
+                @apply --layout-center;
+            }
 
-      .month-name {
-        height: calc(100%/8);
-        box-sizing: border-box;
-        padding: 0 calc(100%/36);
-        line-height: 24px;
-        vertical-align: middle;
-        text-align: center;
-        font-weight: bold;
-        @apply --paper-font-body2;
-        @apply --layout-horizontal;
-        @apply --layout-center;
-        @apply --layout-center-justified;
-        @apply --layout-flex;
-      }
+            .month-name {
+                height: calc(100% / 8);
+                box-sizing: border-box;
+                padding: 0 calc(100% / 36);
+                line-height: 24px;
+                vertical-align: middle;
+                text-align: center;
+                font-weight: bold;
+                @apply --paper-font-body2;
+                @apply --layout-horizontal;
+                @apply --layout-center;
+                @apply --layout-center-justified;
+                @apply --layout-flex;
+            }
 
-      .month-weekdays {
-        color: var(--secondary-text-color);
-      }
+            .month-weekdays {
+                color: var(--secondary-text-color);
+            }
 
-      .month-cell {
-        display: table-cell;
-        padding: 0;
-      }
+            .month-cell {
+                display: table-cell;
+                padding: 0;
+            }
 
-      .month-cell .day {
-        cursor: default;
-        pointer-events: none;
-        line-height: 200%;
-      }
+            .month-cell .day {
+                cursor: default;
+                pointer-events: none;
+                line-height: 200%;
+            }
 
-      .day-item {
-        border-radius: 100%;
-        height: 100%;
-        width: 100%;
-        display: inline-block;
-      }
+            .day-item {
+                border-radius: 100%;
+                height: 100%;
+                width: 100%;
+                display: inline-block;
 
-      .day-item.blank {
-        outline: 0;
-      }
+                @apply --paper-calendar-day-item;
+            }
 
-      .day-item::selection {
-        background: none;
-      }
+            .day-item .day {
+                @apply --paper-calendar-day;
+            }
 
-      .day-item.selected {
-        background: var(--default-primary-color);
-      }
+            .day-item.blank {
+                outline: 0;
+            }
 
-      .day-item.selected .day {
-        color: var(--text-primary-color);
-      }
+            .day-item::selection {
+                background: none;
+            }
 
-      .day-item:not([disabled]) {
-        cursor: pointer;
-      }
+            .day-item.selected {
+                background: var(--default-primary-color);
+            }
 
-      .day-item[disabled] .day {
-        color: var(--text-disabled-color, #9d9d9d);
-      }
+            .day-item.selected .day {
+                color: var(--text-primary-color);
+            }
 
-      .day-item.today .day {
-        font-weight: bold;
-        color: var(--default-primary-color);
-      }
+            .day-item:not([disabled]) {
+                cursor: pointer;
+            }
 
-      .day-item.selected.today .day {
-        color: var(--text-primary-color);
-      }
-    </style>
-    <div id="calendar" aria-live="assertive">
-      <paper-calendar-month-navigation id="monthNav" class="month-nav" label-previous="[[labelPreviousMonth]]" label-next="[[labelNextMonth]]"></paper-calendar-month-navigation>
-      <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
-        <template is="dom-repeat" items="{{_months}}" as="month">
-          <div class$="{{_getMonthClass('month', month)}}">
-            <div class="month-name" role="heading" aria-labelledby$="month-label-[[month.month]]-[[month.year]]">
-              <span id="month-label-[[month.month]]-[[month.year]]" aria-live="assertive" aria-atomic="true">{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
-            </div>
-            <div class="weeks-container" role="grid">
-              <div class="month-weekdays month-row week" aria-hidden="true">
-                <template is="dom-repeat" items="{{_weekdays}}">
-                  <div class="month-cell" role="columnheader">
-                    <div class="day">{{item.0}}</div>
-                  </div>
-                </template>
-              </div>
-              <template is="dom-repeat" items="{{month.weeks}}" as="row">
-                <div class="month-days month-row" role="row">
-                  <template is="dom-repeat" items="{{row}}" as="item">
-                    <div class="month-cell" role="gridcell">
-                      <div id$="{{_getDayId(item.date)}}" class$="{{_getDayClass('day-item selection', item.date, today, date)}}" aria-live="assertive" aria-label$="{{_getAriaDayLabel(item.date, locale)}}" aria-selected$="{{_isSameDate(item.date, date)}}" tabindex$="{{_getTabIndex(item.date, date)}}" on-tap="_tapDay" disabled$="{{_getDisabledState(item.day, item.date, minDate, maxDate)}}">
-                        <div class="day" aria-hidden="true">{{item.day}}</div>
-                      </div>
+            .day-item[disabled] .day {
+                color: var(--text-disabled-color, #9d9d9d);
+            }
+
+            .day-item.today .day {
+                font-weight: bold;
+                color: var(--default-primary-color);
+            }
+
+            .day-item.selected.today .day {
+                color: var(--text-primary-color);
+            }
+        </style>
+        <div id="calendar" aria-live="assertive">
+            <paper-calendar-month-navigation id="monthNav" class="month-nav" label-previous="[[labelPreviousMonth]]"
+                                             label-next="[[labelNextMonth]]"></paper-calendar-month-navigation>
+            <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
+                <template is="dom-repeat" items="{{_months}}" as="month">
+                    <div class$="{{_getMonthClass('month', month)}}">
+                        <div class="month-name" role="heading"
+                             aria-labelledby$="month-label-[[month.month]]-[[month.year]]">
+                            <span id="month-label-[[month.month]]-[[month.year]]" aria-live="assertive"
+                                  aria-atomic="true">{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
+                        </div>
+                        <div class="weeks-container" role="grid">
+                            <div class="month-weekdays month-row week" aria-hidden="true">
+                                <template is="dom-repeat" items="{{_weekdays}}">
+                                    <div class="month-cell" role="columnheader">
+                                        <div class="day">{{item.0}}</div>
+                                    </div>
+                                </template>
+                            </div>
+                            <template is="dom-repeat" items="{{month.weeks}}" as="row">
+                                <div class="month-days month-row" role="row">
+                                    <template is="dom-repeat" items="{{row}}" as="item">
+                                        <div class="month-cell" role="gridcell">
+                                            <div id$="{{_getDayId(item.date)}}"
+                                                 class$="{{_getDayClass('day-item selection', item.date, today, date)}}"
+                                                 aria-live="assertive"
+                                                 aria-label$="{{_getAriaDayLabel(item.date, locale)}}"
+                                                 aria-selected$="{{_isSameDate(item.date, date)}}"
+                                                 tabindex$="{{_getTabIndex(item.date, date)}}" on-tap="_tapDay"
+                                                 disabled$="{{_getDisabledState(item.day, item.date, minDate, maxDate)}}">
+                                                <div class="day" aria-hidden="true">{{item.day}}</div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
                     </div>
-                  </template>
-                </div>
-              </template>
+                </template>
             </div>
-          </div>
-        </template>
-      </div>
-    </div>
-  </template>
-  <script>
-    /* global PaperCalendarBehaviors */
+        </div>
+    </template>
+    <script>
 
-    /**
-     * Number of months to pre-render on both sides of the current month
-     */
-    var PRERENDER_MONTHS = 1;
-
-    Polymer({
-      is: 'paper-calendar',
-
-      behaviors: [
-        Polymer.IronResizableBehavior, PaperCalendarBehaviors.TrackBehavior, PaperCalendarBehaviors.A11yBehavior
-      ],
-
-      observers: ['_populate(currentYear, currentMonth, minDate, maxDate, locale)'],
-
-      listeners: {
-        'iron-resize': '_resizeHandler',
-        'swiped': '_onSwipe',
-        'monthNav.navigate': '_onMonthNavigation',
-        'scroll': '_resetScroll'
-      },
-
-      properties: {
-        /**
-         * The selected date
-         */
-        date: {
-          type: Date,
-          notify: true,
-          value: function () {
-            return new Date();
-          },
-          observer: '_dateChanged'
-        },
+    (function () {
+        /* global PaperCalendarBehaviors */
 
         /**
-         * The current locale
+         * Number of months to pre-render on both sides of the current month
          */
-        locale: {
-          type: String,
-          value: 'en',
-          notify: true,
-          observer: '_localeChanged'
-        },
+        var PRERENDER_MONTHS = 1;
 
-        /**
-         * The minimum allowed date
-         */
-        minDate: {
-          type: Date,
-          value: null
-        },
+        Polymer({
+            is: 'paper-calendar',
 
-        /**
-         * The maximum allowed date
-         */
-        maxDate: {
-          type: Date,
-          value: null
-        },
+            behaviors: [
+                Polymer.IronResizableBehavior, PaperCalendarBehaviors.TrackBehavior, PaperCalendarBehaviors.A11yBehavior
+            ],
 
-        /**
-         * The current selected day
-         * @type {Number}
-         */
-        currentDay: {
-          type: Number
-        },
+            observers: ['_populate(currentYear, currentMonth, minDate, maxDate, locale)'],
 
-        /**
-         * The currently selected month (1-12)
-         */
-        currentMonth: {
-          type: Number
-        },
+            listeners: {
+                'iron-resize': '_resizeHandler',
+                'swiped': '_onSwipe',
+                'monthNav.navigate': '_onMonthNavigation',
+                'scroll': '_resetScroll'
+            },
 
-        /**
-         * The currently selected year
-         */
-        currentYear: {
-          type: Number
-        },
+            properties: {
+                /**
+                 * The selected date
+                 */
+                date: {
+                    type: Date,
+                    notify: true,
+                    value: function () {
+                        return new Date();
+                    },
+                    observer: '_dateChanged'
+                },
 
-        labelNextMonth: {
-          type: String
-        },
+                /**
+                 * The current locale
+                 */
+                locale: {
+                    type: String,
+                    value: 'en',
+                    notify: true,
+                    observer: '_localeChanged'
+                },
 
-        labelPreviousMonth: {
-          type: String
-        },
+                /**
+                 * The minimum allowed date
+                 */
+                minDate: {
+                    type: Date,
+                    value: null
+                },
 
-        /**
-         * Private variables
-         */
-        _contentClass: String,
-        _months: Array,
-        _firstDayOfWeek: Number,
-        _activeWeekDescendant: String
-      },
+                /**
+                 * The maximum allowed date
+                 */
+                maxDate: {
+                    type: Date,
+                    value: null
+                },
 
-      ready: function () {
-        this._updateToday();
-        this.currentMonth = this.date.getMonth() + 1;
-        this.currentYear = this.date.getFullYear();
-      },
+                /**
+                 * The current selected day
+                 * @type {Number}
+                 */
+                currentDay: {
+                    type: Number
+                },
 
-      dateFormat: function (date, format, locale) {
-        if (!date) {
-          return '';
-        }
-        var value = moment(date);
+                /**
+                 * The currently selected month (1-12)
+                 */
+                currentMonth: {
+                    type: Number
+                },
 
-        return value.locale(locale || this.locale).format(format);
-      },
+                /**
+                 * The currently selected year
+                 */
+                currentYear: {
+                    type: Number
+                },
 
-      /**
-       *
-       * PRIVATE
-       *
-       */
+                labelNextMonth: {
+                    type: String
+                },
 
-      _isSameDate: function (dateA, dateB) {
-        return dateA && dateB && dateA.toDateString() === dateB.toDateString();
-      },
+                labelPreviousMonth: {
+                    type: String
+                },
 
-      _localeChanged: function (locale) {
-        var localeMoment = moment();
-        var weekdays = [];
+                /**
+                 * Private variables
+                 */
+                _contentClass: String,
+                _months: Array,
+                _firstDayOfWeek: Number,
+                _activeWeekDescendant: String
+            },
 
-        localeMoment.locale(locale);
+            ready: function () {
+                this._updateToday();
+                this.currentMonth = this.date.getMonth() + 1;
+                this.currentYear = this.date.getFullYear();
+            },
 
-        for (var i = 0; i < 7; i++) {
-          weekdays.push(localeMoment.weekday(i).format('dd'));
-        }
-        this._weekdays = weekdays;
-        this._firstDayOfWeek = localeMoment.weekday(0).format('d');
-      },
+            dateFormat: function (date, format, locale) {
+                if (!date) {
+                    return '';
+                }
+                var value = moment(date);
 
-      _generateMonthData: function (date) {
-        var month = date.getMonth();
-        var day = 1;
-        var d;
-        var dayInfo;
+                return value.locale(locale || this.locale).format(format);
+            },
 
-        var monthData = {
-          year: date.getFullYear(),
-          month: date.getMonth() + 1,
-          date: new Date(date)
-        };
-        var weeks = [
-          []
-        ];
+            /**
+             *
+             * PRIVATE
+             *
+             */
 
-        if (!this._monthWithinValidRange(monthData.year, monthData.month)) {
-          return false;
-        }
+            _isSameDate: function (dateA, dateB) {
+                return dateA && dateB && dateA.toDateString() === dateB.toDateString();
+            },
 
-        // add "padding" days
-        var firstDay = date.getDay() - this._firstDayOfWeek;
-        if (firstDay < 0) {
-          firstDay = 7 + firstDay;
-        }
-        for (d = 0; d < firstDay; d++) {
-          weeks[0].push({ day: null, date: null });
-        }
+            _localeChanged: function (locale) {
+                var localeMoment = moment();
+                var weekdays = [];
 
-        // add actual days
-        while (date.getMonth() === month) {
-          if (weeks[0].length && d % 7 === 0) {
-            // start new week
-            weeks.push([]);
-          }
-          dayInfo = {
-            date: new Date(date.getFullYear(), month, day),
-            name: this.dateFormat(date, 'YYYY-MM-DD'),
-            year: date.getFullYear(),
-            month: month,
-            day: day
-          };
-          weeks[weeks.length - 1].push(dayInfo);
-          date.setDate(++day);
-          d++;
-        }
+                localeMoment.locale(locale);
 
-        // add remaining "padding" days
-        while (d < 42) {
-          if (d % 7 === 0) {
-            weeks.push([]);
-          }
-          weeks[weeks.length - 1].push({ day: null, date: null });
-          d += 1;
-        }
+                for (var i = 0; i < 7; i++) {
+                    weekdays.push(localeMoment.weekday(i).format('dd'));
+                }
+                this._weekdays = weekdays;
+                this._firstDayOfWeek = localeMoment.weekday(0).format('d');
+            },
 
-        monthData.weeks = weeks;
-        return monthData;
-      },
+            _generateMonthData: function (date) {
+                var month = date.getMonth();
+                var day = 1;
+                var d;
+                var dayInfo;
 
-      _populate: function (currentYear, currentMonth, minDate, maxDate) {
-        var monthData;
-        var months = [];
+                var monthData = {
+                    year: date.getFullYear(),
+                    month: date.getMonth() + 1,
+                    date: new Date(date)
+                };
+                var weeks = [
+                    []
+                ];
 
-        // Make sure currentYear/currentMonth are in min/max range
-        if (minDate && new Date(currentYear, currentMonth, 0) < minDate) {
-          this.currentYear = minDate.getFullYear();
-          this.currentMonth = minDate.getMonth() + 1;
-          return;
-        } else if (maxDate && new Date(currentYear, currentMonth - 1, 1) > maxDate) {
-          this.currentYear = maxDate.getFullYear();
-          this.currentMonth = maxDate.getMonth() + 1;
-          return;
-        }
+                if (!this._monthWithinValidRange(monthData.year, monthData.month)) {
+                    return false;
+                }
 
-        for (var i = -PRERENDER_MONTHS; i <= PRERENDER_MONTHS; i++) {
-          monthData = this._generateMonthData(new Date(currentYear, currentMonth - 1 + i, 1));
+                // add "padding" days
+                var firstDay = date.getDay() - this._firstDayOfWeek;
+                if (firstDay < 0) {
+                    firstDay = 7 + firstDay;
+                }
+                for (d = 0; d < firstDay; d++) {
+                    weeks[0].push({day: null, date: null});
+                }
 
-          if (monthData) {
-            months.push(monthData);
-          }
-        }
+                // add actual days
+                while (date.getMonth() === month) {
+                    if (weeks[0].length && d % 7 === 0) {
+                        // start new week
+                        weeks.push([]);
+                    }
+                    dayInfo = {
+                        date: new Date(date.getFullYear(), month, day),
+                        name: this.dateFormat(date, 'YYYY-MM-DD'),
+                        year: date.getFullYear(),
+                        month: month,
+                        day: day
+                    };
+                    weeks[weeks.length - 1].push(dayInfo);
+                    date.setDate(++day);
+                    d++;
+                }
 
-        if (!months.length) {
-          return;
-        }
-        this.set('_months', months);
+                // add remaining "padding" days
+                while (d < 42) {
+                    if (d % 7 === 0) {
+                        weeks.push([]);
+                    }
+                    weeks[weeks.length - 1].push({day: null, date: null});
+                    d += 1;
+                }
 
-        this.async(function () {
-          this._recalculateSelectionCircle();
-          this._positionMonths();
+                monthData.weeks = weeks;
+                return monthData;
+            },
+
+            _populate: function (currentYear, currentMonth, minDate, maxDate) {
+                var monthData;
+                var months = [];
+
+                // Make sure currentYear/currentMonth are in min/max range
+                if (minDate && new Date(currentYear, currentMonth, 0) < minDate) {
+                    this.currentYear = minDate.getFullYear();
+                    this.currentMonth = minDate.getMonth() + 1;
+                    return;
+                } else if (maxDate && new Date(currentYear, currentMonth - 1, 1) > maxDate) {
+                    this.currentYear = maxDate.getFullYear();
+                    this.currentMonth = maxDate.getMonth() + 1;
+                    return;
+                }
+
+                for (var i = -PRERENDER_MONTHS; i <= PRERENDER_MONTHS; i++) {
+                    monthData = this._generateMonthData(new Date(currentYear, currentMonth - 1 + i, 1));
+
+                    if (monthData) {
+                        months.push(monthData);
+                    }
+                }
+
+                if (!months.length) {
+                    return;
+                }
+                this.set('_months', months);
+
+                this.async(function () {
+                    this._recalculateSelectionCircle();
+                    this._positionMonths();
+                });
+            },
+
+            _setActiveWeekDescendant: function (date) {
+                this._activeWeekDescendant = this._getDayId(date);
+            },
+
+            _getDayId: function (date) {
+                if (date) {
+                    return 'day-' + date.getDate() + '-' + (date.getMonth() + 1);
+                }
+            },
+
+            _getDayClass: function (cssClass, date) {
+                if (date) {
+                    if (this._isSameDate(date, this.today)) {
+                        cssClass += ' today';
+                    }
+                    if (this._isSameDate(date, this.date)) {
+                        cssClass += ' selected';
+                        this.async(function () {
+                            this._recalculateSelectionCircle();
+                        });
+                    }
+                } else {
+                    cssClass += ' blank';
+                }
+                return cssClass;
+            },
+
+            _getTabIndex: function (date) {
+                return this._isSameDate(date, this._focusDate) ?
+                        0 :
+                        -1;
+            },
+
+            _getDisabledState: function (day, date) {
+                return !day || !this._withinValidRange(date);
+            },
+
+            _getMonthClass: function (name, month) {
+                return name + ' month-' + month.year + '-' + month.month;
+            },
+
+            _getMonthIdx: function (pos) {
+                // returns the index for the visible month according to the given position
+                var width = this._containerWidth;
+                var i = Math.floor((-pos + (width / 2)) / width);
+                return i < 0 ?
+                        0 :
+                        i;
+            },
+
+            _onMonthNavigation: function (event) {
+                if (event.direction === 'previous') {
+                    this._swipePrevMonth(this._focusToPreviousMonth.bind(this));
+                } else {
+                    this._swipeNextMonth(this._focusToNextMonth.bind(this));
+                }
+            },
+
+            _onSwipe: function (event) {
+                if (event.detail.direction === 'right') {
+                    this._prevMonth();
+                } else {
+                    this._nextMonth();
+                }
+            },
+
+            _incrMonth: function (i) {
+                var date = new Date(this.currentYear, this.currentMonth - 1 + i);
+                var year = date.getFullYear();
+                var month = date.getMonth() + 1;
+                if (this._monthWithinValidRange(year, month)) {
+                    this.currentYear = year;
+                    this.currentMonth = month;
+                }
+            },
+
+            _prevMonth: function () {
+                this._incrMonth(-1);
+            },
+
+            _nextMonth: function () {
+                this._incrMonth(1);
+            },
+
+            _dateChanged: function (date, oldValue) {
+                if (!this._isValidDate(date)) {
+                    console.warn('Invalid date: ' + date);
+                    this.date = oldValue;
+                }
+                if (!this._withinValidRange(date)) {
+                    console.warn('Date outside of valid range: ' + date);
+                    this.date = oldValue;
+                }
+                this.currentYear = this.date.getFullYear();
+                this.currentMonth = this.date.getMonth() + 1;
+                // Only trigger a notification if there actually is a difference.
+                if (oldValue && this.date.getTime && oldValue.getTime && this.date.getTime() === oldValue.getTime()) {
+                    return;
+                }
+                this._recalculateSelectionCircle();
+                this._setActiveWeekDescendant(this.date);
+                this._focusDate = this.date;
+                this.dispatchEvent(new Event('change', {bubbles: true}));
+            },
+
+            _tapDay: function (event) {
+                if (!this._withinValidRange(event.model.item.date)) {
+                    return false;
+                }
+
+                var item = event.model.item;
+                var newDate = new Date(item.year, item.month, item.day);
+                if (this.date.getMilliseconds() === 0) {
+                    // hack to make sure date comparison never gets equality
+                    // so that tap on currently selected date worked as expected
+                    newDate.setMilliseconds(1);
+                }
+                this.currentDay = item.day;
+                this.date = newDate;
+            },
+
+            _isValidDate: function (date) {
+                return date && date.getTime && !isNaN(date.getTime());
+            },
+
+            _withinValidRange: function (date) {
+                return this._isValidDate(date) &&
+                        (!this.minDate || date >= this.minDate) && (!this.maxDate || date <= this.maxDate);
+            },
+
+            _monthWithinValidRange: function (year, month) {
+                var monthStart = new Date(year, month - 1, 1);
+                var monthEnd = new Date(year, month, 0);
+                return this._withinValidRange(monthStart) || this._withinValidRange(monthEnd);
+            },
+
+            _positionMonths: function () {
+                if (!this._months || !this._containerWidth) {
+                    return;
+                }
+                this._scrollWidth = (this.$.calendar.offsetWidth * this._months.length);
+                this.$.months.style.minWidth = this._scrollWidth + 'px';
+                var i = ((this.currentYear * 12) + this.currentMonth) - ((this._months[0].year * 12) + this._months[0].month);
+                this._translateX(-i * this._containerWidth);
+            },
+
+            /**
+             * Force the day selection circle to maintain an 1:1 ratio
+             */
+            _recalculateSelectionCircle: function () {
+                var selected = this.$$('.day-item.selected');
+                if (!selected) {
+                    return;
+                }
+                selected.style.height = '';
+                selected.style.width = '';
+                var w = selected.parentElement.offsetWidth;
+                var h = selected.parentElement.offsetHeight;
+                window.requestAnimationFrame(function () {
+                    if (w > 0 && w < h) {
+                        selected.style.height = w + 'px';
+                    } else if (h > 0) {
+                        selected.style.width = (h / w) * 100 + '%';
+                    }
+                });
+            },
+
+            _resizeHandler: function () {
+                this._containerWidth = this.$.calendar.offsetWidth;
+                this._positionMonths();
+                this._recalculateSelectionCircle();
+            },
+
+            _resetScroll: function () {
+                this.scrollTop = 0;
+                this.scrollLeft = 0;
+            },
+
+            _getDayName: function (date) {
+                return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+            },
+
+            _updateToday: function () {
+                this.today = new Date();
+                this.today.setHours(0, 0, 0, 0);
+            }
         });
-      },
 
-      _setActiveWeekDescendant: function (date) {
-        this._activeWeekDescendant = this._getDayId(date);
-      },
-
-      _getDayId: function (date) {
-        if (date) {
-          return 'day-' + date.getDate() + '-' + (date.getMonth() + 1);
-        }
-      },
-
-      _getDayClass: function (cssClass, date) {
-        if (date) {
-          if (this._isSameDate(date, this.today)) {
-            cssClass += ' today';
-          }
-          if (this._isSameDate(date, this.date)) {
-            cssClass += ' selected';
-            this.async(function () {
-              this._recalculateSelectionCircle();
-            });
-          }
-        } else {
-          cssClass += ' blank';
-        }
-        return cssClass;
-      },
-
-      _getTabIndex: function (date) {
-        return this._isSameDate(date, this._focusDate) ?
-          0 :
-          -1;
-      },
-
-      _getDisabledState: function (day, date) {
-        return !day || !this._withinValidRange(date);
-      },
-
-      _getMonthClass: function (name, month) {
-        return name + ' month-' + month.year + '-' + month.month;
-      },
-
-      _getMonthIdx: function (pos) {
-        // returns the index for the visible month according to the given position
-        var width = this._containerWidth;
-        var i = Math.floor((-pos + (width / 2)) / width);
-        return i < 0 ?
-          0 :
-          i;
-      },
-
-      _onMonthNavigation: function (event) {
-        if (event.direction === 'previous') {
-          this._swipePrevMonth(this._focusToPreviousMonth.bind(this));
-        } else {
-          this._swipeNextMonth(this._focusToNextMonth.bind(this));
-        }
-      },
-
-      _onSwipe: function (event) {
-        if (event.detail.direction === 'right') {
-          this._prevMonth();
-        } else {
-          this._nextMonth();
-        }
-      },
-
-      _incrMonth: function (i) {
-        var date = new Date(this.currentYear, this.currentMonth - 1 + i);
-        var year = date.getFullYear();
-        var month = date.getMonth() + 1;
-        if (this._monthWithinValidRange(year, month)) {
-          this.currentYear = year;
-          this.currentMonth = month;
-        }
-      },
-
-      _prevMonth: function () {
-        this._incrMonth(-1);
-      },
-
-      _nextMonth: function () {
-        this._incrMonth(1);
-      },
-
-      _dateChanged: function (date, oldValue) {
-        if (!this._isValidDate(date)) {
-          console.warn('Invalid date: ' + date);
-          this.date = oldValue;
-        }
-        if (!this._withinValidRange(date)) {
-          console.warn('Date outside of valid range: ' + date);
-          this.date = oldValue;
-        }
-        this.currentYear = this.date.getFullYear();
-        this.currentMonth = this.date.getMonth() + 1;
-        // Only trigger a notification if there actually is a difference.
-        if (oldValue && this.date.getTime && oldValue.getTime && this.date.getTime() === oldValue.getTime()) {
-          return;
-        }
-        this._recalculateSelectionCircle();
-        this._setActiveWeekDescendant(this.date);
-        this._focusDate = this.date;
-        this.dispatchEvent(new Event('change', { bubbles: true }));
-      },
-
-      _tapDay: function (event) {
-        if (!this._withinValidRange(event.model.item.date)) {
-          return false;
-        }
-
-        var item = event.model.item;
-        var newDate = new Date(item.year, item.month, item.day);
-        if (this.date.getMilliseconds() === 0) {
-          // hack to make sure date comparison never gets equality
-          // so that tap on currently selected date worked as expected
-          newDate.setMilliseconds(1);
-        }
-        this.currentDay = item.day;
-        this.date = newDate;
-      },
-
-      _isValidDate: function (date) {
-        return date && date.getTime && !isNaN(date.getTime());
-      },
-
-      _withinValidRange: function (date) {
-        return this._isValidDate(date) &&
-          (!this.minDate || date >= this.minDate) && (!this.maxDate || date <= this.maxDate);
-      },
-
-      _monthWithinValidRange: function (year, month) {
-        var monthStart = new Date(year, month - 1, 1);
-        var monthEnd = new Date(year, month, 0);
-        return this._withinValidRange(monthStart) || this._withinValidRange(monthEnd);
-      },
-
-      _positionMonths: function () {
-        if (!this._months || !this._containerWidth) {
-          return;
-        }
-        this._scrollWidth = (this.$.calendar.offsetWidth * this._months.length);
-        this.$.months.style.minWidth = this._scrollWidth + 'px';
-        var i = ((this.currentYear * 12) + this.currentMonth) - ((this._months[0].year * 12) + this._months[0].month);
-        this._translateX(-i * this._containerWidth);
-      },
-
-      /**
-       * Force the day selection circle to maintain an 1:1 ratio
-       */
-      _recalculateSelectionCircle: function () {
-        var selected = this.$$('.day-item.selected');
-        if (!selected) {
-          return;
-        }
-        selected.style.height = '';
-        selected.style.width = '';
-        var w = selected.parentElement.offsetWidth;
-        var h = selected.parentElement.offsetHeight;
-        window.requestAnimationFrame(function () {
-          if (w > 0 && w < h) {
-            selected.style.height = w + 'px';
-          } else if (h > 0) {
-            selected.style.width = (h / w) * 100 + '%';
-          }
-        });
-      },
-
-      _resizeHandler: function () {
-        this._containerWidth = this.$.calendar.offsetWidth;
-        this._positionMonths();
-        this._recalculateSelectionCircle();
-      },
-
-      _resetScroll: function () {
-        this.scrollTop = 0;
-        this.scrollLeft = 0;
-      },
-
-      _getDayName: function (date) {
-        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-      },
-
-      _updateToday: function () {
-        this.today = new Date();
-        this.today.setHours(0, 0, 0, 0);
-      }
-    });
-  </script>
+    }());
+    </script>
 </dom-module>

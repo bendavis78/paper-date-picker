@@ -1,6 +1,6 @@
 {
   "name": "paper-date-picker",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Provides a responsive date picker based on the material design spec",
   "main": "index.html",
   "devDependencies": {
@@ -44,5 +44,8 @@
   "bugs": {
     "url": "https://github.com/bendavis78/paper-date-picker/issues"
   },
+  "contributors": [
+    "Alexander Friscbbutter <alexander.frischbutter@ing.nl>"
+  ],
   "homepage": "https://github.com/bendavis78/paper-date-picker#readme"
 }

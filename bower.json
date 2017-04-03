@@ -1,8 +1,11 @@
 {
   "name": "paper-date-picker",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "authors": [
     "Ben Davis <bendavis78@gmail.com>"
+  ],
+  "contributors": [
+    "Alexander Friscbbutter <alexander.frischbutter@ing.nl>"
   ],
   "description": "Provides a responsive date picker based on the material design spec",
   "keywords": [

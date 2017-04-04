@@ -80,19 +80,19 @@
       var ady = Math.abs(dy);
       var width = this._containerWidth;
 
-      switch (event.detail.state) {
-        case 'start':
+      switch (event.type) {
+        case 'touchstart':
+        case 'mousedown':
           this._trackStart();
           break;
-
-        case 'track':
+        case 'touchmove':
+        case 'mousemove':
           this._track(dx, dy, adx, ady, width, event);
           break;
-
-        case 'end':
+        case 'touchend':
+        case 'mouseup':
           this._trackEnd(dx, dy, adx, ady, width, event);
           break;
-
         default:
           break;
       }

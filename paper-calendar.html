@@ -184,7 +184,7 @@
         <div id="calendar" aria-live="assertive">
             <paper-calendar-month-navigation id="monthNav" class="month-nav" label-previous="[[labelPreviousMonth]]"
                                              label-next="[[labelNextMonth]]"></paper-calendar-month-navigation>
-            <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
+            <div id="months" class$="{{_contentClass}}">
                 <template is="dom-repeat" items="{{_months}}" as="month">
                     <div class$="{{_getMonthClass('month', month)}}">
                         <div class="month-name" role="heading"
@@ -331,6 +331,62 @@
                 this._updateToday();
                 this.currentMonth = this.date.getMonth() + 1;
                 this.currentYear = this.date.getFullYear();
+
+                var dy, dx, isPressed = false;
+
+                var touchstart = function (e) {
+                    var ev = {
+                        type  : e.type,
+                        detail: {}
+                    };
+
+                    isPressed = true;
+
+                    dy = e.touches ? e.touches[0].clientY : e.clientY;
+                    dx = e.touches ? e.touches[0].clientX : e.clientX;
+
+                    ev.detail.dy = dy;
+                    ev.detail.dx = dx;
+
+                    this._onTrack(ev);
+                }.bind(this);
+
+                var touchmove = function (e) {
+                    if (isPressed) {
+                        var ev = {
+                            type  : e.type,
+                            detail: {}
+                        };
+
+                        ev.detail.dy = (e.touches ? e.touches[0].clientY : e.clientY) - dy;
+                        ev.detail.dx = (e.touches ? e.touches[0].clientX : e.clientX) - dx;
+
+                        this._onTrack(ev);
+                    }
+                }.bind(this);
+
+                var touchend = function (e) {
+                    isPressed = false;
+
+                    var ev = {
+                        type  : e.type,
+                        detail: {}
+                    };
+
+                    ev.detail.dy = (e.changedTouches ? e.changedTouches[0].clientY : e.clientY) - dy;
+                    ev.detail.dx = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX) - dx;
+
+                    this._onTrack(ev);
+                }.bind(this);
+
+                this.$.months.addEventListener("touchstart", touchstart);
+                this.$.months.addEventListener("mousedown", touchstart);
+
+                this.$.months.addEventListener("touchmove", touchmove);
+                this.$.months.addEventListener("mousemove", touchmove);
+
+                this.$.months.addEventListener("touchend", touchend);
+                this.$.months.addEventListener("mouseup", touchend);
             },
 
             dateFormat: function (date, format, locale) {

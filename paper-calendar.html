@@ -331,85 +331,7 @@
                 this._updateToday();
                 this.currentMonth = this.date.getMonth() + 1;
                 this.currentYear = this.date.getFullYear();
-
-                /**
-                 * we have to use mouse/touch events in stead of onTrack event which was used here before.
-                 * the problem with onTrack event is, it does not forwarding events to the paper-scrollable 
-                 * if you do touch so you are not able to scroll (up/down) the scrollable element on mobile
-                 * swipe was also handled by onTrack, thats why it was working.
-                 *
-                 * simple solution to transform event data the same way the onTrack event was returning and 
-                 * pass the data to the function and keep the logic.
-                 * 
-                 * onTrack was handling multipe event states in one event, but we don't have it any more, so 
-                 * we need to do this manualy. This is the reason for multiple functions.
-                 */
-                var dy, dx, isPressed = false;
-
-                var touchstart = function (e) {
-                    /**
-                     * it is not possible to modify the "e" variable the way I need it
-                     * also the only info is needed is type and custom detail.
-                     */
-                    var ev = {
-                        type  : e.type,
-                        detail: {}
-                    };
-                    
-                    /** save press start state to handle mouse moves only if mouse was pressed */
-                    isPressed = true;
-                    /** save positions for later use in the move function to calc the delta */
-                    dy = e.touches ? e.touches[0].clientY : e.clientY;
-                    dx = e.touches ? e.touches[0].clientX : e.clientX;
-
-                    ev.detail.dy = dy;
-                    ev.detail.dx = dx;
-
-                    this._onTrack(ev);
-                }.bind(this);
-
-                var touchmove = function (e) {
-                    /** handle events only after mouse down event was fired */
-                    if (isPressed) {
-                        var ev = {
-                            type  : e.type,
-                            detail: {}
-                        };
-                        
-                        /** calc the delta */
-                        ev.detail.dy = (e.touches ? e.touches[0].clientY : e.clientY) - dy;
-                        ev.detail.dx = (e.touches ? e.touches[0].clientX : e.clientX) - dx;
-
-                        this._onTrack(ev);
-                    }
-                }.bind(this);
-
-                var touchend = function (e) {
-                    isPressed = false;
-                    
-                    var ev = {
-                        type  : e.type,
-                        detail: {}
-                    };
-                    
-                    /** 
-                     * the touch event does not contain the touches array in the touchend event
-                     * but we have the changedTouches array, it saves the latest touch position
-                     */
-                    ev.detail.dy = (e.changedTouches ? e.changedTouches[0].clientY : e.clientY) - dy;
-                    ev.detail.dx = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX) - dx;
-
-                    this._onTrack(ev);
-                }.bind(this);
-
-                this.$.months.addEventListener("touchstart", touchstart);
-                this.$.months.addEventListener("mousedown", touchstart);
-
-                this.$.months.addEventListener("touchmove", touchmove);
-                this.$.months.addEventListener("mousemove", touchmove);
-
-                this.$.months.addEventListener("touchend", touchend);
-                this.$.months.addEventListener("mouseup", touchend);
+                this._emulateOnTrackWithScrollableFix();
             },
 
             dateFormat: function (date, format, locale) {
@@ -426,6 +348,86 @@
              * PRIVATE
              *
              */
+
+            /**
+             * We have to workaround Polymer's `onTrack` event which was used before for `#months` element.
+             * The problem is that `onTrack` does not propagate events to `paper-scrollable` if you touch
+             * on mobile platforms. The result is you are not able to scroll (up/down) the scrollable element.
+             * Swipe was also handled by `onTrack`, that's why it worked.
+             *
+             * Simplest solution is to mimic `onTrack` with fixes for scrolling and keep the rest of logic.
+             *
+             * `onTrack` handled multipe event states in one event, but we don't have it anymore, so
+             * we need to do this manualy. This is the reason for multiple functions.
+             */
+            _emulateOnTrackWithScrollableFix: function() {
+                var dy, dx, isPressed = false;
+
+                var onStart = function (e) {
+                    /**
+                     * it is not possible to modify event variable the way we need it
+                     * also the only info is needed is type and custom detail.
+                     */
+                    var ev = {
+                        type  : e.type,
+                        detail: { state: 'start' }
+                    };
+
+                    /** save press start state to handle mouse moves only if mouse was pressed */
+                    isPressed = true;
+                    /** save positions for later use in the move function to calc the delta */
+                    dy = e.touches ? e.touches[0].clientY : e.clientY;
+                    dx = e.touches ? e.touches[0].clientX : e.clientX;
+
+                    ev.detail.dy = dy;
+                    ev.detail.dx = dx;
+
+                    this._onTrack(ev);
+                }.bind(this);
+
+                var onTrack = function (e) {
+                    /** handle events only after mouse down event was fired */
+                    if (isPressed) {
+                        var ev = {
+                            type  : e.type,
+                            detail: { state: 'track' }
+                        };
+
+                        /** calc the delta */
+                        ev.detail.dy = (e.touches ? e.touches[0].clientY : e.clientY) - dy;
+                        ev.detail.dx = (e.touches ? e.touches[0].clientX : e.clientX) - dx;
+
+                        this._onTrack(ev);
+                    }
+                }.bind(this);
+
+                var onEnd = function (e) {
+                    isPressed = false;
+
+                    var ev = {
+                        type  : e.type,
+                        detail: { state: 'end' }
+                    };
+
+                    /**
+                     * the touch event does not contain the touches array in the touchend event
+                     * but we have the changedTouches array, it saves the latest touch position
+                     */
+                    ev.detail.dy = (e.changedTouches ? e.changedTouches[0].clientY : e.clientY) - dy;
+                    ev.detail.dx = (e.changedTouches ? e.changedTouches[0].clientX : e.clientX) - dx;
+
+                    this._onTrack(ev);
+                }.bind(this);
+
+                this.$.months.addEventListener("touchstart", onStart);
+                this.$.months.addEventListener("mousedown", onStart);
+
+                this.$.months.addEventListener("touchmove", onTrack);
+                this.$.months.addEventListener("mousemove", onTrack);
+
+                this.$.months.addEventListener("touchend", onEnd);
+                this.$.months.addEventListener("mouseup", onEnd);
+            },
 
             _isSameDate: function (dateA, dateB) {
                 return dateA && dateB && dateA.toDateString() === dateB.toDateString();

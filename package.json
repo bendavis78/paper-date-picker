@@ -1,6 +1,6 @@
 {
   "name": "paper-date-picker",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Provides a responsive date picker based on the material design spec",
   "main": "index.html",
   "devDependencies": {

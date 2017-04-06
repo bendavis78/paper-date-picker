@@ -1,6 +1,6 @@
-.idea
-.bowerrc
-components
-bower_components
+.idea/
+components/
+bower_components/
+node_modules/
 node_modules
-gulpfile.js
+npm-debug.log

@@ -24,17 +24,17 @@
     <style>
       /* Application of mixins to local .paper-date-picker-dialog elements */
       .paper-date-picker-dialog {
-        @apply(--paper-date-picker-dialog);
+        @apply --paper-date-picker-dialog;
       }
       .paper-date-picker-dialog > paper-date-picker {
         --paper-calendar: {
-          @apply(--paper-date-picker-dialog-calendar);
+          @apply --paper-date-picker-dialog-calendar;
         };
-        @apply(--paper-date-picker-dialog-picker);
+        @apply --paper-date-picker-dialog-picker;
       }
       .paper-date-picker-dialog > paper-date-picker:not([narrow]) {
         --paper-date-picker-heading: {
-          @apply(--paper-date-picker-dialog-heading);
+          @apply --paper-date-picker-dialog-heading;
         };
       }
     </style>

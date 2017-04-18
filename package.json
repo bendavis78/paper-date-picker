@@ -13,10 +13,10 @@
     "web-component-tester": "^4.2.2"
   },
   "scripts": {
-    "start": "./node_modules/.bin/polyserve -o",
+    "start": "polymer serve -o",
     "test": "wct --skip-selenium-install",
     "lint": "./node_modules/.bin/polylint && ./node_modules/.bin/ing-kit-quality-checker",
-    "postinstall": "bower install"
+    "postinstall": "polymer install --variants"
   },
   "repository": {
     "type": "git",

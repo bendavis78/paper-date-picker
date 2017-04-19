@@ -276,6 +276,16 @@ styling:
         this.today = this.$.calendar.today;
         this.isTouch = 'ontouchstart' in window;
         this._selectPage('chooseDate');
+        
+        /** polymer 2.0 event forwarding */
+        this.$.calendar.addEventListener("change", function(e) {
+          this.dispatchEvent(new Event('change', {bubbles: true}))
+        }.bind(this));
+
+        /** polymer 2.0 event forwarding */
+        this.$.calendar.addEventListener("cancel", function(e) {
+          this.dispatchEvent(new Event('cancel', {bubbles: true}))
+        }.bind(this));
       },
       dateFormat: function() {
         return this.$.calendar.dateFormat.apply(this.$.calendar, arguments);

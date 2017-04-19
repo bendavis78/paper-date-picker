@@ -334,6 +334,7 @@
                  * no listeners with id.event in polymer 2.0
                  */
                 this.$.monthNav.addEventListener("navigate", this._onMonthNavigation.bind(this));
+                this.$.months.addEventListener("keydown", this._keyHandler.bind(this));
             },
 
             dateFormat: function (date, format, locale) {

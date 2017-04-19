@@ -546,6 +546,11 @@
             },
 
             _dateChanged: function (date, oldValue) {
+                /** need this chek for polymer 2.0, otherwise call stack error */
+                if(!date || !oldValue) {
+                    return;
+                }
+                
                 if (!this._isValidDate(date)) {
                     console.warn('Invalid date: ' + date);
                     this.date = oldValue;

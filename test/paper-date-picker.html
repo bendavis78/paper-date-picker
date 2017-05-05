@@ -41,6 +41,7 @@
 
           it('should not swipe after the max bound', function (done) {
             // Check initialization
+            setTimeout(function () {
             expect(element.date).to.be.not.null;
             expect(element.maxDate).to.be.not.null;
 
@@ -61,6 +62,7 @@
               expect(calendar._currentPos).to.equal(-(calendar.$.months.clientWidth / 2));
               done();
             }, 500);
+            }, 1500);
           });
         });
 

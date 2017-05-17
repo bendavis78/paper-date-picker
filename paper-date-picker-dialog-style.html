@@ -1,42 +1,42 @@
-<style is="custom-style">
-/* mixin definitions */
-:root {
-  --paper-date-picker-dialog: {
-    margin: 0;
-    max-height: 520px !important;
-    overflow: hidden;
-  };
-  --paper-date-picker-dialog-picker: {
-    margin-top: 0 !important;
-    padding: 0;
-  };
-  --paper-date-picker-dialog-calendar: {
-    padding-bottom: 0;
-  };
-  --paper-date-picker-dialog-heading: {
-    margin-bottom: -62px;
-  };
-}
-</style>
-
 <dom-module id="paper-date-picker-dialog-style">
   <template>
-    <style>
-      /* Application of mixins to local .paper-date-picker-dialog elements */
-      .paper-date-picker-dialog {
-        @apply --paper-date-picker-dialog;
-      }
-      .paper-date-picker-dialog > paper-date-picker {
-        --paper-calendar: {
-          @apply --paper-date-picker-dialog-calendar;
-        };
-        @apply --paper-date-picker-dialog-picker;
-      }
-      .paper-date-picker-dialog > paper-date-picker:not([narrow]) {
-        --paper-date-picker-heading: {
-          @apply --paper-date-picker-dialog-heading;
-        };
-      }
-    </style>
+    <custom-style>
+      <style is="custom-style">
+        /* Application of mixins to local .paper-date-picker-dialog elements */
+        .paper-date-picker-dialog {
+          @apply --paper-date-picker-dialog;
+        }
+        .paper-date-picker-dialog > paper-date-picker {
+          --paper-calendar: {
+            @apply --paper-date-picker-dialog-calendar;
+          };
+          @apply --paper-date-picker-dialog-picker;
+        }
+        .paper-date-picker-dialog > paper-date-picker:not([narrow]) {
+          --paper-date-picker-heading: {
+            @apply --paper-date-picker-dialog-heading;
+          };
+        }
+
+        /* mixin definitions */
+        :root {
+          --paper-date-picker-dialog: {
+            margin: 0;
+            max-height: 520px !important;
+            overflow: hidden;
+          };
+          --paper-date-picker-dialog-picker: {
+            margin-top: 0 !important;
+            padding: 0;
+          };
+          --paper-date-picker-dialog-calendar: {
+            padding-bottom: 0;
+          };
+          --paper-date-picker-dialog-heading: {
+            margin-bottom: -62px;
+          };
+        }
+      </style>
+    </custom-style>
   </template>
 </dom-module>

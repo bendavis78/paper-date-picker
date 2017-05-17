@@ -224,7 +224,6 @@
         </div>
     </template>
     <script>
-
     (function () {
         /* global PaperCalendarBehaviors */
 
@@ -245,7 +244,6 @@
             listeners: {
                 'iron-resize': '_resizeHandler',
                 'swiped': '_onSwipe',
-                'monthNav.navigate': '_onMonthNavigation',
                 'scroll': '_resetScroll'
             },
 
@@ -331,6 +329,11 @@
                 this._updateToday();
                 this.currentMonth = this.date.getMonth() + 1;
                 this.currentYear = this.date.getFullYear();
+                /**
+                 * no listeners with id.event in polymer 2.0
+                 */
+                this.$.monthNav.addEventListener("navigate", this._onMonthNavigation.bind(this));
+                this.$.months.addEventListener("keydown", this._keyHandler.bind(this));
                 this._emulateOnTrackWithScrollableFix();
             },
 
@@ -624,6 +627,11 @@
             },
 
             _dateChanged: function (date, oldValue) {
+                /** need this chek for polymer 2.0, otherwise call stack error */
+                if(!date || !oldValue) {
+                    return;
+                }
+                
                 if (!this._isValidDate(date)) {
                     console.warn('Invalid date: ' + date);
                     this.date = oldValue;
@@ -707,9 +715,15 @@
             },
 
             _resizeHandler: function () {
-                this._containerWidth = this.$.calendar.offsetWidth;
-                this._positionMonths();
-                this._recalculateSelectionCircle();
+                /**
+                 * after upgrading to polymer 2.0 for unknown reason the offsetWidth is returning 0
+                 * was able to fix it only with setTimeout. Pray to be forgiven by the gods of javascript.
+                 */
+                setTimeout(function() {
+                    this._containerWidth = this.$.calendar.offsetWidth;
+                    this._positionMonths();
+                    this._recalculateSelectionCircle();
+                }.bind(this), 1);
             },
 
             _resetScroll: function () {

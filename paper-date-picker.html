@@ -55,99 +55,101 @@ styling:
 @demo demo/index.html
 -->
 
-<style is="custom-style" include="paper-date-picker-dialog-style">
-  /* includes dialog style at document-level for backward compatibility */
-</style>
-
 <dom-module id="paper-date-picker">
   <template>
-    <style>
-      :host {
-        -webkit-touch-callout: none;
-        -webkit-user-select: none;
-        -khtml-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-        display: inline-block;
-        color: var(--primary-text-color);
-        @apply --paper-font-body1;
-        @apply --paper-date-picker;
-      }
+    <custom-style>
+      <style is="custom-style" include="paper-date-picker-dialog-style">
+        /* includes dialog style at document-level for backward compatibility */
 
-      /** Landscape ******************/
-      #datePicker {
-        width: var(--date-picker-width, 512px);
-        height: var(--date-picker-height, 248px);
-        @apply --layout-horizontal;
-      }
-      #heading {
-        width: 168px;
-        @apply --paper-date-picker-heading;
-      }
-
-      /** Narrow *********************/
-      :host([narrow]) #datePicker {
-        width: var(--narrow-date-picker-width, 320px);
-        height: var(--narrow-date-picker-height, 428px);
-        @apply --layout-vertical;
-      }
-      :host([narrow]) #heading {
-        width: auto;
-        height: 96px;
-        padding: 16px 24px;
-      }
-
-      /** Heading ********************/
-      #heading {
-        padding: 16px;
-        box-sizing: border-box;
-        color: var(--text-primary-color);
-        background: var(--default-primary-color);
-        @apply --layout-vertical;
-        @apply --layout-around-justfied;
-      }
-      #heading .date,
-      #heading .year {
-        cursor: pointer;
-      }
-      #heading .date {
-        @apply --paper-font-display1;
-        font-weight: bold;
-        margin-top: 2px;
-        @apply --paper-date-picker-heading-date;
-      }
-      #heading div.date {
-        letter-spacing: 0.025em;
-      }
-      #heading .date span {
-        white-space: nowrap;
-      }
-      #heading .year {
-        @apply --paper-font-body2;
-        font-size: 16px;
-        @apply --paper-date-picker-heading-date;
-      }
-      #heading:not(.pg-chooseYear) .year,
-      #heading.pg-chooseYear .date {
-        color: var(--light-primary-color);
-      }
-
-      /** Calendar/Year picker ********/
-      :host([isTouch]) paper-year-list::-webkit-scrollbar {
-        width: 0 !important;
-      }
-      #pages {
-        @apply --layout-flex;
-        width: auto;
-        background: var(--default-background-color);
-      }
-      #calendar {
-        --paper-calendar: {
-          @apply --paper-date-picker-calendar;
+        :host {
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          -khtml-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+          display: inline-block;
+          color: var(--primary-text-color);
+          @apply --paper-font-body1;
+          @apply --paper-date-picker;
         }
-      }
-    </style>
+
+        /** Landscape ******************/
+        #datePicker {
+          width: var(--date-picker-width, 512px);
+          height: var(--date-picker-height, 248px);
+          @apply --layout-horizontal;
+        }
+        #heading {
+          width: 168px;
+          @apply --paper-date-picker-heading;
+        }
+
+        /** Narrow *********************/
+        :host([narrow]) #datePicker {
+          width: var(--narrow-date-picker-width, 320px);
+          height: var(--narrow-date-picker-height, 428px);
+          @apply --layout-vertical;
+        }
+        :host([narrow]) #heading {
+          width: auto;
+          height: 96px;
+          padding: 16px 24px;
+        }
+
+        /** Heading ********************/
+        #heading {
+          padding: 16px;
+          box-sizing: border-box;
+          color: var(--text-primary-color);
+          background: var(--default-primary-color);
+          @apply --layout-vertical;
+          @apply --layout-around-justfied;
+        }
+        #heading .date,
+        #heading .year {
+          cursor: pointer;
+        }
+        #heading .date {
+          @apply --paper-font-display1;
+          font-weight: bold;
+          margin-top: 2px;
+          @apply --paper-date-picker-heading-date;
+        }
+        #heading div.date {
+          letter-spacing: 0.025em;
+        }
+        #heading .date span {
+          white-space: nowrap;
+        }
+        #heading .year {
+          @apply --paper-font-body2;
+          font-size: 16px;
+          @apply --paper-date-picker-heading-date;
+        }
+        #heading:not(.pg-chooseYear) .year,
+        #heading.pg-chooseYear .date {
+          color: var(--light-primary-color);
+        }
+
+        /** Calendar/Year picker ********/
+        :host([isTouch]) paper-year-list::-webkit-scrollbar {
+          width: 0 !important;
+        }
+        #pages {
+          @apply --layout-flex;
+          width: auto;
+          background: var(--default-background-color);
+        }
+        #calendar {
+          --paper-calendar: {
+            @apply --paper-date-picker-calendar;
+          }
+        }
+
+      </style>
+    </custom-style>
+
     <iron-media-query query="{{_getMediaQuery(forceNarrow, responsiveWidth)}}" query-matches="{{_queryMatches}}"></iron-media-query>
     <div id="datePicker">
       <template is="dom-if" if="{{!noHeading}}">
@@ -276,6 +278,16 @@ styling:
         this.today = this.$.calendar.today;
         this.isTouch = 'ontouchstart' in window;
         this._selectPage('chooseDate');
+        
+        /** polymer 2.0 event forwarding */
+        this.$.calendar.addEventListener("change", function(e) {
+          this.dispatchEvent(new Event('change', {bubbles: true}))
+        }.bind(this));
+
+        /** polymer 2.0 event forwarding */
+        this.$.calendar.addEventListener("cancel", function(e) {
+          this.dispatchEvent(new Event('cancel', {bubbles: true}))
+        }.bind(this));
       },
       dateFormat: function() {
         return this.$.calendar.dateFormat.apply(this.$.calendar, arguments);

@@ -1,6 +1,6 @@
 {
   "name": "paper-date-picker",
-  "version": "1.4.2",
+  "version": "2.0.0",
   "authors": [
     "Ben Davis <bendavis78@gmail.com>",
     "Alexander Friscbbutter <alexander.frischbutter@ing.nl>"
@@ -40,7 +40,8 @@
     "paper-dialog": "PolymerElements/paper-dialog#^1.0.0",
     "paper-button": "PolymerElements/paper-button#^1.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
-    "web-component-tester": "Polymer/web-component-tester#^4.2.2"
+    "web-component-tester": "Polymer/web-component-tester#^4.2.2",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers"
   },
   "resolutions": {
     "polymer": "^1.0.0",

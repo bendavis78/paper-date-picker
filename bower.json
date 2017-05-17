@@ -46,36 +46,5 @@
   "resolutions": {
     "polymer": "^1.0.0",
     "webcomponentsjs": "^0.7.2"
-  },
-  "variants": {
-    "polymer-2.0": {
-      "dependencies": {
-        "moment-element": "bendavis78/moment-element#^1.1.1",
-        "polymer": "Polymer/polymer#2.0.0-rc.2",
-        "iron-icon": "PolymerElements/iron-icon#2.0-preview",
-        "iron-iconset-svg": "PolymerElements/iron-iconset-svg#2.0-preview",
-        "iron-flex-layout": "PolymerElements/iron-flex-layout#2.0-preview",
-        "iron-media-query": "PolymerElements/iron-media-query#2.0-preview",
-        "iron-resizable": "PolymerElements/iron-resizable-behavior#2.0-preview",
-        "iron-selector": "PolymerElements/iron-selector#2.0-preview",
-        "neon-animation": "PolymerElements/neon-animation#2.0-preview",
-        "paper-ripple": "PolymerElements/paper-ripple#2.0-preview",
-        "paper-styles": "PolymerElements/paper-styles#2.0-preview",
-        "paper-icon-button": "PolymerElements/paper-icon-button#2.0-preview",
-        "iron-list": "PolymerElements/iron-list#2.0-preview"
-      },
-      "devDependencies": {
-        "iron-component-page": "PolymerElements/iron-component-page#2.0-preview",
-        "iron-demo-helpers": "PolymerElements/iron-demo-helpers#2.0-preview",
-        "paper-dialog": "PolymerElements/paper-dialog#2.0-preview",
-        "paper-button": "PolymerElements/paper-button#2.0-preview",
-        "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
-        "web-component-tester": "Polymer/web-component-tester#^4.2.2"
-      },
-      "resolutions": {
-        "webcomponentsjs": "v1.0.0-rc.5",
-        "polymer": "^2.0.0-rc.2"
-      }
-    }
   }
 }

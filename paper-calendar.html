@@ -717,13 +717,13 @@
             _resizeHandler: function () {
                 /**
                  * after upgrading to polymer 2.0 for unknown reason the offsetWidth is returning 0
-                 * was able to fix it only with setTimeout. Pray to be forgiven by the gods of javascript (c).
+                 * was able to fix it only with setTimeout/async. Pray to be forgiven by the gods of javascript.
                  */
-                setTimeout(function() {
-                this._containerWidth = this.$.calendar.offsetWidth;
-                this._positionMonths();
-                this._recalculateSelectionCircle();
-                }.bind(this), 1)
+                this.async(function() {
+                    this._containerWidth = this.$.calendar.offsetWidth;
+                    this._positionMonths();
+                    this._recalculateSelectionCircle();
+                }.bind(this));
             },
 
             _resetScroll: function () {

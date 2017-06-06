@@ -1,8 +1,9 @@
 {
   "name": "paper-date-picker",
-  "version": "1.2.0",
+  "version": "2.0.1",
   "authors": [
-    "Ben Davis <bendavis78@gmail.com>"
+    "Ben Davis <bendavis78@gmail.com>",
+    "Alexander Friscbbutter <alexander.frischbutter@ing.nl>"
   ],
   "description": "Provides a responsive date picker based on the material design spec",
   "keywords": [
@@ -39,7 +40,8 @@
     "paper-dialog": "PolymerElements/paper-dialog#^1.0.0",
     "paper-button": "PolymerElements/paper-button#^1.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
-    "web-component-tester": "Polymer/web-component-tester#^4.2.2"
+    "web-component-tester": "Polymer/web-component-tester#^4.2.2",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers"
   },
   "resolutions": {
     "polymer": "^1.0.0",

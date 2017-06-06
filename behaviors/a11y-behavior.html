@@ -1,0 +1,179 @@
+<script>
+    var keys = {
+        ArrowUp: 38,
+        ArrowRight: 39,
+        ArrowDown: 40,
+        ArrowLeft: 37,
+        Home: 36,
+        End: 35,
+        PageUp: 33,
+        PageDown: 34,
+        Enter: 13,
+        Space: 32,
+        Escape: 27
+    };
+
+    // TODO : When switching months the current month needs to be addressed in voice
+    //        tried to do it unsuccessfully with dynamicly linking the aria-labelledby
+
+    window.PaperCalendarBehaviors = window.PaperCalendarBehaviors || {};
+
+    /**
+     *   `PaperCalendarBehaviors.A11yBehavior` is meant to be put on components that want to incorporate a11y for the calendar layout
+     *
+     *    @demo demo/index.html
+     *    @element a11y-behavior
+     *    @polymerBehavior PaperCalendarBehaviors.A11yBehavior
+     */
+
+    window.PaperCalendarBehaviors.A11yBehavior = {
+        properties: {
+            _focusDate: {
+                type: Date,
+                notify: true,
+                observer: '_focusDateChanged'
+            }
+        },
+
+        /**
+         * Returns the Day label in aria format
+         * @return {String}
+         */
+        _getAriaDayLabel: function (date, locale) {
+            return this.dateFormat(date, 'D, dddd, MMMM, YYYY', locale);
+        },
+
+        /**
+         * Handles all a11y key commands
+         * — left: goes back a day
+         * - up: goes back a week
+         * - right: adds a day
+         * - down: adds a week
+         * - home: goes to the beginning of the week
+         * - end: goes to the end of the week
+         * - pageup: adds a month
+         * - pagedown: goes back a month
+         * - alt+pageup: adds a year
+         * - alt+pagedown: goes back a year
+         * - enter: selects the currently focussed date
+         * - escape: cancels
+         */
+        _keyHandler: function (event) {
+            var targetDate = new Date(this._focusDate || this.date);
+            var date = targetDate.getDate();
+            var month = targetDate.getMonth();
+            var year = targetDate.getFullYear();
+
+            switch (event.keyCode) {
+                case keys.ArrowUp:
+                    targetDate.setDate(date - 7);
+                    break;
+                case keys.ArrowRight:
+                    targetDate.setDate(date + 1);
+                    break;
+                case keys.ArrowDown:
+                    targetDate.setDate(date + 7);
+                    break;
+                case keys.ArrowLeft:
+                    targetDate.setDate(date - 1);
+                    break;
+
+                case keys.Home:
+                    targetDate.setDate(date - targetDate.getDay());
+                    break;
+                case keys.End:
+                    targetDate.setDate(date + (6 - targetDate.getDay()));
+                    break;
+
+                case keys.PageUp:
+                    if (event.altKey) {
+                        targetDate.setYear(year + 1);
+                        break;
+                    }
+                    targetDate.setMonth(month + 1);
+                    break;
+                case keys.PageDown:
+                    if (event.altKey) {
+                        targetDate.setYear(year - 1);
+                        break;
+                    }
+                    targetDate.setMonth(month - 1);
+                    break;
+                case keys.Enter:
+                case keys.Space:
+                    this.date = targetDate;
+                    break;
+
+                case keys.Escape:
+                    targetDate = this.date;
+                    this.dispatchEvent(new Event('cancel', { bubbles: true }));
+                    break;
+                default:
+                    return;
+            }
+
+            if (this._withinValidRange(targetDate)) {
+                this._focusDate = targetDate;
+
+                setTimeout(function () {
+                    this.$$('#' + this._getDayId(this._focusDate)).focus();
+                }.bind(this), 0);
+            }
+        },
+
+        /**
+         * Sets the focus date to next month`
+         */
+        _focusToNextMonth: function () {
+            var targetDate = new Date(this._focusDate || this.date);
+            var month = targetDate.getMonth();
+
+            targetDate.setMonth(month + 1);
+
+            if (this._withinValidRange(targetDate)) {
+                this._focusDate = targetDate;
+            } else {
+                this._focusDate = this.maxDate;
+            }
+        },
+
+        /**
+         * Sets the focus date to previous month`
+         */
+        _focusToPreviousMonth: function () {
+            var targetDate = new Date(this._focusDate || this.date);
+            var month = targetDate.getMonth();
+
+            targetDate.setMonth(month - 1);
+
+            if (this._withinValidRange(targetDate)) {
+                this._focusDate = targetDate;
+            } else {
+                this._focusDate = this.minDate;
+            }
+        },
+
+        /**
+         * Checks if the focusDate is equal to the selectedDate
+         */
+        _hasFocus: function (date) {
+            return this._focusDate.toDateString() === date.toDateString();
+        },
+
+        /**
+         * When the focusDate changes
+         */
+        _focusDateChanged: function (newValue, oldValue) {
+            var oldFocusElement = this.$$('#' + this._getDayId(oldValue || this.date));
+            var newFocusElement = this.$$('#' + this._getDayId(newValue));
+
+            if (oldFocusElement) {
+                oldFocusElement.tabIndex = -1;
+            }
+
+            if (newFocusElement) {
+                newFocusElement.tabIndex = 0;
+            }
+        }
+    };
+</script>

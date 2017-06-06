@@ -1,0 +1,17 @@
+{
+    "extends": "eslint-config-airbnb-es5",
+    "plugins": [ "html" ],
+    "globals": {
+        "Polymer": true,
+        "PaperCalendarBehaviors": true,
+        "moment": true
+    },
+    "rules": {
+        "new-cap": 0,
+        "indent": ["error", 4,
+            { "SwitchCase": 1 }
+        ],
+        "func-names": [0],
+        "valid-jsdoc": 0
+    }
+}

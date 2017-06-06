@@ -3,14 +3,14 @@ paper-date-picker
 
 **NOTE:** in bower, this package is `polymer-paper-date-picker`
 
-Material Design date picker, compatible with *Polymer 1.0*
+Material Design date picker, compatible with *Polymer 2.0*
 
 Provides a responsive date picker based on the material design spec. This
 component aims to be a clone of the date picker introduced in Android Lollipop.
 
 ![wide picker screenshot][wide] ![narrow picker screenshot][narrow]
 
-See the [component page](http://bendavis78.github.io/paper-date-picker/) for 
+See the [component page](http://bendavis78.github.io/paper-date-picker/) for
 full documentation.
 
 ## Examples:

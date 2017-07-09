@@ -524,8 +524,7 @@
         }.bind(this));
       },
       _swipeNextMonth: function() {
-        if (!this.maxDate || this.currentMonth < this.maxDate.getMonth() + 1) {
-          this.fire('swipe-start', {direction: 'left'});
+        if (!this.maxDate || this.currentYear < this.maxDate.getFullYear() || this.currentMonth < this.maxDate.getMonth() + 1) {
           this._translateX(-this._containerWidth * 2, 'swipe', function() {
             this.set('_contentClass', '');
             this.transform('translateX(' + this._startPos + 'px)', this.$.months);
@@ -628,7 +627,12 @@
         }
         if (!this._withinValidRange(date)) {
           console.warn('Date outside of valid range: ' + date);
-          this.date = date = oldValue;
+          if(date.getFullYear() == this.maxDate.getFullYear()) {
+            this.date = this.maxDate;
+          } else if(date.getFullYear() == this.minDate.getFullYear()){
+            this.date = this.minDate;
+          } else {
+            this.date = date = oldValue;
         }
         this.currentYear = date.getFullYear();
         this.currentMonth = date.getMonth() + 1;

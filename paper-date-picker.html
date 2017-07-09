@@ -263,7 +263,7 @@ styling:
       },
       ready: function() {
         this.today = this.$.calendar.today;
-        this.isTouch = 'ontouchstart' in window;
+        this._setIsTouch('ontouchstart' in window);
         this._selectPage('chooseDate');
       },
       dateFormat: function() {

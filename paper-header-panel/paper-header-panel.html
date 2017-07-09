@@ -1,4 +1,5 @@
 <!--
+@license
 Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
 This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
 The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
@@ -86,6 +87,13 @@ To change the shadow that shows up underneath the header:
       };
     }
 
+To change the panel container:
+
+    paper-header-panel {
+      --paper-header-panel-container: {
+        border: 1px solid gray;
+      };
+
 To change the panel container in different modes:
 
     paper-header-panel {
@@ -120,6 +128,7 @@ Custom property | Description | Default
 ----------------|-------------|----------
 `--paper-header-panel` | Mixin applied to the element | `{}`
 `--paper-header-panel-body` | Mixin applied to the element's body (i.e. everything below the toolbar) | `{}`
+`--paper-header-panel-container` | Mixin applied to the container in any mode | `{}`
 `--paper-header-panel-scroll-container` | Mixin applied to the container when in scroll mode | `{}`
 `--paper-header-panel-cover-container` | Mixin applied to the container when in cover mode | `{}`
 `--paper-header-panel-standard-container` | Mixin applied to the container when in standard mode | `{}`
@@ -163,6 +172,10 @@ Custom property | Description | Default
         min-height: 0;
 
         @apply(--paper-header-panel-body);
+      }
+
+      #mainContainer {
+        @apply(--paper-header-panel-container);
       }
 
       /*
@@ -465,7 +478,7 @@ Custom property | Description | Default
                 header.classList.remove('animate');
               }, animateDuration);
             } else {
-              header.classList.toggle('animate', configs.tallMode[newMode]);
+              this.toggleClass('animate', configs.tallMode[newMode], header);
             }
           }
           this._keepScrollingState();

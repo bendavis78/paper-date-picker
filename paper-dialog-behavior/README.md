@@ -43,24 +43,12 @@ Use the `dialog-dismiss` and `dialog-confirm` attributes on interactive controls
 dialog. If the user dismisses the dialog with `dialog-confirm`, the `closingReason` will update
 to include `confirmed: true`.
 
-### Styling
-
-The following custom properties and mixins are available for styling.
-
-| Custom property | Description | Default |
-| --- | --- | --- |
-| `--paper-dialog-background-color` | Dialog background color | `--primary-background-color` |
-| `--paper-dialog-color` | Dialog foreground color | `--primary-text-color` |
-| `--paper-dialog` | Mixin applied to the dialog | `{}` |
-| `--paper-dialog-title` | Mixin applied to the title (`<h2>`) element | `{}` |
-| `--paper-dialog-button-color` | Button area foreground color | `--default-primary-color` |
-
 ### Accessibility
 
 This element has `role="dialog"` by default. Depending on the context, it may be more appropriate
 to override this attribute with `role="alertdialog"`.
 
-If `modal` is set, the element will set `aria-modal` and prevent the focus from exiting the element.
+If `modal` is set, the element will prevent the focus from exiting the element.
 It will also ensure that focus remains in the dialog.
 
 

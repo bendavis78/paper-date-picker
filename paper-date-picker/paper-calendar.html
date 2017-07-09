@@ -1,11 +1,14 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
-<link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../paper-ripple/paper-ripple.html">
-<link rel="import" href="../paper-styles/paper-styles.html">
+<link rel="import" href="../paper-styles/color.html">
+<link rel="import" href="../paper-styles/default-theme.html">
+<link rel="import" href="../paper-styles/shadow.html">
+<link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
-<link rel="import" href="../moment-element/moment-with-locales-import.html">
+<link rel="import" href="../moment-element/moment-import.html">
+<link rel="import" href="paper-date-picker-icons.html">
 
 <dom-module id="paper-calendar">
   <template>
@@ -86,6 +89,8 @@
         left: 0;
         width: 100%;
         opacity: 1;
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
       }
       .month-nav .col {
         position: relative;
@@ -112,9 +117,21 @@
         text-align: center;
         font-weight: bold;
         @apply(--paper-font-body2);
+        @apply(--layout-horizontal);
+        @apply(--layout-center);
+        @apply(--layout-center-justified);
+        @apply(--layout-flex);
       }
       .month-weekdays {
         color: var(--secondary-text-color);
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+        @apply(--layout-flex);
+      }
+      .month-days {
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+        @apply(--layout-flex);
       }
       .month-col .day {
         cursor: default;
@@ -155,15 +172,21 @@
       .day-item.selected.today .day {
         color: var(--text-primary-color);
       }
+      .flex {
+        @apply(--layout-flex);
+      }
+      .flex-5 {
+        @apply(--layout-flex-5);
+      }
     </style>
     <div id="calendar">
       <div id="months" on-track="_onTrack" class$="{{_contentClass}}">
         <template is="dom-repeat" items="{{_months}}" as="month">
           <div class$="{{_getMonthClass('month', month)}}">
-            <div class="month-row month-name layout horizontal center-center flex">
+            <div class="month-row month-name">
               <span>{{dateFormat(month.date, 'MMMM YYYY', locale)}}</span>
             </div>
-            <div class="month-row month-weekdays week layout horizontal justified flex">
+            <div class="month-row month-weekdays week">
               <template is="dom-repeat" items="{{_weekdays}}">
                 <div class="month-col layout vertical flex">
                   <div class="day">{{item.0}}</div>
@@ -171,7 +194,7 @@
               </template>
             </div>
             <template is="dom-repeat" items="{{month.weeks}}" as="row">
-              <div class="month-row layout horizontal justified flex">
+              <div class="month-row month-days">
                 <template is="dom-repeat" items="{{row}}">
                   <div class="month-col">
                     <div class$="{{_getDayClass('day-item selection', item.date, today, date)}}"
@@ -186,18 +209,18 @@
           </div>
         </template>
       </div>
-      <div id="monthNav" class="month-nav layout horizontal center">
+      <div id="monthNav" class="month-nav">
         <div class="flex col self-stretch">
           <div class="btn" on-tap="_swipePrevMonth">
             <paper-ripple center class="ripple circle"></paper-ripple>
-            <iron-icon class="icon flex" icon="chevron-left"></iron-icon>
+            <iron-icon class="icon flex" icon="date-picker:chevron-left"></iron-icon>
           </div>
         </div>
         <div class="flex-5"></div>
         <div class="flex col self-stretch">
           <div class="btn" on-tap="_swipeNextMonth">
             <paper-ripple center class="ripple circle"></paper-ripple>
-            <iron-icon class="icon flex" icon="chevron-right"></iron-icon>
+            <iron-icon class="icon flex" icon="date-picker:chevron-right"></iron-icon>
           </div>
         </div>
       </div>
@@ -219,6 +242,14 @@
 
     // Number of months to preload on both sides of the current month
     var PRELOAD_MONTHS = 1;
+
+    function dateDiff(a, b) {
+      a = new Date(a.getTime());
+      b = new Date(b.getTime());
+      a.setHours(0, 0, 0, 0);
+      b.setHours(0, 0, 0, 0);
+      return (a.getTime() - b.getTime()) / 86400000;
+    }
 
     Polymer({
       is: 'paper-calendar',
@@ -270,7 +301,8 @@
           type: Number
         },
         _contentClass: String,
-        _months: Array
+        _months: Array,
+        _firstDayOfWeek: Number,
       },
       behaviors: [
         Polymer.IronResizableBehavior
@@ -286,7 +318,7 @@
         this._updateToday();
         this.currentMonth = this.date.getMonth() + 1;
         this.currentYear = this.date.getFullYear();
-        this._transitionEvent = this.style.WebkitTransition ? 'transitionEnd' : 'webkitTransitionEnd';
+        this._transitionEvent = this._whichTransitionEnd();
       },
       dateFormat: function(date, format, locale) {
         if (!date) {
@@ -386,11 +418,10 @@
       },
       _getDayClass: function(cssClass, date) {
         if (date) {
-          var timestamp = date.getTime();
-          if (timestamp === this.today.getTime()) {
+          if (dateDiff(date, this.today) === 0) {
             cssClass += ' today';
           }
-          if (timestamp === this.date.getTime()) {
+          if (dateDiff(date, this.date) === 0) {
             cssClass += ' selected';
             this.async(function() {
               this._updateSelection();
@@ -442,7 +473,7 @@
 
             // If we're dragging outside the bounds, add some resistence
             if (x > 0 || x < (-fullWidth + width)) {
-              if (isNaN(parseInt(this._resistStart))) {
+              if (isNaN(parseInt(this._resistStart, 10))) {
                 this._resistStart = adx;
               }
               var rdx = adx - this._resistStart;
@@ -485,6 +516,7 @@
         }
       },
       _swipePrevMonth: function() {
+        this.fire('swipe-start', {direction: 'right'});
         this._translateX(0, 'swipe', function() {
           this.set('_contentClass', '');
           this.transform('translateX(' + this._startPos + 'px)', this.$.months);
@@ -492,11 +524,13 @@
         }.bind(this));
       },
       _swipeNextMonth: function() {
-        this._translateX(-this._containerWidth * 2, 'swipe', function() {
-          this.set('_contentClass', '');
-          this.transform('translateX(' + this._startPos + 'px)', this.$.months);
-          this.fire('swiped', {direction: 'left'});
-        }.bind(this));
+        if (!this.maxDate || this.currentYear < this.maxDate.getFullYear() || this.currentMonth < this.maxDate.getMonth() + 1) {
+          this._translateX(-this._containerWidth * 2, 'swipe', function() {
+            this.set('_contentClass', '');
+            this.transform('translateX(' + this._startPos + 'px)', this.$.months);
+            this.fire('swiped', {direction: 'left'});
+          }.bind(this));
+        }
       },
       _getMonthIdx: function(pos) {
         // returns the index for the visible month according to the given position
@@ -505,7 +539,7 @@
         return i < 0 ? 0 : i;
       },
       _translateX: function(x, transition, cb) {
-        if (isNaN(parseInt(x))) {
+        if (isNaN(parseInt(x, 10))) {
           throw new Error('Not a number: ' + x);
         }
         this._currentPos = x;
@@ -593,24 +627,34 @@
         }
         if (!this._withinValidRange(date)) {
           console.warn('Date outside of valid range: ' + date);
-          this.date = date = oldValue;
+          if(date.getFullYear() == this.maxDate.getFullYear()) {
+            this.date = this.maxDate;
+          } else if(date.getFullYear() == this.minDate.getFullYear()){
+            this.date = this.minDate;
+          } else {
+            this.date = date = oldValue;
+          }
         }
         this.currentYear = date.getFullYear();
         this.currentMonth = date.getMonth() + 1;
+        // Only trigger a notification if there actually is a difference.
         if (oldValue && date.getTime && oldValue.getTime && date.getTime() === oldValue.getTime()) {
           return;
         }
-        // clone the date object so as not to have unintended effects on bindings
-        date = new Date(date.getTime());
-        date.setHours(0, 0, 0, 0);
-        this.set('date', date);
         this._updateSelection();
       },
       _tapDay: function(event) {
         if (!this._withinValidRange(event.model.item.date)) {
           return false;
         }
-        this.date = event.model.item.date;
+        var item = event.model.item;
+        var newDate = new Date(this.date.getTime());
+        newDate.setDate(1);
+        newDate.setYear(item.year);
+        newDate.setMonth(item.month);
+        newDate.setDate(item.day);
+        newDate.setHours(0,0,0,0);
+        this.date = newDate;
       },
       _isValidDate: function(date) {
         return date && date.getTime && !isNaN(date.getTime());
@@ -668,6 +712,20 @@
         this.today = new Date();
         this.today.setHours(0, 0, 0, 0);
       },
+      _whichTransitionEnd: function() {
+        var transitions = {
+          'WebkitTransition' : 'webkitTransitionEnd',
+          'MozTransition'    : 'transitionend',
+          'OTransition'      : 'oTransitionEnd otransitionend',
+          'transition'       : 'transitionend'
+        };
+
+        for (var t in transitions) {
+          if (this.style[t] !== undefined){
+            return transitions[t];
+          }
+        }
+      }
     });
    })();
   </script>

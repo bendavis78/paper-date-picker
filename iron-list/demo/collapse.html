@@ -12,10 +12,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <html>
 <head>
 
-  <title>Collapsable items using iron-list</title>
+  <title>Collapsible items using iron-list</title>
 
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=no">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
 
@@ -23,13 +23,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
   <link rel="import" href="../../polymer/polymer.html">
   <link rel="import" href="../../iron-flex-layout/iron-flex-layout.html">
-  <link rel="import" href="../../paper-toolbar/paper-toolbar.html">
-  <link rel="import" href="../../paper-scroll-header-panel/paper-scroll-header-panel.html">
+  <link rel="import" href="../../app-layout/app-toolbar/app-toolbar.html">
   <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+  <link rel="import" href="../../paper-styles/color.html">
+  <link rel="import" href="../../paper-styles/typography.html">
   <link rel="import" href="../../iron-ajax/iron-ajax.html">
   <link rel="import" href="../../iron-icons/iron-icons.html">
+  <link rel="import" href="../../iron-image/iron-image.html">
   <link rel="import" href="../iron-list.html">
 
+  <style>
+    body {
+      background-color: #eee;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 </head>
 <body unresolved>
 
@@ -37,31 +46,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
     <style>
       :host {
-        @apply(--layout-fit);
-        @apply(--layout-vertical);
+        display: block;
         @apply(--paper-font-common-base);
-        background-color: var(--paper-grey-200, #eee);
       }
 
-      paper-toolbar {
-        background: var(--google-green-700);
+      app-toolbar {
+        background-color: var(--google-green-700);
         box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3);
         font-weight: bold;
+        color: white;
+        font-size: 18px;
         z-index: 1;
-        --paper-toolbar-title: {
-          overflow: visible;
-        };
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
       }
 
-      paper-toolbar paper-icon-button {
+      app-toolbar paper-icon-button {
         --paper-icon-button-ink-color: white;
       }
 
       iron-list {
-        padding-top: 1px;
-        padding-bottom: 16px;
-        -webkit-flex: 1 1;
-        flex: 1 1;
+        padding-top: 64px;
         --iron-list-items-container: {
           max-width: 800px;
           margin: auto;
@@ -76,14 +83,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         padding: 20px;
         background-color: white;
         border: 1px solid #ddd;
-
         cursor: pointer;
         margin-bottom: 10px;
-      }
-
-      .item:focus {
-        outline: 0;
-        border-color: #666;
       }
 
       .avatar {
@@ -141,58 +142,65 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
       }
     </style>
+
     <iron-ajax url="data/contacts.json" last-response="{{items}}" auto></iron-ajax>
-      <paper-toolbar>
-        <paper-icon-button icon="arrow-back" alt="Back"></paper-icon-button>
-        <div class="spacer"></div>
-        <paper-icon-button icon="search" alt="Search"></paper-icon-button>
-        <paper-icon-button icon="more-vert" alt="More options"></paper-icon-button>
-        <div class="bottom title">Collapsable items using iron-list</div>
-      </paper-toolbar>
-      <iron-list id="list" items="[[items]]" as="item">
-        <template>
-          <div on-tap="_collapseExpand">
-            <div class$="[[getClassForItem(item, item.expanded)]]" tabindex="0">
-              <img class="avatar" src="[[item.image]]">
-              <div class="pad">
-                <div class="primary">[[item.name]]</div>
-                <div class="shortText">[[item.shortText]]</div>
-                <div class="longText">[[item.longText]]</div>
-              </div>
-              <iron-icon icon$="[[iconForItem(item)]]"></iron-icon>
+
+    <app-toolbar>
+      <div main-title>Collapsible items</div>
+      <paper-icon-button icon="search" alt="Search"></paper-icon-button>
+      <paper-icon-button icon="more-vert" alt="More options"></paper-icon-button>
+    </app-toolbar>
+
+    <iron-list id="list" items="[[items]]" as="item" selection-enabled multi-selection>
+      <template>
+        <div>
+          <div class$="[[getClassForItem(item, selected)]]" tabindex$="[[tabIndex]]">
+            <iron-image class="avatar" sizing="contain" src="[[item.image]]"></iron-image>
+            <div class="pad">
+              <div class="primary">[[item.name]]</div>
+              <div class="shortText">[[item.shortText]]</div>
+              <div class="longText">[[item.longText]]</div>
             </div>
+            <iron-icon icon$="[[iconForItem(item)]]"></iron-icon>
           </div>
-        </template>
-      </iron-list>
+        </div>
+      </template>
+    </iron-list>
+
   </template>
+
   <script>
-  HTMLImports.whenReady(function() {
+
+    HTMLImports.whenReady(function() {
+
       Polymer({
         is: 'x-collapse',
+
         properties: {
+
           items: {
             type: Array
           }
+
         },
 
-        _collapseExpand: function(e) {
-          var list = this.$.list;
-          var index = e.model.index;
-          var isExpanded = list.items[index].expanded;
-
-          list.set('items.' + index + '.expanded', !isExpanded);
-          list.updateSizeForItem(e.model.index);
+        attached: function() {
+          // Use the document element
+          this.$.list.scrollTarget = this.ownerDocument.documentElement;
         },
 
         iconForItem: function(item) {
           return item ? (item.integer < 50 ? 'star-border' : 'star') : '';
         },
 
-        getClassForItem: function(item, expanded) {
-          return expanded ? 'item expanded' : 'item';
+        getClassForItem: function(item, selected) {
+          return selected ? 'item expanded' : 'item';
         }
+
       });
+
     });
+
   </script>
 </dom-module>
 

@@ -15,6 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../prism-element/prism-highlighter.html">
+<link rel="import" href="../prism-element/prism-theme-default.html">
 <link rel="import" href="iron-doc-property.html">
 <link rel="import" href="iron-doc-viewer-styles.html">
 
@@ -49,7 +50,7 @@ property.
 
 <dom-module id="iron-doc-viewer">
   <template>
-    <style include="iron-doc-viewer-styles"></style>
+    <style include="iron-doc-viewer-styles prism-theme-default"></style>
 
     <prism-highlighter></prism-highlighter>
 
@@ -147,7 +148,7 @@ property.
           // Note that this is only an error during element creation. You are free
           // to stomp over the descriptor after it is ready.
           if (jsonDescriptor && this.descriptor) {
-            console.error(
+            Polymer.Base._error(
                 this,
                 'received both a bound descriptor:', this.descriptor,
                 'and JSON descriptor:', this._jsonDescriptor,
@@ -178,7 +179,7 @@ property.
           try {
             return JSON.parse(textContent);
           } catch(error) {
-            console.error('Failure when parsing JSON:', textContent, error);
+            Polymer.Base._error('Failure when parsing JSON:', textContent, error);
             throw error;
           }
         },

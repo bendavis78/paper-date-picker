@@ -1,5 +1,8 @@
 paper-date-picker
 =================
+
+**NOTE:** in bower, this package is `polymer-paper-date-picker`
+
 Material Design date picker, compatible with *Polymer 1.0*
 
 Provides a responsive date picker based on the material design spec. This
@@ -65,8 +68,8 @@ commit message. For example: "Fixes issue #123".
 If you find this component useful, please show your support by donating to
 [Bold Idea](http://boldidea.org). Click the button below!
 
-[![ideaSpark campaign button][donate]](https://donorbox.org/bold-idea-make-ideaspark-possible-for-dallas-area-students)
+[![Donate to Bold Idea][donate]](https://boldidea.org/donate)
 
 [wide]: http://i.imgur.com/I0SjSWf.png
 [narrow]: http://i.imgur.com/SsrLJDo.png
-[donate]: http://www.boldidea.org/donate-badge-md-1.png
+[donate]: http://boldidea.org/static/donate-badge-md-1.png

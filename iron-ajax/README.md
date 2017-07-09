@@ -17,15 +17,15 @@ thing! https://github.com/PolymerLabs/tedium/issues
 _[Demo and API docs](https://elements.polymer-project.org/elements/iron-ajax)_
 
 
-##&lt;iron-ajax&gt;
+## &lt;iron-ajax&gt;
 
 The `iron-ajax` element exposes network request functionality.
 
 ```html
 <iron-ajax
     auto
-    url="http://gdata.youtube.com/feeds/api/videos/"
-    params='{"alt":"json", "q":"chrome"}'
+    url="https://www.googleapis.com/youtube/v3/search"
+    params='{"part":"snippet", "q":"polymer", "key": "YOUTUBE_API_KEY", "type": "video"}'
     handle-as="json"
     on-response="handleResponse"
     debounce-duration="300"></iron-ajax>
@@ -43,14 +43,14 @@ element.
 
 
 
-##&lt;iron-request&gt;
+## &lt;iron-request&gt;
 
 iron-request can be used to perform XMLHttpRequests.
 
 ```html
 <iron-request id="xhr"></iron-request>
 ...
-this.$.xhr.send({url: url, params: params});
+this.$.xhr.send({url: url, body: params});
 ```
 
 

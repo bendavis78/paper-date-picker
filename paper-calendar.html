@@ -288,6 +288,13 @@
           type: Date,
           value: null
         },
+          /**
+         * Disables validation of date range when date property changes
+         */
+        disableMinMaxValidation: {
+          type: Boolean,
+          value: false
+        },
         /**
          * The currently selected month (1-12)
          */
@@ -626,9 +633,11 @@
           console.warn('Invalid date: ' + date);
           this.date = date = oldValue;
         }
-        if (!this._withinValidRange(date)) {
-          console.warn('Date outside of valid range: ' + date);
-          this.date = date = oldValue;
+         if(!this.disableMinMaxValidation){
+            if (!this._withinValidRange(date)) {
+              console.warn('Date outside of valid range: ' + date);
+              this.date = date = oldValue;
+            }
         }
         this.currentYear = date.getFullYear();
         this.currentMonth = date.getMonth() + 1;

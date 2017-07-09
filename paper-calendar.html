@@ -7,7 +7,7 @@
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
-<link rel="import" href="../moment-element/moment-import.html">
+<link rel="import" href="../moment-element/moment-with-locales-import.html">
 <link rel="import" href="paper-date-picker-icons.html">
 
 <dom-module id="paper-calendar">
@@ -523,7 +523,8 @@
         }.bind(this));
       },
       _swipeNextMonth: function() {
-        if (!this.maxDate || this.currentMonth < this.maxDate.getMonth() + 1) {
+        if (!this.maxDate || this.currentYear < this.maxDate.getFullYear() ||
+            this.currentMonth < this.maxDate.getMonth() + 1) {
           this._translateX(-this._containerWidth * 2, 'swipe', function() {
             this.set('_contentClass', '');
             this.transform('translateX(' + this._startPos + 'px)', this.$.months);

@@ -124,7 +124,7 @@ styling:
       }
       #heading .year {
         @apply(--paper-font-body2);
-        font-size: 16px;
+        font-size: var(--paper-date-picker-year-size, 16px);
         @apply(--paper-date-picker-heading-date);
       }
       #heading:not(.pg-chooseYear) .year,

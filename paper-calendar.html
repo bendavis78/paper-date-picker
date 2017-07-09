@@ -516,6 +516,7 @@
         }
       },
       _swipePrevMonth: function() {
+        this.fire('swipe-start', {direction: 'right'});
         this._translateX(0, 'swipe', function() {
           this.set('_contentClass', '');
           this.transform('translateX(' + this._startPos + 'px)', this.$.months);
@@ -650,6 +651,7 @@
         newDate.setYear(item.year);
         newDate.setMonth(item.month);
         newDate.setDate(item.day);
+        newDate.setHours(0,0,0,0);
         this.date = newDate;
       },
       _isValidDate: function(date) {

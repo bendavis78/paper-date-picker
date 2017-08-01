@@ -154,7 +154,10 @@ styling:
           <template is="dom-repeat" items="{{_splitHeadingDate(date, headingFormat, locale)}}">
             <span>{{item}}</span>
           </template>
-        </div>
+		</div>
+		<div class="timeContainer">
+			<content select=".time"></content>
+		</div>
       </div>
       <neon-animated-pages id="pages" selected="{{_selectedPage}}" attr-for-selected="id"
         entry-animation="fade-in-animation" exit-animation="fade-out-animation"
@@ -167,7 +170,8 @@ styling:
         <neon-animatable id="chooseYear">
           <paper-year-list id="yearList" date="{{date}}" on-tap="_tapHeadingDate" min="[[_minYear]]" max="[[_maxYear]]"></paper-year-list>
         </neon-animatable>
-      </neon-animated-pages>
+	  	<content select="neon-animatable"></content>
+	  </neon-animated-pages>
     </div>
   </template>
   <script>

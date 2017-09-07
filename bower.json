@@ -38,11 +38,11 @@
     "iron-component-page": "PolymerElements/iron-component-page#^2.0.0",
     "paper-dialog": "PolymerElements/paper-dialog#^2.0.0",
     "paper-button": "PolymerElements/paper-button#^2.0.0",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
     "web-component-tester": "Polymer/web-component-tester#^4.2.2"
   },
   "resolutions": {
     "polymer": "^2.0.0",
-    "webcomponentsjs": "^0.7.2"
+    "webcomponentsjs": "^v1.0.2"
   }
 }

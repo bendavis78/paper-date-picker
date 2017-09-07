@@ -7,7 +7,7 @@
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
-<link rel="import" href="../moment-element/moment-import.html">
+<link rel="import" href="../moment-element/moment.html">
 <link rel="import" href="paper-date-picker-icons.html">
 
 <dom-module id="paper-calendar">
@@ -227,8 +227,6 @@
     </div>
   </template>
   <script>
-    (function() {
-
     // Ignore movement within this distance (px)
     var WIGGLE_THRESHOLD = 4;
     var WIGGLE_THRESHOLD_SQUARE = WIGGLE_THRESHOLD * WIGGLE_THRESHOLD;
@@ -251,84 +249,84 @@
       return (a.getTime() - b.getTime()) / 86400000;
     }
 
-    Polymer({
-      is: 'paper-calendar',
-      properties: {
-        /*
-         * The selected date
-         */
-        date: {
-          type: Date,
-          notify: true,
-          value: function() {
-            return new Date();
+    class PaperCalendar extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element) {
+      static get is() { return 'paper-calendar'; }
+      static get properties() {
+        return {
+          /*
+           * The selected date
+           */
+          date: {
+            type: Date,
+            notify: true,
+            value: function () {
+              return new Date();
+            },
+            observer: '_dateChanged'
           },
-          observer: '_dateChanged'
-        },
-        /**
-         * The current locale
-         */
-        locale: {
-          type: String,
-          value: 'en',
-          notify: true,
-          observer: '_localeChanged'
-        },
-        /**
-         * The minimum allowed date
-         */
-        minDate: {
-          type: Date,
-          value: null
-        },
-        /**
-         * The maximum allowed date
-         */
-        maxDate: {
-          type: Date,
-          value: null
-        },
-        /**
-         * The currently selected month (1-12)
-         */
-        currentMonth: {
-          type: Number
-        },
-        /**
-         * The currently selected year
-         */
-        currentYear: {
-          type: Number
-        },
-        _contentClass: String,
-        _months: Array,
-        _firstDayOfWeek: Number,
-      },
-      behaviors: [
-        Polymer.IronResizableBehavior
-      ],
-      observers: [
-        '_populate(currentYear, currentMonth, minDate, maxDate, locale)',
-      ],
-      listeners: {
-        'iron-resize': '_resizeHandler',
-        'swiped': '_onSwipe'
-      },
-      ready: function() {
+          /**
+           * The current locale
+           */
+          locale: {
+            type: String,
+            value: 'en',
+            notify: true,
+            observer: '_localeChanged'
+          },
+          /**
+           * The minimum allowed date
+           */
+          minDate: {
+            type: Date,
+            value: null
+          },
+          /**
+           * The maximum allowed date
+           */
+          maxDate: {
+            type: Date,
+            value: null
+          },
+          /**
+           * The currently selected month (1-12)
+           */
+          currentMonth: {
+            type: Number
+          },
+          /**
+           * The currently selected year
+           */
+          currentYear: {
+            type: Number
+          },
+          _contentClass: String,
+          _months: Array,
+          _firstDayOfWeek: Number
+        };
+      }
+      static get observers() {
+        return [
+          '_populate(currentYear, currentMonth, minDate, maxDate, locale)'
+        ]
+      }
+      ready() {
+        super.ready();
+        this.addEventListener('iron-resize', this._resizeHandler.bind(this));
+        this.addEventListener('swiped', this._onSwipe.bind(this));
         this._updateToday();
         this.currentMonth = this.date.getMonth() + 1;
         this.currentYear = this.date.getFullYear();
         this._transitionEvent = this._whichTransitionEnd();
-      },
-      dateFormat: function(date, format, locale) {
+      }
+      dateFormat(date, format, locale) {
         if (!date) {
           return '';
         }
         var value = moment(date);
         value.locale(locale || this.locale);
         return value.format(format);
-      },
-      _localeChanged: function(locale) {
+      }
+      _localeChanged(locale) {
         var localeMoment = moment();
         localeMoment.locale(locale);
         var weekdays = [];
@@ -337,8 +335,8 @@
         }
         this._weekdays = weekdays;
         this._firstDayOfWeek = localeMoment.weekday(0).format('d');
-      },
-      _populate: function(currentYear, currentMonth, minDate, maxDate) {
+      }
+      _populate(currentYear, currentMonth, minDate, maxDate) {
         var date, month, weeks, day, d, dayInfo, monthData, months = [];
 
         // Make sure currentYear/currentMonth are in min/max range
@@ -415,8 +413,8 @@
           this._updateSelection();
           this._positionSlider();
         });
-      },
-      _getDayClass: function(cssClass, date) {
+      }
+      _getDayClass(cssClass, date) {
         if (date) {
           if (dateDiff(date, this.today) === 0) {
             cssClass += ' today';
@@ -429,14 +427,14 @@
           }
         }
         return cssClass;
-      },
-      _isDisabled: function(day, date) {
+      }
+      _isDisabled(day, date) {
         return !day || !this._withinValidRange(date);
-      },
-      _getMonthClass: function(name, month) {
+      }
+      _getMonthClass(name, month) {
         return name + ' month-' + month.year + '-' + month.month;
-      },
-      _onTrack: function(event) {
+      }
+      _onTrack(event) {
         var dx = event.detail.dx;
         var dy = event.detail.dy;
         var adx = Math.abs(dx);
@@ -514,16 +512,16 @@
             }
             this._gesture = null;
         }
-      },
-      _swipePrevMonth: function() {
+      }
+      _swipePrevMonth() {
         this.fire('swipe-start', {direction: 'right'});
         this._translateX(0, 'swipe', function() {
           this.set('_contentClass', '');
           this.transform('translateX(' + this._startPos + 'px)', this.$.months);
           this.fire('swiped', {direction: 'right'});
         }.bind(this));
-      },
-      _swipeNextMonth: function() {
+      }
+      _swipeNextMonth() {
         if (!this.maxDate || this.currentYear < this.maxDate.getFullYear() || this.currentMonth < this.maxDate.getMonth() + 1) {
           this._translateX(-this._containerWidth * 2, 'swipe', function() {
             this.set('_contentClass', '');
@@ -531,14 +529,14 @@
             this.fire('swiped', {direction: 'left'});
           }.bind(this));
         }
-      },
-      _getMonthIdx: function(pos) {
+      }
+      _getMonthIdx(pos) {
         // returns the index for the visible month according to the given position
         var width = this._containerWidth;
         var i = Math.floor((-pos + (width/2)) / width);
         return i < 0 ? 0 : i;
-      },
-      _translateX: function(x, transition, cb) {
+      }
+      _translateX(x, transition, cb) {
         if (isNaN(parseInt(x, 10))) {
           throw new Error('Not a number: ' + x);
         }
@@ -572,8 +570,8 @@
           }
           this.transform('translateX(' + x + 'px)', this.$.months);
         }.bind(this));
-      },
-      _getFastestMovement: function(event) {
+      }
+      _getFastestMovement(event) {
         // detect flick based on fastest segment of movement
         var l = this._moveQueue.length;
         var dt, tx, ty, tv2, x = 0, y = 0, v2 = 0;
@@ -589,23 +587,23 @@
           }
         }
         return {x: x, y: y, v: Math.sqrt(v2)};
-      },
-      _onSwipe: function(event) {
+      }
+      _onSwipe(event) {
         if (event.detail.direction === 'right') {
           this._prevMonth();
         } else {
           this._nextMonth();
         }
-      },
-      _once: function(eventName, callback, node) {
+      }
+      _once(eventName, callback, node) {
         node = node || this;
         function onceCallback() {
           node.removeEventListener(eventName, onceCallback);
           callback.apply(null, arguments);
         }
         node.addEventListener(eventName, onceCallback);
-      },
-      _incrMonth: function(i) {
+      }
+      _incrMonth(i) {
         var date = new Date(this.currentYear, this.currentMonth - 1 + i);
         var year = date.getFullYear();
         var month = date.getMonth() + 1;
@@ -613,14 +611,14 @@
           this.currentYear = year;
           this.currentMonth = month;
         }
-      },
-      _prevMonth: function() {
+      }
+      _prevMonth() {
         this._incrMonth(-1);
-      },
-      _nextMonth: function() {
+      }
+      _nextMonth() {
         this._incrMonth(1);
-      },
-      _dateChanged: function(date, oldValue) {
+      }
+      _dateChanged(date, oldValue) {
         if (!this._isValidDate(date)) {
           console.warn('Invalid date: ' + date);
           this.date = date = oldValue;
@@ -642,8 +640,8 @@
           return;
         }
         this._updateSelection();
-      },
-      _tapDay: function(event) {
+      }
+      _tapDay(event) {
         if (!this._withinValidRange(event.model.item.date)) {
           return false;
         }
@@ -655,22 +653,22 @@
         newDate.setDate(item.day);
         newDate.setHours(0,0,0,0);
         this.date = newDate;
-      },
-      _isValidDate: function(date) {
+      }
+      _isValidDate(date) {
         return date && date.getTime && !isNaN(date.getTime());
-      },
-      _withinValidRange: function(date) {
+      }
+      _withinValidRange(date) {
         if (this._isValidDate(date)) {
           return (!this.minDate || date >= this.minDate) && (!this.maxDate || date <= this.maxDate);
         }
         return false;
-      },
-      _monthWithinValidRange: function(year, month) {
+      }
+      _monthWithinValidRange(year, month) {
         var monthStart = new Date(year, month-1, 1);
         var monthEnd = new Date(year, month, 0);
         return this._withinValidRange(monthStart) || this._withinValidRange(monthEnd);
-      },
-      _positionSlider: function() {
+      }
+      _positionSlider() {
         if (!this._months || !this._containerWidth) {
           return;
         }
@@ -679,10 +677,10 @@
         var i = ((this.currentYear * 12) + this.currentMonth) -
                  ((this._months[0].year * 12) + this._months[0].month);
         this._translateX(-i * this._containerWidth);
-      },
-      _updateSelection: function() {
+      }
+      _updateSelection() {
         // Force the day selection circle to maintain a 1:1 ratio
-        var selected = this.$$('.day-item.selected');
+        var selected = this.shadowRoot.querySelector('.day-item.selected');
         if (!selected) {
           return;
         }
@@ -699,20 +697,20 @@
             selected.style.width = h + 'px';
           }
         });
-      },
-      _resizeHandler: function() {
+      }
+      _resizeHandler() {
         this._containerWidth = this.$.calendar.offsetWidth;
         this._positionSlider();
         this._updateSelection();
-      },
-      _getDayName: function(date) {
+      }
+      _getDayName(date) {
         return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-      },
-      _updateToday: function() {
+      }
+      _updateToday() {
         this.today = new Date();
         this.today.setHours(0, 0, 0, 0);
-      },
-      _whichTransitionEnd: function() {
+      }
+      _whichTransitionEnd() {
         var transitions = {
           'WebkitTransition' : 'webkitTransitionEnd',
           'MozTransition'    : 'transitionend',
@@ -726,7 +724,7 @@
           }
         }
       }
-    });
-   })();
+    }
+    window.customElements.define(PaperCalendar.is, PaperCalendar);
   </script>
 </dom-module>

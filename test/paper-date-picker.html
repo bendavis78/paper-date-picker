@@ -37,9 +37,10 @@
           // Check initialization
           expect(element.date).to.be.not.null;
           expect(element.maxDate).to.be.not.null;
+          expect(element.id).to.be.equal('picker');
 
           // Try to swipe after the max bound
-          var calendar = element.$$('paper-calendar');
+          var calendar = element.getCalendar();
           calendar._swipeNextMonth();
           calendar._swipeNextMonth();
           calendar._swipeNextMonth();

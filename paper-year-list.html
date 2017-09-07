@@ -40,52 +40,55 @@
     </iron-list>
   </template>
   <script>
-    Polymer({
-      is: 'paper-year-list',
-      properties: {
-        date: {
-          type: Date,
-          notify: true,
-          observer: '_dateChange'
-        },
-        /**
-         * Maximum allowed year.
-         */
-        max: {
-          type: Number,
-          value: 2100,
-          observer: '_maxChange'
-        },
-        /**
-         * Minimum allowed year.
-         */
-        min: {
-          type: Number,
-          value: 1900,
-          observer: '_minChange'
-        },
-        /**
-         * The selected year, sync with the year of the given date
-         * or null if year isn't within range.
-         */
-        selected: {
-          type: Number,
-          notify: true,
-          observer: '_selectedChange'
-        },
-        /**
-         * The allowed years array.
-         */
-        _years: {
-          type: Array,
-          computed: '_computeYears(min, max)',
-          readOnly: true,
-          value: function() {
-            return Date.now().getFullYear;
+    class PaperYearList extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element) {
+      static get is() { return 'paper-year-list'; }
+      static get properties() {
+        return {
+          date: {
+            type: Date,
+            notify: true,
+            observer: '_dateChange'
+          },
+          /**
+           * Maximum allowed year.
+           */
+          max: {
+            type: Number,
+            value: 2100,
+            observer: '_maxChange'
+          },
+          /**
+           * Minimum allowed year.
+           */
+          min: {
+            type: Number,
+            value: 1900,
+            observer: '_minChange'
+          },
+          /**
+           * The selected year, sync with the year of the given date
+           * or null if year isn't within range.
+           */
+          selected: {
+            type: Number,
+            notify: true,
+            observer: '_selectedChange'
+          },
+          /**
+           * The allowed years array.
+           */
+          _years: {
+            type: Array,
+            computed: '_computeYears(min, max)',
+            readOnly: true,
+            value: function () {
+              return Date.now().getFullYear;
+            }
           }
-        }
-      },
-      ready: function() {
+        };
+      }
+      ready() {
+        super.ready();
         // hack for iron-list not to scroll to the first visible index on resize 
         this.$.yearList._resizeHandler = function() {
           this.debounce('resize', function() {
@@ -96,11 +99,11 @@
             }
           });
         }.bind(this.$.yearList);
-      },
+      }
       /**
        * Scroll in the years list to center the selected year.
        */
-      centerSelected: function() {
+      centerSelected() {
         if (this.selected !== null) {
           var selectedYearIdx = this.selected - this.min;
           this.$.yearList.scrollToIndex(selectedYearIdx);
@@ -115,19 +118,19 @@
             }
           }.bind(this.$.yearList));
         }
-      },
+      }
       /**
        * Return the selected class if needed.
        */
-      _addSelectedClass: function(selected) {
+      _addSelectedClass(selected) {
         if (selected) {
           return ' selected';
         }
-      },
+      }
       /**
        * Compute the years array passed to the iron-list.
        */
-      _computeYears: function(min, max) {
+      _computeYears(min, max) {
         if (typeof min !== 'number' || typeof max !== 'number') {
           return;
         }
@@ -136,29 +139,29 @@
           years.push({year: min});
         }
         return years;
-      },
+      }
       /**
        * Set 'selected' attribute to the new date's year if it is within range, else set it to null.
        */
-      _dateChange: function(date) {
+      _dateChange(date) {
         var newYear = date.getFullYear();
         this.selected = this._withinRange(newYear) ? newYear : null;
-      },
-      _maxChange: function(max) {
+      }
+      _maxChange(max) {
         if (typeof max !== 'number') {
           this.max = 2100;
         }
-      },
-      _minChange: function(min) {
+      }
+      _minChange(min) {
         if (typeof min !== 'number') {
           this.min = 1900;
         }
-      },
+      }
       /**
        * If selected is null, clear iron-list selection,
        * else select it in iron-list and synchronize 'date' attribute.
        */
-      _selectedChange: function(selected) {
+      _selectedChange(selected) {
         if (selected === null) {
           this.$.yearList.clearSelection();
           return;
@@ -168,35 +171,33 @@
           this.date = new Date(this.date.setFullYear(selected));
         }
         this._selectYearInList(selected);
-      },
+      }
       /**
        * Select the given year in the years list.
        */
-      _selectYearInList: function(year) {
+      _selectYearInList(year) {
         var yearIdx = year - this.min;
-        this.$.yearList.selectItem(yearIdx);
-      },
+        this.$.yearList.selectIndex(yearIdx);
+      }
       /**
        * Update 'selected' attribute and select in iron-list
        * from a tapped item's event in the years list.
        */
-      _tappedYearHandler: function(e) {
-        var yearItem = e.model.__data__.item;
+      _tappedYearHandler(e) {
+        var yearItem = e.model.__data.item;
         var year = yearItem.year;
         if (this.selected !== year) {
           this.$.yearList.selectItem(yearItem);
           this.selected = year;
         }
-      },
+      }
       /**
        * Return true if year is between min and max.
        */
-      _withinRange: function(year) {
+      _withinRange(year) {
         return  !(this.min && year < this.min || this.max && year > this.max );
-      },
-      behaviors: [
-        Polymer.IronResizableBehavior
-      ]
-    });
+      }
+    }
+    window.customElements.define(PaperYearList.is, PaperYearList);
   </script>
 </dom-module>

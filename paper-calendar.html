@@ -516,6 +516,7 @@
         }
       },
       _swipePrevMonth: function() {
+        this.fire('swipe-start', {direction: 'right'});
         this._translateX(0, 'swipe', function() {
           this.set('_contentClass', '');
           this.transform('translateX(' + this._startPos + 'px)', this.$.months);
@@ -628,7 +629,13 @@
         }
         if (!this._withinValidRange(date)) {
           console.warn('Date outside of valid range: ' + date);
-          this.date = date = oldValue;
+          if(date.getFullYear() == this.maxDate.getFullYear()) {
+            this.date = this.maxDate;
+          } else if(date.getFullYear() == this.minDate.getFullYear()){
+            this.date = this.minDate;
+          } else {
+            this.date = date = oldValue;
+          }
         }
         this.currentYear = date.getFullYear();
         this.currentMonth = date.getMonth() + 1;
@@ -644,9 +651,11 @@
         }
         var item = event.model.item;
         var newDate = new Date(this.date.getTime());
+        newDate.setDate(1);
         newDate.setYear(item.year);
         newDate.setMonth(item.month);
         newDate.setDate(item.day);
+        newDate.setHours(0,0,0,0);
         this.date = newDate;
       },
       _isValidDate: function(date) {

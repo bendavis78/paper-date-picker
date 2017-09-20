@@ -18,7 +18,7 @@
     "merge-stream": "^0.1.8",
     "portfinder": "^0.4.0",
     "vinyl-paths": "^1.0.0",
-    "web-component-tester": "^3.3.3"
+    "web-component-tester": "^5.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

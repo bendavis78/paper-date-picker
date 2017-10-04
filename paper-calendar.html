@@ -317,12 +317,24 @@
 
         ready() {
           super.ready();
-          this.addEventListener('iron-resize', this._resizeHandler.bind(this));
-          this.addEventListener('swiped', this._onSwipe.bind(this));
+          this._resizeHandler = this._resizeHandler.bind(this);
+          this._onSwipe= this._onSwipe.bind(this);
           this._updateToday();
           this.currentMonth = this.date.getMonth() + 1;
           this.currentYear = this.date.getFullYear();
           this._transitionEvent = this._whichTransitionEnd();
+        }
+
+        connectedCallback() {
+          super.connectedCallback();
+          this.addEventListener('iron-resize', this._resizeHandler);
+          this.addEventListener('swiped', this._onSwipe);
+        }
+
+        disconnectedCallback() {
+          super.disconnectedCallback();
+          this.removeEventListener('iron-resize', this._resizeHandler);
+          this.removeEventListener('swiped', this._onSwipe);
         }
 
         dateFormat(date, format, locale) {

@@ -258,10 +258,18 @@ styling:
       }
       ready() {
         super.ready();
-        this.addEventListener('iron-resize', this._resizeHandler.bind(this));
+        this._resizeHandler = this._resizeHandler.bind(this);
         this.today = this.$.calendar.today;
         this._setIsTouch('ontouchstart' in window);
         this._selectPage('chooseDate');
+      }
+      connectedCallback() {
+        super.connectedCallback();
+        this.addEventListener('iron-resize', this._resizeHandler);
+      }
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.removeEventListener('iron-resize', this._resizeHandler);
       }
       dateFormat() {
         return this.$.calendar.dateFormat.apply(this.$.calendar, arguments);

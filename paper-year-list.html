@@ -184,7 +184,7 @@
        * from a tapped item's event in the years list.
        */
       _tappedYearHandler(e) {
-        var yearItem = e.model.__data.item;
+        var yearItem = e.model.item;
         var year = yearItem.year;
         if (this.selected !== year) {
           this.$.yearList.selectItem(yearItem);

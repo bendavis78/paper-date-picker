@@ -39,6 +39,6 @@
     "paper-dialog": "PolymerElements/paper-dialog#^2.0.0",
     "paper-button": "PolymerElements/paper-button#^2.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
-    "web-component-tester": "Polymer/web-component-tester#^4.2.2"
+    "web-component-tester": "Polymer/web-component-tester#^5.0.0"
   }
 }

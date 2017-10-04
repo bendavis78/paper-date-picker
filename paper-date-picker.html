@@ -266,9 +266,6 @@ styling:
       dateFormat() {
         return this.$.calendar.dateFormat.apply(this.$.calendar, arguments);
       }
-      getCalendar() {
-        return this.$.calendar;
-      }
       _tapHeadingDate() {
         if (this.$.pages.selected !== 'chooseDate') {
           this._selectPage('chooseDate');

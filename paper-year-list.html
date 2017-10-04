@@ -81,7 +81,7 @@
             type: Array,
             computed: '_computeYears(min, max)',
             readOnly: true,
-            value: function () {
+            value() {
               return Date.now().getFullYear;
             }
           }

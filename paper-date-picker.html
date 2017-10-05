@@ -171,105 +171,110 @@ styling:
     </div>
   </template>
   <script>
-
-    Polymer({
-      is: 'paper-date-picker',
-      properties: {
-        /**
-         * The selected date (YYYY-MM-DD)
-         */
-        date: {
-          type: Date,
-          notify: true
-        },
-        /**
-         * Maximum screen width at which the picker uses a vertical layout
-         */
-        responsiveWidth: {
-          type: String,
-          value: '560px'
-        },
-        /**
-         * The current locale
-         */
-        locale: {
-          type: String,
-          value: 'en'
-        },
-        /**
-         * The format of the date displayed in the heading.
-         * See docuemntation for Moment.js for more info.
-         */
-        headingFormat: {
-          type: String,
-          value: 'ddd, MMM D'
-        },
-        /**
-         * The minimum allowed date
-         */
-        minDate: {
-          type: Date,
-          value: null
-        },
-        /**
-         * The maximum allowed date
-         */
-        maxDate: {
-          type: Date,
-          value: null
-        },
-        /**
-         * Force narrow layout
-         */
-        forceNarrow: {
-          type: Boolean,
-          value: false
-        },
-        narrow: {
-          type: Boolean,
-          reflectToAttribute: true,
-          notify: true,
-          computed: '_computeNarrow(forceNarrow, _queryMatches)'
-        },
-        isTouch: {
-          type: Boolean,
-          value: false,
-          readOnly: true,
-          reflectToAttribute: true
-        },
-        _queryMatches: {
-          type: Boolean,
-          value: false
-        },
-        headingBreak: {
-          type: String,
-          value: '[,]'
-        },
-        _selectedPage: String,
-        _maxYear: {
-          type: Number,
-          computed: '_getFullYear(maxDate)'
-        },
-        _minYear: {
-          type: Number,
-          computed: '_getFullYear(minDate)'
-        }
-      },
-      behaviors: [
-        Polymer.IronResizableBehavior
-      ],
-      listeners: {
-        'iron-resize': '_resizeHandler'
-      },
-      ready: function() {
+    class PaperDatePicker extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element) {
+      static get is() { return 'paper-date-picker'; }
+      static get properties() {
+        return {
+          /**
+           * The selected date (YYYY-MM-DD)
+           */
+          date: {
+            type: Date,
+            notify: true
+          },
+          /**
+           * Maximum screen width at which the picker uses a vertical layout
+           */
+          responsiveWidth: {
+            type: String,
+            value: '560px'
+          },
+          /**
+           * The current locale
+           */
+          locale: {
+            type: String,
+            value: 'en'
+          },
+          /**
+           * The format of the date displayed in the heading.
+           * See docuemntation for Moment.js for more info.
+           */
+          headingFormat: {
+            type: String,
+            value: 'ddd, MMM D'
+          },
+          /**
+           * The minimum allowed date
+           */
+          minDate: {
+            type: Date,
+            value: null
+          },
+          /**
+           * The maximum allowed date
+           */
+          maxDate: {
+            type: Date,
+            value: null
+          },
+          /**
+           * Force narrow layout
+           */
+          forceNarrow: {
+            type: Boolean,
+            value: false
+          },
+          narrow: {
+            type: Boolean,
+            reflectToAttribute: true,
+            notify: true,
+            computed: '_computeNarrow(forceNarrow, _queryMatches)'
+          },
+          isTouch: {
+            type: Boolean,
+            value: false,
+            readOnly: true,
+            reflectToAttribute: true
+          },
+          _queryMatches: {
+            type: Boolean,
+            value: false
+          },
+          headingBreak: {
+            type: String,
+            value: '[,]'
+          },
+          _selectedPage: String,
+          _maxYear: {
+            type: Number,
+            computed: '_getFullYear(maxDate)'
+          },
+          _minYear: {
+            type: Number,
+            computed: '_getFullYear(minDate)'
+          }
+        };
+      }
+      ready() {
+        super.ready();
+        this._resizeHandler = this._resizeHandler.bind(this);
         this.today = this.$.calendar.today;
         this._setIsTouch('ontouchstart' in window);
         this._selectPage('chooseDate');
-      },
-      dateFormat: function() {
+      }
+      connectedCallback() {
+        super.connectedCallback();
+        this.addEventListener('iron-resize', this._resizeHandler);
+      }
+      disconnectedCallback() {
+        super.disconnectedCallback();
+        this.removeEventListener('iron-resize', this._resizeHandler);
+      }
+      dateFormat() {
         return this.$.calendar.dateFormat.apply(this.$.calendar, arguments);
-      },
-      _tapHeadingDate: function() {
+      }
+      _tapHeadingDate() {
         if (this.$.pages.selected !== 'chooseDate') {
           this._selectPage('chooseDate');
         } else {
@@ -278,26 +283,26 @@ styling:
           this.$.calendar.currentMonth = this.date.getMonth() + 1;
           this.$.calendar.currentYear = this.date.getFullYear();
         }
-      },
-      _tapHeadingYear: function() {
+      }
+      _tapHeadingYear() {
         if (this.$.pages.selected !== 'chooseYear') {
           this._selectPage('chooseYear');
           this.$.yearList.centerSelected();
         }
-      },
-      _selectPage: function(page) {
+      }
+      _selectPage(page) {
         this.$.pages.selected = page;
-      },
-      _getMediaQuery: function(forceNarrow, responsiveWidth) {
+      }
+      _getMediaQuery(forceNarrow, responsiveWidth) {
         return '(max-width: ' + (forceNarrow ? '' : responsiveWidth) + ')';
-      },
-      _getHeadingClass: function(pfx, selectedPage) {
+      }
+      _getHeadingClass(pfx, selectedPage) {
         return pfx + ' pg-' + selectedPage;
-      },
-      _getFullYear: function(date) {
+      }
+      _getFullYear(date) {
         return date ? new Date(date).getFullYear() : null;
-      },
-      _splitHeadingDate: function(date, format, locale) {
+      }
+      _splitHeadingDate(date, format, locale) {
         var re = new RegExp(this.headingBreak, 'g');
         var text = this.dateFormat(date, format, locale);
         var seps = text.match(re);
@@ -310,14 +315,14 @@ styling:
           });
         }
         return value;
-      },
-      _computeNarrow: function(queryMatches, forceNarrow) {
+      }
+      _computeNarrow(queryMatches, forceNarrow) {
         return queryMatches || forceNarrow;
-      },
-      _pageSelected: function() {
+      }
+      _pageSelected() {
         this._resizeHandler();
-      },
-      _resizeHandler: function() {
+      }
+      _resizeHandler() {
         if (this._resizing) {
           return;
         }
@@ -327,6 +332,7 @@ styling:
 
         this.updateStyles();
       }
-    });
+    }
+    window.customElements.define(PaperDatePicker.is, PaperDatePicker);
   </script>
 </dom-module>

@@ -1,23 +1,27 @@
-<style is="custom-style">
-/* mixin definitions */
-:root {
-  --paper-date-picker-dialog: {
-    margin: 0;
-    max-height: 520px !important;
-    overflow: hidden;
-  };
-  --paper-date-picker-dialog-picker: {
-    margin-top: 0 !important;
-    padding: 0;
-  };
-  --paper-date-picker-dialog-calendar: {
-    padding-bottom: 0;
-  };
-  --paper-date-picker-dialog-heading: {
-    margin-bottom: -62px;
-  };
-}
-</style>
+<link rel="import" href="../polymer/lib/elements/custom-style.html">
+
+<custom-style>
+  <style is="custom-style">
+  /* mixin definitions */
+  html {
+    --paper-date-picker-dialog: {
+      margin: 0;
+      max-height: 520px !important;
+      overflow: hidden;
+    };
+    --paper-date-picker-dialog-picker: {
+      margin-top: 0 !important;
+      padding: 0;
+    };
+    --paper-date-picker-dialog-calendar: {
+      padding-bottom: 0;
+    };
+    --paper-date-picker-dialog-heading: {
+      margin-bottom: -62px;
+    };
+  }
+  </style>
+</custom-style>
 
 <dom-module id="paper-date-picker-dialog-style">
   <template>

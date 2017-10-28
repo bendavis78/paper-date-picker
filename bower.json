@@ -20,7 +20,7 @@
     "/test/"
   ],
   "dependencies": {
-    "moment-element": "MaritzSTL/moment-imports#^1.1.0",
+    "moment-imports": "MaritzSTL/moment-imports#^1.1.0",
     "polymer": "Polymer/polymer#^2.0.0",
     "iron-icon": "PolymerElements/iron-icon#^2.0.0",
     "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^2.0.0",

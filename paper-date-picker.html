@@ -70,28 +70,28 @@ styling:
         user-select: none;
         display: inline-block;
         color: var(--primary-text-color);
-        @apply(--paper-font-body1);
-        @apply(--paper-date-picker);
+        @apply --paper-font-body1;
+        @apply --paper-date-picker;
       }
 
       /** Landscape ******************/
       #datePicker {
         width: 512px;
         height: 248px;
-        @apply(--layout-horizontal);
+        @apply --layout-horizontal;
       }
 
       /** Narrow *********************/
       :host([narrow]) #datePicker {
         width: 328px;
         height: 428px;
-        @apply(--layout-vertical);
+        @apply --layout-vertical;
       }
       :host([narrow]) #heading {
         width: auto;
         height: 96px;
         padding: 16px 24px;
-        @apply(--paper-date-picker-heading--narrow);
+        @apply --paper-date-picker-heading--narrow;
       }
 
       /** Heading ********************/
@@ -102,18 +102,18 @@ styling:
         color: var(--text-primary-color);
         background: var(--default-primary-color);
 
-        @apply(--layout-vertical);
-        @apply(--paper-date-picker-heading);
+        @apply --layout-vertical;
+        @apply --paper-date-picker-heading;
       }
       #heading .date,
       #heading .year {
         cursor: pointer;
       }
       #heading .date {
-        @apply(--paper-font-display1);
+        @apply --paper-font-display1;
         font-weight: bold;
         margin-top: 2px;
-        @apply(--paper-date-picker-heading-date);
+        @apply --paper-date-picker-heading-date;
       }
       #heading div.date {
         letter-spacing: 0.025em;
@@ -122,9 +122,9 @@ styling:
         white-space: nowrap;
       }
       #heading .year {
-        @apply(--paper-font-body2);
+        @apply --paper-font-body2;
         font-size: var(--paper-date-picker-year-size, 16px);
-        @apply(--paper-date-picker-heading-date);
+        @apply --paper-date-picker-heading-date;
       }
       #heading:not(.pg-chooseYear) .year,
       #heading.pg-chooseYear .date {
@@ -136,13 +136,13 @@ styling:
         width: 0 !important;
       }
       #pages {
-        @apply(--layout-flex);
+        @apply --layout-flex;
         width: auto;
         background: var(--default-background-color);
       }
       #calendar {
         --paper-calendar: {
-          @apply(--paper-date-picker-calendar);
+          @apply --paper-date-picker-calendar;
         }
       }
     </style>

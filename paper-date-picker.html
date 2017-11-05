@@ -161,7 +161,7 @@ styling:
         on-iron-select="_pageSelected">
         <neon-animatable id="chooseDate">
           <paper-calendar id="calendar" locale="{{locale}}" date="{{date}}"
-            min-date="{{minDate}}" max-date="{{maxDate}}">
+            min-date="{{minDate}}" max-date="{{maxDate}}" invalid-dates="{{invalidDates}}" valid-dates="{{validDates}}">
           </paper-calendar>
         </neon-animatable>
         <neon-animatable id="chooseYear">
@@ -217,6 +217,24 @@ styling:
         maxDate: {
           type: Date,
           value: null
+        },
+        /**
+         * Array of selectable dates
+         * (whitelist)
+         * Format must be String YYYY-MM-DD
+         */
+        validDates:{
+          type: Array,
+          value: []
+        },
+        /**
+         * Array of not selectable dates
+         * (blacklist)
+         * Format must be String YYYY-MM-DD
+         */
+        invalidDates:{
+          type: Array,
+          value: []
         },
         /**
          * Force narrow layout

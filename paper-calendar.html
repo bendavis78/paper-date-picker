@@ -289,6 +289,22 @@
           value: null
         },
         /**
+         *Array of selectable dates
+         * (whitelist)
+         */
+        validDates:{
+          type: Array,
+          value: []
+        },
+        /**
+         * Array of not selectable dates
+         * (blacklist)
+         */
+        invalidDates:{
+          type: Array,
+          value: []
+        },
+        /**
          * The currently selected month (1-12)
          */
         currentMonth: {
@@ -431,7 +447,7 @@
         return cssClass;
       },
       _isDisabled: function(day, date) {
-        return !day || !this._withinValidRange(date);
+        return !day || !this._withinValidRange(date) || ! this._confirmsToWhiteAndBlacklist(date);
       },
       _getMonthClass: function(name, month) {
         return name + ' month-' + month.year + '-' + month.month;
@@ -635,6 +651,7 @@
             this.date = date = oldValue;
           }
         }
+
         this.currentYear = date.getFullYear();
         this.currentMonth = date.getMonth() + 1;
         // Only trigger a notification if there actually is a difference.
@@ -644,7 +661,7 @@
         this._updateSelection();
       },
       _tapDay: function(event) {
-        if (!this._withinValidRange(event.model.item.date)) {
+        if (!this._withinValidRange(event.model.item.date) || !this._confirmsToWhiteAndBlacklist(event.model.item.date)) {
           return false;
         }
         var item = event.model.item;
@@ -661,7 +678,27 @@
       },
       _withinValidRange: function(date) {
         if (this._isValidDate(date)) {
-          return (!this.minDate || date >= this.minDate) && (!this.maxDate || date <= this.maxDate);
+          return  (!this.minDate || date >= this.minDate) && (!this.maxDate || date <= this.maxDate);
+        }
+        return false;
+      },
+
+      _confirmsToWhiteAndBlacklist: function(date){
+        if(this._isValidDate(date)) {
+          var result = !this._isInBlacklist(date) && this._isInWhitelist(date);
+          return result;
+        }
+        return false;
+      },
+      _isInWhitelist: function(date){
+        if(this.validDates && this.validDates.length > 0 && this._isValidDate(date)) {
+          return this.validDates.indexOf(this.dateFormat(date,'YYYY-MM-DD')) >= 0;
+        }
+        return true;
+      },
+      _isInBlacklist: function(date){
+        if(this.invalidDates && this.invalidDates.length > 0 && this._isValidDate(date)) {
+          return this.invalidDates.indexOf(this.dateFormat(date,'YYYY-MM-DD')) >= 0;
         }
         return false;
       },

@@ -264,7 +264,9 @@
               type: Date,
               notify: true,
               value() {
-                return new Date();
+                var d = new Date();
+                d.setHours(0, 0, 0, 0);
+                return d;
               },
               observer: '_dateChanged'
             },

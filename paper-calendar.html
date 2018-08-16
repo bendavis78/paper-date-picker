@@ -666,9 +666,9 @@
           }
           if (!this._withinValidRange(date)) {
             console.warn('Date outside of valid range: ' + date);
-            if (date.getFullYear() == this.maxDate.getFullYear()) {
+            if (this.maxDate && date.getFullYear() == this.maxDate.getFullYear()) {
               this.date = this.maxDate;
-            } else if (date.getFullYear() == this.minDate.getFullYear()) {
+            } else if (this.minDate && date.getFullYear() == this.minDate.getFullYear()) {
               this.date = this.minDate;
             } else {
               this.date = date = oldValue;
